@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tamagotchi P1 Authentic</title>
     <style>
-        /* Base styles & reset */
+        /* Base Reset */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         body {
             background-color: #000;
@@ -18,476 +18,419 @@
             color: white;
         }
 
-        /* MENU HAMBURGER */
-        .hamburger { position: fixed; top: 15px; left: 15px; z-index: 1000; cursor: pointer; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; border: 1px solid #444; }
-        .hamburger div { width: 25px; height: 3px; background: #ddd; margin: 4px 0; border-radius: 2px; }
+        /* HAMBURGER MENU */
+        .hamburger { 
+            position: fixed; top: 15px; left: 15px; z-index: 1000; cursor: pointer; 
+            padding: 10px; background: #333; border-radius: 8px; border: 1px solid #555; 
+        }
+        .hamburger div { width: 25px; height: 3px; background: #fff; margin: 4px 0; border-radius: 2px; }
         .menu-dropdown { 
-            display: none; position: fixed; top: 60px; left: 15px; background: #222; border: 1px solid #555; border-radius: 8px; z-index: 1001; min-width: 180px; 
+            display: none; position: fixed; top: 60px; left: 15px; background: #222; 
+            border: 1px solid #555; border-radius: 8px; z-index: 1001; min-width: 180px; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
         .menu-dropdown.active { display: block; }
-        .menu-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        .menu-item:last-child { border-bottom: none; }
+        .menu-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; font-size: 14px; }
         .menu-item:hover { background: #333; }
+        .menu-item:last-child { border-bottom: none; }
         .menu-item input { display: none; }
 
         /* DEVICE CONTAINER */
         .device-container {
-            width: 320px;
-            height: 400px;
+            width: 340px;
+            height: 420px;
             position: relative;
-            background: var(--shell-bg, linear-gradient(135deg, #6a5acd 0%, #483d8b 100%));
-            border-radius: 50% 50% 50% 50% / 55% 55% 45% 45%;
+            /* Authentique violet */
+            background: linear-gradient(135deg, #6a5acd 0%, #483d8b 100%);
+            /* Forme d'oeuf P1 exacte */
+            border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
             box-shadow: 
-                inset -5px -5px 15px rgba(0,0,0,0.4),
-                inset 5px 5px 15px rgba(255,255,255,0.3),
-                0 0 0 4px rgba(0,0,0,0.2),
-                0 20px 50px rgba(0,0,0,0.6);
+                inset -8px -8px 20px rgba(0,0,0,0.5),
+                inset 8px 8px 20px rgba(255,255,255,0.3),
+                0 0 0 2px rgba(0,0,0,0.2),
+                0 30px 60px rgba(0,0,0,0.6);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 45px;
-            transition: background 0.3s ease;
+            padding-top: 55px;
         }
 
-        /* Keychain Loop */
-        .keychain {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 40px; height: 40px; border-radius: 50%; border: 4px solid #888;
+        /* LOOP (Porte-clés) */
+        .loop {
+            position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 50px; border-radius: 50%; border: 6px solid #aaa;
             z-index: -1;
-        }
-        .keychain-hole {
-            position: absolute; top: 15px; width: 12px; height: 12px;
-            background: radial-gradient(circle at 30% 30%, #eee, #555);
-            border-radius: 50%; border: 1px solid #444;
         }
 
         /* BRANDING */
         .brand {
             font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
             font-weight: bold;
-            font-size: 20px;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            font-size: 24px;
+            letter-spacing: 2px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.4);
             transform: scaleY(0.9);
         }
 
-        /* SCREEN BEZEL & LCD */
+        /* SCREEN BEZEL (Gris clair) */
         .screen-bezel {
-            background: #d4d4d4;
-            width: 210px;
-            height: 210px;
-            border-radius: 20px;
+            background: #e0e0e0;
+            width: 220px;
+            height: 220px;
+            border-radius: 25px; /* Arrondi authentique */
             display: flex;
             justify-content: center;
             align-items: center;
             box-shadow: 
                 inset 2px 2px 5px rgba(0,0,0,0.1),
-                0 2px 5px rgba(0,0,0,0.2);
+                0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 25px;
             position: relative;
         }
 
+        /* LCD SCREEN (Vert) */
         .lcd {
-            width: 156px; /* 32px * 4 + margins -> approx real ratio */
-            height: 156px;
-            background-color: #7c8b41; /* Authentic P1 green */
-            border: 2px solid #5a6630;
-            border-radius: 8px;
+            width: 160px; height: 160px;
+            background-color: #839150; /* Vert olive authentique */
+            border: 2px solid #6b7740;
+            border-radius: 6px;
             position: relative;
             image-rendering: pixelated;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 2px;
+            overflow: hidden;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Scanlines/Grid effect */
+        /* Scanlines */
         .lcd::after {
-            content: " ";
-            display: block;
-            position: absolute;
+            content: " "; display: block; position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 2px, 2px 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 2px;
             pointer-events: none;
-        }
-
-        /* MENU ICONS ROW */
-        .menu-row {
-            display: flex;
-            justify-content: space-between;
-            height: 20px;
-            padding: 0 4px;
             z-index: 5;
         }
-        .menu-row.bottom { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1px; }
-        .menu-row.top { border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 1px; }
 
-        .icon {
-            width: 24px; height: 18px;
-            background-repeat: no-repeat;
-            background-position: center;
-            opacity: 0.3;
+        /* ICONS ROWS */
+        .icons-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 5px;
+            background: rgba(0,0,0,0.05);
+            height: 24px;
+            z-index: 10;
         }
-        .icon.active { opacity: 1; filter: brightness(0); }
+        .icons-row.top { border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .icons-row.bottom { border-top: 1px solid rgba(0,0,0,0.1); }
 
-        /* AUTHENTIC ICONS (Base64 Pixel Art from Spriters Resource references) */
-        /* Top: Feed, Light, Game, Meds */
-        .i-feed { background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAICAYAAADN5B7xAAAAKklEQVQYlWNgIAL8x4KHgX8oiv8T0YRvEsaA8I9CMAxQ0wJ0zUB5JlgAAL01C/W+x6OQAAAAAElFTkSuQmCC'); } 
-        .i-light { background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAICAYAAADN5B7xAAAALUlEQVQYlWNgIAL8x4KHgX8oiv8T0YRvEsaA8I9CMAxQ0wJ0zUB5JlgAAL01C/W+x6OQAAAAAElFTkSuQmCC'); /* Placeholder style, replaced below */ } 
-        /* Real icons replacement logic in JS or detailed CSS */
+        /* EMOJI ICONS (Black, Simple, Authentic Look) */
+        .icon {
+            width: 20px; height: 20px;
+            font-size: 16px;
+            line-height: 20px;
+            text-align: center;
+            opacity: 0.25;
+            filter: grayscale(100%) contrast(200%); /* Noir pur */
+            cursor: pointer;
+            position: relative;
+        }
+        .icon.active { opacity: 1; transform: scale(1.1); }
 
-        /* Better SVG Icons for clarity on modern screens but pixel-perfect look */
-        .i-feed { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 1h2v4H1zM5 1h2v4H5zM9 1h2v8H9zM1 6h2v1H1z' fill='%23000'/%3E%3C/svg%3E"); }
-        .i-light { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M4 1h4v2H4zM2 3h8v5H2zM4 8h4v2H4z' fill='%23000'/%3E%3C/svg%3E"); }
-        .i-game { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 4h3v4H1zM5 5h6v2H5z' fill='%23000'/%3E%3C/svg%3E"); }
-        .i-meds { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 5h4v2H1zM5 3h2v6H5zM7 5h4v2H7z' fill='%23000'/%3E%3C/svg%3E"); }
-
-        /* Bottom: Duck, Scale, Disc, Attn */
-        .i-duck { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 5h3v2H2zM5 3h4v4H5zM9 5h1v1H9z' fill='%23000'/%3E%3C/svg%3E"); }
-        .i-scale { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 2h10v8H1zM3 4h6v1H3z' fill='%23000'/%3E%3C/svg%3E"); }
-        .i-disc { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 2h8v8H2zM4 4h1v2H4zM7 4h1v2H7zM4 8h4v1H4z' fill='%23000'/%3E%3C/svg%3E"); }
-        .i-attn { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M4 2h4v2H4zM4 5h4v2H4zM4 8h4v2H4z' fill='%23000'/%3E%3C/svg%3E"); }
+        /* Triangle indicator for selection */
+        .icon.selected::after {
+            content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+            border: 4px solid transparent;
+        }
+        .top .icon.selected::after { top: 20px; border-top-color: #000; }
+        .bottom .icon.selected::after { bottom: 20px; border-bottom-color: #000; }
 
         /* MAIN GAME AREA */
-        .main-stage {
-            flex: 1;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .game-stage {
+            flex: 1; position: relative;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* SPRITES */
+        /* BUTTONS AREA (Inside the egg shape) */
+        .buttons-area {
+            display: flex; gap: 30px;
+            margin-bottom: 40px; /* Remonte pour être dans la coque */
+        }
+
+        .btn-group { position: relative; width: 50px; height: 50px; }
+
+        .phys-btn {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 0 #999, 
+                0 8px 10px rgba(0,0,0,0.3),
+                inset 0 2px 5px rgba(255,255,255,0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .phys-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #999, inset 0 2px 5px rgba(0,0,0,0.2); }
+
+        .b-yellow { background: #f4d03f; }
+        .b-red { background: #e74c3c; }
+        .b-blue { background: #3498db; }
+
+        .btn-label {
+            position: absolute; bottom: -22px; width: 100%; text-align: center;
+            font-size: 10px; font-weight: bold; color: #ccc; letter-spacing: 1px;
+            font-family: sans-serif;
+        }
+
+        /* TEXT DISPLAY (Pixel Font) */
+        .lcd-msg {
+            position: absolute; width: 100%; text-align: center; top: 10px;
+            font-family: 'Courier New', monospace; font-weight: bold; font-size: 12px;
+            color: #000; display: none; z-index: 20; background: rgba(131, 145, 80, 0.9);
+        }
+        .lcd-msg.show { display: block; }
+
+        /* SPRITES (CSS Pixel Art) */
         .sprite {
-            width: 32px; height: 32px;
+            width: 48px; height: 48px;
             image-rendering: pixelated;
-            background-repeat: no-repeat;
-            background-size: contain;
-        }
-
-        /* Base64 Authentic Sprites */
-        .s-egg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 2h4v2h2v2h2v6h-2v2h-2v2H6v-2H4v-2H2V6h2V4h2V2zm1 2v2h2V4H7zm-2 2v2h2V6H5zm4 0v2h2V6H9zm-4 2v2h2V8H5zm4 0v2h2V8H9zm-4 2v2h2v-2H5zm4 0v2h2v-2H9z' fill='%23000'/%3E%3C/svg%3E"); }
-        .s-baby { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 4h4v2h2v6h-2v2H6v-2H4V6h2V4zm1 3h1v1H7V7zm3 0h1v1h-1V7zm-2 3h2v1H8v-1z' fill='%23000'/%3E%3C/svg%3E"); }
-        .s-poop { 
-            position: absolute; bottom: 10px; right: 10px; width: 16px; height: 16px; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8h8v2H4zm2-2h4v2H6zm1 4h2v2H7z' fill='%23000'/%3E%3C/svg%3E");
             background-size: contain; background-repeat: no-repeat;
         }
 
-        /* TEXT / UI OVERLAY inside LCD */
-        .lcd-text {
-            position: absolute; width: 100%; top: 40px; text-align: center;
-            font-family: 'Courier New', monospace; font-size: 10px; color: #000; font-weight: bold;
-            display: none; z-index: 10;
-        }
-        .lcd-text.show { display: block; }
-
-        /* BUTTONS */
-        .buttons-area {
-            display: flex; gap: 24px; margin-top: 25px;
-        }
-        .btn-wrapper { position: relative; width: 48px; height: 48px; }
-        .t-btn {
-            width: 100%; height: 100%;
-            border-radius: 50%; border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #999, 0 8px 5px rgba(0,0,0,0.4);
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-        .t-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #999, 0 2px 3px rgba(0,0,0,0.4); }
-
-        .b-select { background: #f4e778; } /* Yellowish */
-        .b-decide { background: #e07474; } /* Reddish */
-        .b-cancel { background: #74bce0; } /* Blueish */
-
-        .label {
-            position: absolute; bottom: -20px; width: 100%; text-align: center;
-            font-size: 10px; font-weight: bold; color: #ccc; letter-spacing: 1px;
-        }
+        /* EGG */
+        .s-egg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 2h4v2h2v2h2v6h-2v2h-2v2H6v-2H4v-2H2V6h2V4h2V2zm1 2v2h2V4H7zm-2 2v2h2V6H5zm4 0v2h2V6H9zm-4 2v2h2V8H5zm4 0v2h2V8H9zm-4 2v2h2v-2H5zm4 0v2h2v-2H9z' fill='%23000'/%3E%3C/svg%3E"); }
+        /* BABY */
+        .s-baby { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 4h4v2h2v6h-2v2H6v-2H4V6h2V4zm1 3h1v1H7V7zm3 0h1v1h-1V7zm-2 3h2v1H8v-1z' fill='%23000'/%3E%3C/svg%3E"); }
+        /* ADULT (Maskutchi) */
+        .s-adult { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 2h8v2h2v8h-2v2H4v-2H2V4h2V2zm2 3h2v2H6V5zm4 0h2v2h-2V5zm-4 4h8v2H6V9z' fill='%23000'/%3E%3C/svg%3E"); }
+        /* POOP */
+        .poop { position: absolute; bottom: 5px; right: 5px; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8h8v2H4zm2-2h4v2H6zm1 4h2v2H7z' fill='%23000'/%3E%3C/svg%3E"); background-size: contain; }
 
     </style>
 </head>
 <body>
 
-    <!-- HAMBURGER -->
-    <div class="hamburger" onclick="toggleMenu()">
-        <div></div><div></div><div></div>
-    </div>
+    <div class="hamburger" onclick="toggleSysMenu()"><div></div><div></div><div></div></div>
     <div class="menu-dropdown" id="sysMenu">
-        <div class="menu-item" onclick="setShell('purple')">🟣 Violet (Default)</div>
-        <div class="menu-item" onclick="setShell('blue')">🔵 Bleu</div>
-        <div class="menu-item" onclick="setShell('white')">⚪ Blanc</div>
-        <div class="menu-item" onclick="saveData()">💾 Sauvegarder</div>
-        <label class="menu-item">📂 Charger <input type="file" onchange="loadData(this)"></label>
+        <div class="menu-item" onclick="setSkin('purple')">🟣 Violet</div>
+        <div class="menu-item" onclick="setSkin('blue')">🔵 Bleu</div>
+        <div class="menu-item" onclick="setSkin('white')">⚪ Blanc</div>
+        <div class="menu-item" onclick="saveData()">💾 Save</div>
+        <label class="menu-item">📂 Load <input type="file" onchange="loadData(this)"></label>
         <div class="menu-item" onclick="resetData()">🔄 Reset</div>
     </div>
 
-    <!-- DEVICE -->
     <div class="device-container" id="device">
-        <div class="keychain"><div class="keychain-hole"></div></div>
+        <div class="loop"></div>
         <div class="brand">GOTCHI</div>
 
         <div class="screen-bezel">
-            <div class="lcd" id="lcd">
-                <!-- Top Icons -->
-                <div class="menu-row top">
-                    <div class="icon i-feed" id="icon-0"></div>
-                    <div class="icon i-light" id="icon-1"></div>
-                    <div class="icon i-game" id="icon-2"></div>
-                    <div class="icon i-meds" id="icon-3"></div>
+            <div class="lcd">
+                <div class="icons-row top">
+                    <div class="icon" id="i0">🍽️</div>
+                    <div class="icon" id="i1">💡</div>
+                    <div class="icon" id="i2">🏏</div>
+                    <div class="icon" id="i3">💉</div>
                 </div>
 
-                <!-- Main Stage -->
-                <div class="main-stage">
-                    <div class="sprite s-egg" id="charSprite"></div>
-                    <div id="poopZone"></div>
-                    <div class="lcd-text" id="lcdMsg"></div>
+                <div class="game-stage">
+                    <div class="lcd-msg" id="msg"></div>
+                    <div id="sprite" class="sprite s-egg"></div>
+                    <div id="poops"></div>
                 </div>
 
-                <!-- Bottom Icons -->
-                <div class="menu-row bottom">
-                    <div class="icon i-duck" id="icon-4"></div>
-                    <div class="icon i-scale" id="icon-5"></div>
-                    <div class="icon i-disc" id="icon-6"></div>
-                    <div class="icon i-attn" id="icon-7"></div>
+                <div class="icons-row bottom">
+                    <div class="icon" id="i4">🦆</div>
+                    <div class="icon" id="i5">⚖️</div>
+                    <div class="icon" id="i6">😠</div>
+                    <div class="icon" id="i7">⚠️</div>
                 </div>
             </div>
         </div>
 
         <div class="buttons-area">
-            <div class="btn-wrapper">
-                <button class="t-btn b-select" onmousedown="pressA()"></button>
-                <div class="label">SELECT</div>
+            <div class="btn-group">
+                <button class="phys-btn b-yellow" onmousedown="input('A')"></button>
+                <div class="btn-label">SELECT</div>
             </div>
-            <div class="btn-wrapper">
-                <button class="t-btn b-decide" onmousedown="pressB()"></button>
-                <div class="label">DECIDE</div>
+            <div class="btn-group">
+                <button class="phys-btn b-red" onmousedown="input('B')"></button>
+                <div class="btn-label">DECIDE</div>
             </div>
-            <div class="btn-wrapper">
-                <button class="t-btn b-cancel" onmousedown="pressC()"></button>
-                <div class="label">CANCEL</div>
+            <div class="btn-group">
+                <button class="phys-btn b-blue" onmousedown="input('C')"></button>
+                <div class="btn-label">CANCEL</div>
             </div>
         </div>
     </div>
 
     <script>
-        /* GAME STATE */
         const STATE = {
-            stage: 'egg', // egg, baby, adult, dead
-            hunger: 0,    // 0 to 4 (4 is full)
-            happy: 0,     // 0 to 4
-            weight: 5,    // oz
-            age: 0,       // days
+            stage: 'egg', // egg, baby, adult
+            birth: Date.now(),
+            hunger: 2,
+            happy: 2,
+            weight: 5,
             poops: 0,
             sick: false,
-            sleeping: false,
+            menuIdx: -1, // 0-7
             lightOn: true,
-            birth: Date.now(),
-            menuIdx: -1,  // -1 = none, 0-7 = icons
-            view: 'home'  // home, clock, stats
+            view: 'game' // game, stats
         };
 
-        /* CORE LOGIC */
-        function init() {
-            // Load or Default
-            const saved = localStorage.getItem('gotchi_save');
-            if(saved) Object.assign(STATE, JSON.parse(saved));
-
-            // Start Loop
-            setInterval(tick, 1000); 
-            render();
-        }
-
-        function tick() {
+        // LOOP
+        setInterval(() => {
             const now = Date.now();
 
-            // EGG HATCHING logic (1 min)
-            if(STATE.stage === 'egg' && (now - STATE.birth > 60000)) {
+            // Hatch
+            if(STATE.stage === 'egg' && now - STATE.birth > 10000) { // 10s for demo
                 STATE.stage = 'baby';
-                STATE.hunger = 1;
-                STATE.happy = 1;
                 uiMsg("HATCHED!");
             }
 
-            // Simple NEEDS decay
-            if(STATE.stage !== 'egg' && STATE.stage !== 'dead') {
+            // Needs
+            if(STATE.stage !== 'egg') {
                 if(Math.random() < 0.02) STATE.hunger = Math.max(0, STATE.hunger - 1);
                 if(Math.random() < 0.02) STATE.happy = Math.max(0, STATE.happy - 1);
                 if(Math.random() < 0.01) STATE.poops = Math.min(4, STATE.poops + 1);
-
-                // Sleep (9PM - 9AM)
-                const hr = new Date().getHours();
-                STATE.sleeping = (hr >= 21 || hr < 9);
             }
 
-            // Auto-Save
-            localStorage.setItem('gotchi_save', JSON.stringify(STATE));
             render();
-        }
+            // Auto Save
+            localStorage.setItem('vpet_save', JSON.stringify(STATE));
+        }, 1000);
 
-        /* RENDER SYSTEM */
+        // RENDER
         function render() {
-            // 1. Icons Highlight
+            // Icons
             for(let i=0; i<8; i++) {
-                document.getElementById('icon-'+i).className = 'icon i-' + ['feed','light','game','meds','duck','scale','disc','attn'][i] + (STATE.menuIdx === i ? ' active' : '');
+                const el = document.getElementById('i'+i);
+                el.classList.remove('selected', 'active');
+                if(STATE.menuIdx === i) el.classList.add('selected'); // Arrow
+            }
+            // Attention Icon
+            if(STATE.hunger===0 || STATE.happy===0 || STATE.poops>2 || STATE.sick) {
+                document.getElementById('i7').classList.add('active');
             }
 
-            // 2. Sprite
-            const s = document.getElementById('charSprite');
+            // Sprite
+            const s = document.getElementById('sprite');
             s.className = 'sprite s-' + STATE.stage;
+            // Wiggle Animation
+            s.style.transform = (Date.now() % 1000 < 500) ? 'translateX(-1px)' : 'translateX(1px)';
 
-            // Animation (Wiggle) via CSS transform toggling if needed, but handled by GIF or step CSS usually. 
-            // Here simplistic wiggle:
-            s.style.transform = (Date.now() % 1000 < 500) ? 'translateX(0)' : 'translateX(2px)';
-            if(STATE.sleeping) s.style.transform = 'rotate(90deg)'; // Sleeping posture
-
-            // 3. Poops
-            const pZone = document.getElementById('poopZone');
+            // Poops
+            const pZone = document.getElementById('poops');
             pZone.innerHTML = '';
             for(let i=0; i<STATE.poops; i++) {
                 let p = document.createElement('div');
-                p.className = 's-poop';
-                p.style.right = (i*14) + 'px';
+                p.className = 'poop';
+                p.style.right = (i*15) + 'px';
                 pZone.appendChild(p);
             }
-
-            // 4. Lights
-            const lcd = document.getElementById('lcd');
-            lcd.style.backgroundColor = STATE.lightOn ? '#7c8b41' : '#334';
-
-            // 5. Attention Icon Logic
-            if(STATE.hunger === 0 || STATE.happy === 0 || STATE.sick || STATE.poops >= 3) {
-                document.getElementById('icon-7').classList.add('active'); // Force active
-            } else if (STATE.menuIdx !== 7) {
-                document.getElementById('icon-7').classList.remove('active');
-            }
         }
 
-        /* INPUT HANDLING */
-        function pressA() {
-            // SELECT: Cycle icons
+        // INPUT
+        function input(btn) {
             if(STATE.stage === 'egg') return;
-            if(STATE.view !== 'home') return; // Cannot select while in stats/clock
 
-            if(STATE.menuIdx === -1) STATE.menuIdx = 0;
-            else STATE.menuIdx = (STATE.menuIdx + 1) % 8;
-            render();
-        }
-
-        function pressB() {
-            // DECIDE: Confirm or Show Clock
-            if(STATE.stage === 'egg') { uiMsg("WAIT..."); return; }
-
-            if(STATE.menuIdx === -1) {
-                // If no icon selected, B toggles Clock (simplified here to just toggle stats view for now)
-                toggleStats();
-            } else {
-                executeAction(STATE.menuIdx);
+            if(btn === 'A') {
+                // Cycle Menu
+                if(STATE.menuIdx === -1) STATE.menuIdx = 0;
+                else STATE.menuIdx = (STATE.menuIdx + 1) % 8;
             }
-        }
 
-        function pressC() {
-            // CANCEL: Back to home
-            STATE.menuIdx = -1;
-            STATE.view = 'home';
-            document.getElementById('lcdMsg').classList.remove('show');
+            if(btn === 'B') {
+                // Confirm
+                if(STATE.menuIdx === -1) {
+                    toggleStats(); // No menu selected -> Stats
+                } else {
+                    doAction(STATE.menuIdx);
+                }
+            }
+
+            if(btn === 'C') {
+                // Cancel
+                STATE.menuIdx = -1;
+                uiMsg(""); // Clear msg
+            }
             render();
         }
 
-        /* ACTIONS */
-        function executeAction(idx) {
+        function doAction(idx) {
             switch(idx) {
-                case 0: // Feed
-                    if(STATE.sleeping) { uiMsg("ZZZ..."); break; }
-                    showMenuText("MEAL  SNACK");
-                    // In a full emu, you'd select meal/snack. Here auto-feed meal for simplicity.
-                    setTimeout(() => { 
-                        STATE.hunger = Math.min(4, STATE.hunger+1); 
-                        STATE.weight++; 
-                        uiMsg("YUM!"); 
-                        STATE.menuIdx = -1;
-                    }, 1000);
+                case 0: // Eat
+                    uiMsg("MEAL...");
+                    setTimeout(() => { STATE.hunger=4; STATE.weight++; uiMsg(""); STATE.menuIdx=-1; }, 1000);
                     break;
                 case 1: // Light
                     STATE.lightOn = !STATE.lightOn;
                     STATE.menuIdx = -1;
                     break;
                 case 2: // Game
-                    uiMsg("PLAYING...");
-                    setTimeout(() => { STATE.happy = Math.min(4, STATE.happy+1); STATE.weight--; uiMsg("WIN!"); STATE.menuIdx = -1; }, 2000);
+                    uiMsg("WIN!");
+                    STATE.happy=4; STATE.weight--; STATE.menuIdx=-1;
+                    setTimeout(() => uiMsg(""), 1000);
                     break;
                 case 3: // Meds
-                    if(STATE.sick) { STATE.sick = false; uiMsg("CURED"); }
-                    else uiMsg("NOPE");
+                    if(STATE.sick) { STATE.sick=false; uiMsg("OK"); }
                     STATE.menuIdx = -1;
                     break;
                 case 4: // Flush
-                    if(STATE.poops > 0) { STATE.poops = 0; uiMsg("CLEAN!"); }
-                    STATE.menuIdx = -1;
+                    STATE.poops = 0; uiMsg("CLEAN"); STATE.menuIdx = -1;
+                    setTimeout(() => uiMsg(""), 1000);
                     break;
                 case 5: // Stats
-                    toggleStats(); // Use same stat view
-                    STATE.menuIdx = -1;
-                    break;
-                case 6: // Discipline
-                    uiMsg("SCOLD!");
+                    toggleStats();
                     STATE.menuIdx = -1;
                     break;
             }
-            render();
         }
 
         function toggleStats() {
-            if(STATE.view === 'stats') {
-                STATE.view = 'home';
-                document.getElementById('lcdMsg').classList.remove('show');
-            } else {
-                STATE.view = 'stats';
-                const age = Math.floor((Date.now() - STATE.birth)/86400000);
-                // Simple Text Render for stats
-                uiMsg(`AGE:${age} W:${STATE.weight}g
-♥:${STATE.hunger} ★:${STATE.happy}`);
+            const el = document.getElementById('msg');
+            if(el.innerText.includes("AGE")) el.innerText = "";
+            else {
+                const age = Math.floor((Date.now() - STATE.birth)/60000); // Minutes for demo
+                el.innerText = `AGE:${age} W:${STATE.weight}g
+Hunger:${STATE.hunger}/4`;
+                el.style.display = 'block';
             }
         }
 
         function uiMsg(txt) {
-            const el = document.getElementById('lcdMsg');
+            const el = document.getElementById('msg');
             el.innerText = txt;
-            el.classList.add('show');
-            // Auto hide if transient
-            if(txt !== "MEAL  SNACK" && !txt.includes("AGE")) {
-               setTimeout(() => el.classList.remove('show'), 2000);
-            }
+            el.style.display = txt ? 'block' : 'none';
         }
 
-        /* SYSTEM MENU FUNCTIONS */
-        function toggleMenu() { document.getElementById('sysMenu').classList.toggle('active'); }
-        function setShell(color) {
+        // SYSTEM
+        function toggleSysMenu() { document.getElementById('sysMenu').classList.toggle('active'); }
+        function setSkin(c) {
             const d = document.getElementById('device');
-            if(color==='purple') d.style.background = 'linear-gradient(135deg, #6a5acd, #483d8b)';
-            if(color==='blue') d.style.background = 'linear-gradient(135deg, #4682b4, #1e90ff)';
-            if(color==='white') d.style.background = '#f0f0f0';
-            toggleMenu();
+            if(c==='purple') d.style.background='linear-gradient(135deg, #6a5acd, #483d8b)';
+            if(c==='blue') d.style.background='linear-gradient(135deg, #4682b4, #1e90ff)';
+            if(c==='white') d.style.background='#f0f0f0';
+            toggleSysMenu();
         }
-        function resetData() { localStorage.removeItem('gotchi_save'); location.reload(); }
         function saveData() { 
             const blob = new Blob([JSON.stringify(STATE)], {type:'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'gotchi.json'; a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='gotchi.json'; a.click();
         }
-        function loadData(input) {
+        function loadData(el) {
             const r = new FileReader();
-            r.onload = e => { Object.assign(STATE, JSON.parse(e.target.result)); render(); toggleMenu(); };
-            r.readAsText(input.files[0]);
+            r.onload = e => Object.assign(STATE, JSON.parse(e.target.result));
+            r.readAsText(el.files[0]);
         }
+        function resetData() { localStorage.removeItem('vpet_save'); location.reload(); }
 
-        // START
-        init();
+        // INIT
+        const sv = localStorage.getItem('vpet_save');
+        if(sv) Object.assign(STATE, JSON.parse(sv));
+        render();
 
     </script>
 </body>
