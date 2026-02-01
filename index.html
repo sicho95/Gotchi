@@ -1,436 +1,365 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tamagotchi P1 Authentic</title>
+    <title>Tamagotchi P1 - Authentic</title>
     <style>
-        /* Base Reset */
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        :root {
+            --shell-color: #6a5acd; /* Violet P1 */
+            --bg-color: #000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
         body {
-            background-color: #000;
+            background-color: var(--bg-color);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            font-family: monospace;
             overflow: hidden;
-            color: white;
+            font-family: 'Courier New', monospace;
         }
 
-        /* HAMBURGER MENU */
-        .hamburger { 
-            position: fixed; top: 15px; left: 15px; z-index: 1000; cursor: pointer; 
-            padding: 10px; background: #333; border-radius: 8px; border: 1px solid #555; 
-        }
-        .hamburger div { width: 25px; height: 3px; background: #fff; margin: 4px 0; border-radius: 2px; }
-        .menu-dropdown { 
-            display: none; position: fixed; top: 60px; left: 15px; background: #222; 
-            border: 1px solid #555; border-radius: 8px; z-index: 1001; min-width: 180px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        .menu-dropdown.active { display: block; }
-        .menu-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; font-size: 14px; }
-        .menu-item:hover { background: #333; }
-        .menu-item:last-child { border-bottom: none; }
-        .menu-item input { display: none; }
-
-        /* DEVICE CONTAINER */
-        .device-container {
-            width: 340px;
-            height: 420px;
-            position: relative;
-            /* Authentique violet */
-            background: linear-gradient(135deg, #6a5acd 0%, #483d8b 100%);
-            /* Forme d'oeuf P1 exacte */
+        /* --- DEVICE SHELL --- */
+        .device {
+            width: 320px;
+            height: 400px;
+            background: var(--shell-color);
+            /* Authentic Egg Shape: Flatter bottom, pointed top */
             border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
-            box-shadow: 
-                inset -8px -8px 20px rgba(0,0,0,0.5),
-                inset 8px 8px 20px rgba(255,255,255,0.3),
-                0 0 0 2px rgba(0,0,0,0.2),
-                0 30px 60px rgba(0,0,0,0.6);
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 55px;
+            box-shadow: 
+                inset -10px -10px 20px rgba(0,0,0,0.4), /* Shadow inside right/bottom */
+                inset 10px 10px 20px rgba(255,255,255,0.3), /* Highlight inside left/top */
+                0 0 0 4px rgba(0,0,0,0.2), /* Border outline */
+                0 20px 50px rgba(0,0,0,0.6); /* Drop shadow */
+            padding-top: 50px;
         }
 
-        /* LOOP (Porte-clés) */
+        /* Keychain Loop */
         .loop {
-            position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
-            width: 50px; height: 50px; border-radius: 50%; border: 6px solid #aaa;
-            z-index: -1;
+            position: absolute; top: -15px; width: 40px; height: 40px;
+            border-radius: 50%; border: 5px solid #888; z-index: -1;
         }
 
-        /* BRANDING */
+        /* Logo text */
         .brand {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             font-weight: bold;
-            font-size: 24px;
-            letter-spacing: 2px;
             color: #fff;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 3px rgba(0,0,0,0.4);
+            font-size: 22px;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
             transform: scaleY(0.9);
         }
 
-        /* SCREEN BEZEL (Gris clair) */
+        /* --- SCREEN AREA --- */
         .screen-bezel {
-            background: #e0e0e0;
-            width: 220px;
-            height: 220px;
-            border-radius: 25px; /* Arrondi authentique */
+            background: #d0d0d0;
+            width: 230px;
+            height: 230px;
+            border-radius: 30px; /* Softer rect */
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 
-                inset 2px 2px 5px rgba(0,0,0,0.1),
-                0 4px 8px rgba(0,0,0,0.3);
-            margin-bottom: 25px;
-            position: relative;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px; /* Space for buttons */
         }
 
-        /* LCD SCREEN (Vert) */
         .lcd {
-            width: 160px; height: 160px;
-            background-color: #839150; /* Vert olive authentique */
-            border: 2px solid #6b7740;
-            border-radius: 6px;
+            width: 170px; /* Wider screen */
+            height: 170px;
+            background-color: #8b9c46; /* Authentic Olive Green */
+            border: 2px solid #6e7c38;
+            border-radius: 10px;
             position: relative;
             image-rendering: pixelated;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            overflow: hidden;
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+            padding: 4px;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.2);
         }
 
-        /* Scanlines */
-        .lcd::after {
-            content: " "; display: block; position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 2px;
+        /* Pixel Grid Effect */
+        .lcd::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 3px 3px;
             pointer-events: none;
             z-index: 5;
         }
 
-        /* ICONS ROWS */
-        .icons-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 2px 5px;
-            background: rgba(0,0,0,0.05);
-            height: 24px;
-            z-index: 10;
+        /* --- MENU ICONS --- */
+        /* We use SVG pixel art for crisp icons */
+        .menu-row {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 24px; z-index: 10;
         }
-        .icons-row.top { border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .icons-row.bottom { border-top: 1px solid rgba(0,0,0,0.1); }
 
-        /* EMOJI ICONS (Black, Simple, Authentic Look) */
-        .icon {
-            width: 20px; height: 20px;
-            font-size: 16px;
-            line-height: 20px;
-            text-align: center;
-            opacity: 0.25;
-            filter: grayscale(100%) contrast(200%); /* Noir pur */
-            cursor: pointer;
+        .icon-box {
+            width: 24px; height: 24px;
+            opacity: 0.2; /* Inactive state dimmed */
+            transition: opacity 0.1s;
+        }
+
+        .icon-box.active {
+            opacity: 1; /* Active state black */
+            filter: drop-shadow(0 1px 0 rgba(255,255,255,0.5));
+        }
+
+        .icon-box.selected {
             position: relative;
         }
-        .icon.active { opacity: 1; transform: scale(1.1); }
-
-        /* Triangle indicator for selection */
-        .icon.selected::after {
+        /* Selection Arrow */
+        .icon-box.selected::after {
             content: ''; position: absolute; left: 50%; transform: translateX(-50%);
             border: 4px solid transparent;
         }
-        .top .icon.selected::after { top: 20px; border-top-color: #000; }
-        .bottom .icon.selected::after { bottom: 20px; border-bottom-color: #000; }
+        .top .icon-box.selected::after { bottom: -6px; border-top-color: #000; }
+        .bottom .icon-box.selected::after { top: -6px; border-bottom-color: #000; }
 
-        /* MAIN GAME AREA */
-        .game-stage {
-            flex: 1; position: relative;
-            display: flex; justify-content: center; align-items: center;
+        /* --- GAME STAGE --- */
+        .stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* BUTTONS AREA (Inside the egg shape) */
-        .buttons-area {
-            display: flex; gap: 30px;
-            margin-bottom: 40px; /* Remonte pour être dans la coque */
+        /* --- BUTTONS (INSIDE EGG) --- */
+        .controls {
+            display: flex;
+            gap: 25px;
+            /* Negative margin to pull them up into the egg if needed, 
+               but flex layout inside .device handles it naturally now */
+            margin-bottom: 30px;
+            z-index: 20;
         }
 
-        .btn-group { position: relative; width: 50px; height: 50px; }
+        .btn-wrapper {
+            position: relative;
+            width: 54px; height: 54px;
+        }
 
-        .phys-btn {
+        .tama-btn {
             width: 100%; height: 100%;
             border-radius: 50%;
             border: none;
             cursor: pointer;
+            position: relative;
             box-shadow: 
-                0 4px 0 #999, 
-                0 8px 10px rgba(0,0,0,0.3),
-                inset 0 2px 5px rgba(255,255,255,0.4);
-            transition: transform 0.1s, box-shadow 0.1s;
+                0 4px 0 #888, /* Side depth */
+                0 10px 10px rgba(0,0,0,0.3), /* Drop shadow */
+                inset 2px 2px 5px rgba(255,255,255,0.3);
+            transition: top 0.1s, box-shadow 0.1s;
+            top: 0;
         }
-        .phys-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #999, inset 0 2px 5px rgba(0,0,0,0.2); }
 
-        .b-yellow { background: #f4d03f; }
-        .b-red { background: #e74c3c; }
-        .b-blue { background: #3498db; }
+        .tama-btn:active {
+            top: 4px;
+            box-shadow: 0 0 0 #888, inset 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn-a { background: #f1c40f; } /* Yellow */
+        .btn-b { background: #e74c3c; } /* Red */
+        .btn-c { background: #3498db; } /* Blue */
 
         .btn-label {
-            position: absolute; bottom: -22px; width: 100%; text-align: center;
-            font-size: 10px; font-weight: bold; color: #ccc; letter-spacing: 1px;
-            font-family: sans-serif;
+            position: absolute; bottom: -18px; width: 100%;
+            text-align: center; font-size: 10px; font-weight: bold;
+            color: rgba(255,255,255,0.7);
         }
 
-        /* TEXT DISPLAY (Pixel Font) */
-        .lcd-msg {
-            position: absolute; width: 100%; text-align: center; top: 10px;
-            font-family: 'Courier New', monospace; font-weight: bold; font-size: 12px;
-            color: #000; display: none; z-index: 20; background: rgba(131, 145, 80, 0.9);
-        }
-        .lcd-msg.show { display: block; }
-
-        /* SPRITES (CSS Pixel Art) */
+        /* --- SPRITES & UI --- */
         .sprite {
             width: 48px; height: 48px;
             image-rendering: pixelated;
-            background-size: contain; background-repeat: no-repeat;
+            background-repeat: no-repeat;
+            background-size: contain;
         }
 
-        /* EGG */
-        .s-egg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 2h4v2h2v2h2v6h-2v2h-2v2H6v-2H4v-2H2V6h2V4h2V2zm1 2v2h2V4H7zm-2 2v2h2V6H5zm4 0v2h2V6H9zm-4 2v2h2V8H5zm4 0v2h2V8H9zm-4 2v2h2v-2H5zm4 0v2h2v-2H9z' fill='%23000'/%3E%3C/svg%3E"); }
-        /* BABY */
-        .s-baby { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 4h4v2h2v6h-2v2H6v-2H4V6h2V4zm1 3h1v1H7V7zm3 0h1v1h-1V7zm-2 3h2v1H8v-1z' fill='%23000'/%3E%3C/svg%3E"); }
-        /* ADULT (Maskutchi) */
-        .s-adult { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 2h8v2h2v8h-2v2H4v-2H2V4h2V2zm2 3h2v2H6V5zm4 0h2v2h-2V5zm-4 4h8v2H6V9z' fill='%23000'/%3E%3C/svg%3E"); }
-        /* POOP */
-        .poop { position: absolute; bottom: 5px; right: 5px; width: 16px; height: 16px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8h8v2H4zm2-2h4v2H6zm1 4h2v2H7z' fill='%23000'/%3E%3C/svg%3E"); background-size: contain; }
+        /* SVG Data URIs for Pixel Perfect Look */
+        /* FORK & KNIFE */
+        .i-feed { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M3 2h2v5H3zm0 6h2v6H3zm8-6h2v5h-2zm0 6h2v6h-2z'/%3E%3C/svg%3E"); }
+        /* LIGHT BULB */
+        .i-light { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M6 1h4v2H6zm-2 3h8v5H4zm3 6h2v2H7z'/%3E%3C/svg%3E"); }
+        /* BAT & BALL */
+        .i-game { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M2 8l6-6 2 2-6 6zm9 0h3v3h-3z'/%3E%3C/svg%3E"); } /* Stylized Bat */
+        /* SYRINGE */
+        .i-meds { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M2 12h4v2H2zm5-2h2v4H7zm3-2h4v2h-4z'/%3E%3C/svg%3E"); }
+        /* DUCK */
+        .i-duck { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M2 6h4v3H2zm5 2h7v2H7zm0 3h5v3H7z'/%3E%3C/svg%3E"); }
+        /* SCALE */
+        .i-scale { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M1 2h14v10H1zm3 2h8v5H4z'/%3E%3C/svg%3E"); }
+        /* DISCIPLINE (Face) */
+        .i-disc { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M3 3h10v10H3zm2 2h2v2H5zm4 0h2v2H9zm-3 5h4v1H6z'/%3E%3C/svg%3E"); }
+        /* ATTENTION */
+        .i-attn { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M4 2h8v12H4zm2 2h4v4H6zm0 6h4v2H6z'/%3E%3C/svg%3E"); }
+
+        /* Character Sprites */
+        .s-egg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M6 2h4v2h2v2h2v6h-2v2h-2v2H6v-2H4v-2H2V6h2V4h2V2zm1 2v2h2V4H7zm-2 2v2h2V6H5zm4 0v2h2V6H9zm-4 2v2h2V8H5zm4 0v2h2V8H9zm-4 2v2h2v-2H5zm4 0v2h2v-2H9z'/%3E%3C/svg%3E"); }
+        .s-baby { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M6 5h4v1h1v1h1v4h-1v1h-1v1H6v-1H5v-1H4V7h1V6h1V5zm1 2h1v1H7V7zm2 0h1v1H9V7z'/%3E%3C/svg%3E"); }
+
+        .overlay-text {
+            position: absolute; width: 100%; text-align: center; top: 20px;
+            font-size: 12px; font-weight: bold; color: #000;
+        }
+
+        /* Hamburger Menu */
+        .menu-btn { position: fixed; top: 20px; left: 20px; font-size: 24px; color: #fff; cursor: pointer; z-index: 100; }
+        .sys-menu { display: none; position: fixed; top: 60px; left: 20px; background: #fff; padding: 10px; border-radius: 5px; z-index: 101; }
+        .sys-menu.open { display: block; }
+        .sys-item { padding: 5px 10px; cursor: pointer; border-bottom: 1px solid #eee; font-family: sans-serif; font-size: 14px; }
 
     </style>
 </head>
 <body>
 
-    <div class="hamburger" onclick="toggleSysMenu()"><div></div><div></div><div></div></div>
-    <div class="menu-dropdown" id="sysMenu">
-        <div class="menu-item" onclick="setSkin('purple')">🟣 Violet</div>
-        <div class="menu-item" onclick="setSkin('blue')">🔵 Bleu</div>
-        <div class="menu-item" onclick="setSkin('white')">⚪ Blanc</div>
-        <div class="menu-item" onclick="saveData()">💾 Save</div>
-        <label class="menu-item">📂 Load <input type="file" onchange="loadData(this)"></label>
-        <div class="menu-item" onclick="resetData()">🔄 Reset</div>
+    <div class="menu-btn" onclick="toggleSys()">☰</div>
+    <div class="sys-menu" id="sysMenu">
+        <div class="sys-item" onclick="save()">💾 Save</div>
+        <div class="sys-item" onclick="reset()">🔄 Reset</div>
+        <div class="sys-item" onclick="setColor('#6a5acd')">🟣 Purple</div>
+        <div class="sys-item" onclick="setColor('#3498db')">🔵 Blue</div>
+        <div class="sys-item" onclick="setColor('#e74c3c')">🔴 Red</div>
+        <div class="sys-item" onclick="setColor('#ffffff')">⚪ White</div>
     </div>
 
-    <div class="device-container" id="device">
+    <div class="device" id="shell">
         <div class="loop"></div>
         <div class="brand">GOTCHI</div>
 
         <div class="screen-bezel">
             <div class="lcd">
-                <div class="icons-row top">
-                    <div class="icon" id="i0">🍽️</div>
-                    <div class="icon" id="i1">💡</div>
-                    <div class="icon" id="i2">🏏</div>
-                    <div class="icon" id="i3">💉</div>
+                <!-- Top Icons -->
+                <div class="menu-row top">
+                    <div class="icon-box i-feed" id="i0"></div>
+                    <div class="icon-box i-light" id="i1"></div>
+                    <div class="icon-box i-game" id="i2"></div>
+                    <div class="icon-box i-meds" id="i3"></div>
                 </div>
 
-                <div class="game-stage">
-                    <div class="lcd-msg" id="msg"></div>
+                <!-- Stage -->
+                <div class="stage">
+                    <div class="overlay-text" id="msg"></div>
                     <div id="sprite" class="sprite s-egg"></div>
-                    <div id="poops"></div>
                 </div>
 
-                <div class="icons-row bottom">
-                    <div class="icon" id="i4">🦆</div>
-                    <div class="icon" id="i5">⚖️</div>
-                    <div class="icon" id="i6">😠</div>
-                    <div class="icon" id="i7">⚠️</div>
+                <!-- Bottom Icons -->
+                <div class="menu-row bottom">
+                    <div class="icon-box i-duck" id="i4"></div>
+                    <div class="icon-box i-scale" id="i5"></div>
+                    <div class="icon-box i-disc" id="i6"></div>
+                    <div class="icon-box i-attn" id="i7"></div>
                 </div>
             </div>
         </div>
 
-        <div class="buttons-area">
-            <div class="btn-group">
-                <button class="phys-btn b-yellow" onmousedown="input('A')"></button>
+        <div class="controls">
+            <div class="btn-wrapper">
+                <button class="tama-btn btn-a" onclick="btnA()"></button>
                 <div class="btn-label">SELECT</div>
             </div>
-            <div class="btn-group">
-                <button class="phys-btn b-red" onmousedown="input('B')"></button>
+            <div class="btn-wrapper">
+                <button class="tama-btn btn-b" onclick="btnB()"></button>
                 <div class="btn-label">DECIDE</div>
             </div>
-            <div class="btn-group">
-                <button class="phys-btn b-blue" onmousedown="input('C')"></button>
+            <div class="btn-wrapper">
+                <button class="tama-btn btn-c" onclick="btnC()"></button>
                 <div class="btn-label">CANCEL</div>
             </div>
         </div>
     </div>
 
     <script>
-        const STATE = {
-            stage: 'egg', // egg, baby, adult
+        // State
+        let state = {
+            stage: 'egg',
+            menuIdx: -1,
             birth: Date.now(),
-            hunger: 2,
-            happy: 2,
-            weight: 5,
-            poops: 0,
-            sick: false,
-            menuIdx: -1, // 0-7
-            lightOn: true,
-            view: 'game' // game, stats
+            hunger: 1,
+            happy: 1,
+            poops: 0
         };
 
-        // LOOP
+        // Init
+        if(localStorage.getItem('g_save')) state = JSON.parse(localStorage.getItem('g_save'));
+
+        // Loop
         setInterval(() => {
-            const now = Date.now();
-
-            // Hatch
-            if(STATE.stage === 'egg' && now - STATE.birth > 10000) { // 10s for demo
-                STATE.stage = 'baby';
-                uiMsg("HATCHED!");
+            if(state.stage === 'egg' && Date.now() - state.birth > 10000) {
+                state.stage = 'baby';
+                ui("HATCH!");
             }
-
-            // Needs
-            if(STATE.stage !== 'egg') {
-                if(Math.random() < 0.02) STATE.hunger = Math.max(0, STATE.hunger - 1);
-                if(Math.random() < 0.02) STATE.happy = Math.max(0, STATE.happy - 1);
-                if(Math.random() < 0.01) STATE.poops = Math.min(4, STATE.poops + 1);
-            }
-
             render();
-            // Auto Save
-            localStorage.setItem('vpet_save', JSON.stringify(STATE));
-        }, 1000);
+            localStorage.setItem('g_save', JSON.stringify(state));
+        }, 500);
 
-        // RENDER
         function render() {
             // Icons
             for(let i=0; i<8; i++) {
-                const el = document.getElementById('i'+i);
-                el.classList.remove('selected', 'active');
-                if(STATE.menuIdx === i) el.classList.add('selected'); // Arrow
-            }
-            // Attention Icon
-            if(STATE.hunger===0 || STATE.happy===0 || STATE.poops>2 || STATE.sick) {
-                document.getElementById('i7').classList.add('active');
+                let el = document.getElementById('i'+i);
+                el.classList.remove('selected');
+                if(i === state.menuIdx) el.classList.add('selected');
+
+                // Active states (light off, sick, etc - simplified)
+                if(i===7 && (state.hunger<2 || state.poops>0)) el.classList.add('active');
+                else el.classList.remove('active');
             }
 
             // Sprite
-            const s = document.getElementById('sprite');
-            s.className = 'sprite s-' + STATE.stage;
-            // Wiggle Animation
-            s.style.transform = (Date.now() % 1000 < 500) ? 'translateX(-1px)' : 'translateX(1px)';
+            let s = document.getElementById('sprite');
+            s.className = 'sprite s-' + state.stage;
 
-            // Poops
-            const pZone = document.getElementById('poops');
-            pZone.innerHTML = '';
-            for(let i=0; i<STATE.poops; i++) {
-                let p = document.createElement('div');
-                p.className = 'poop';
-                p.style.right = (i*15) + 'px';
-                pZone.appendChild(p);
-            }
+            // Wiggle
+            s.style.transform = (Date.now() % 1000 < 500) ? 'translateX(-2px)' : 'translateX(2px)';
         }
 
-        // INPUT
-        function input(btn) {
-            if(STATE.stage === 'egg') return;
-
-            if(btn === 'A') {
-                // Cycle Menu
-                if(STATE.menuIdx === -1) STATE.menuIdx = 0;
-                else STATE.menuIdx = (STATE.menuIdx + 1) % 8;
-            }
-
-            if(btn === 'B') {
-                // Confirm
-                if(STATE.menuIdx === -1) {
-                    toggleStats(); // No menu selected -> Stats
-                } else {
-                    doAction(STATE.menuIdx);
-                }
-            }
-
-            if(btn === 'C') {
-                // Cancel
-                STATE.menuIdx = -1;
-                uiMsg(""); // Clear msg
-            }
+        // Controls
+        function btnA() {
+            if(state.stage === 'egg') return;
+            state.menuIdx = (state.menuIdx + 1) % 8;
             render();
         }
 
-        function doAction(idx) {
-            switch(idx) {
-                case 0: // Eat
-                    uiMsg("MEAL...");
-                    setTimeout(() => { STATE.hunger=4; STATE.weight++; uiMsg(""); STATE.menuIdx=-1; }, 1000);
-                    break;
-                case 1: // Light
-                    STATE.lightOn = !STATE.lightOn;
-                    STATE.menuIdx = -1;
-                    break;
-                case 2: // Game
-                    uiMsg("WIN!");
-                    STATE.happy=4; STATE.weight--; STATE.menuIdx=-1;
-                    setTimeout(() => uiMsg(""), 1000);
-                    break;
-                case 3: // Meds
-                    if(STATE.sick) { STATE.sick=false; uiMsg("OK"); }
-                    STATE.menuIdx = -1;
-                    break;
-                case 4: // Flush
-                    STATE.poops = 0; uiMsg("CLEAN"); STATE.menuIdx = -1;
-                    setTimeout(() => uiMsg(""), 1000);
-                    break;
-                case 5: // Stats
-                    toggleStats();
-                    STATE.menuIdx = -1;
-                    break;
-            }
+        function btnB() {
+            if(state.stage === 'egg' || state.menuIdx === -1) return;
+            action(state.menuIdx);
         }
 
-        function toggleStats() {
-            const el = document.getElementById('msg');
-            if(el.innerText.includes("AGE")) el.innerText = "";
-            else {
-                const age = Math.floor((Date.now() - STATE.birth)/60000); // Minutes for demo
-                el.innerText = `AGE:${age} W:${STATE.weight}g
-Hunger:${STATE.hunger}/4`;
-                el.style.display = 'block';
-            }
+        function btnC() {
+            state.menuIdx = -1;
+            ui("");
+            render();
         }
 
-        function uiMsg(txt) {
-            const el = document.getElementById('msg');
-            el.innerText = txt;
-            el.style.display = txt ? 'block' : 'none';
+        function action(i) {
+            ui("OK!");
+            setTimeout(() => ui(""), 1000);
+            if(i===0) state.hunger = 4;
+            if(i===4) state.poops = 0;
+            state.menuIdx = -1;
         }
 
-        // SYSTEM
-        function toggleSysMenu() { document.getElementById('sysMenu').classList.toggle('active'); }
-        function setSkin(c) {
-            const d = document.getElementById('device');
-            if(c==='purple') d.style.background='linear-gradient(135deg, #6a5acd, #483d8b)';
-            if(c==='blue') d.style.background='linear-gradient(135deg, #4682b4, #1e90ff)';
-            if(c==='white') d.style.background='#f0f0f0';
-            toggleSysMenu();
+        function ui(txt) {
+            document.getElementById('msg').innerText = txt;
         }
-        function saveData() { 
-            const blob = new Blob([JSON.stringify(STATE)], {type:'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='gotchi.json'; a.click();
-        }
-        function loadData(el) {
-            const r = new FileReader();
-            r.onload = e => Object.assign(STATE, JSON.parse(e.target.result));
-            r.readAsText(el.files[0]);
-        }
-        function resetData() { localStorage.removeItem('vpet_save'); location.reload(); }
 
-        // INIT
-        const sv = localStorage.getItem('vpet_save');
-        if(sv) Object.assign(STATE, JSON.parse(sv));
-        render();
+        // System
+        function toggleSys() { document.getElementById('sysMenu').classList.toggle('open'); }
+        function save() { /* auto saved */ alert('Saved'); }
+        function reset() { localStorage.removeItem('g_save'); location.reload(); }
+        function setColor(c) { document.getElementById('shell').style.background = c; }
 
     </script>
 </body>
