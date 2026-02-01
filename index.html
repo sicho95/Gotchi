@@ -16,7 +16,7 @@
 
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #e8eaf6 0%, #d1d9e6 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -140,14 +140,14 @@
 
         /* Device Tamagotchi */
         .tamagotchi-device {
-            background: var(--shell-color, linear-gradient(145deg, #6a5acd, #483d8b));
-            border-radius: 48% 48% 50% 50% / 42% 42% 45% 45%;
-            padding: 25px 22px 40px 22px;
+            background: var(--shell-color, linear-gradient(145deg, #5b7dd4, #3d5a9e));
+            border-radius: 48% 48% 50% 50% / 42% 42% 48% 48%;
+            padding: 25px 20px 30px 20px;
             box-shadow: 
                 0 25px 60px rgba(0,0,0,0.25),
                 inset 0 -6px 20px rgba(0,0,0,0.2),
                 inset 0 2px 12px rgba(255,255,255,0.25);
-            width: 380px;
+            width: 360px;
             position: relative;
             transition: background 0.3s ease;
         }
@@ -177,30 +177,30 @@
 
         /* Écran LCD */
         .screen-wrapper {
-            background: linear-gradient(145deg, #ddd, #bbb);
-            border-radius: 15px;
-            padding: 10px;
-            margin-bottom: 22px;
+            background: linear-gradient(145deg, #d8d8d8, #b0b0b0);
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 18px;
             box-shadow: 
-                inset 0 2px 8px rgba(0,0,0,0.3),
-                0 2px 5px rgba(255,255,255,0.4);
+                inset 0 2px 6px rgba(0,0,0,0.3),
+                0 2px 4px rgba(255,255,255,0.4);
         }
 
         .screen-border {
             background: #1a1a1a;
-            border-radius: 10px;
-            padding: 7px;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.9);
+            border-radius: 8px;
+            padding: 5px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.9);
         }
 
         .screen {
             background: #8ba446;
             width: 100%;
-            height: 220px;
-            border-radius: 6px;
+            height: 195px;
+            border-radius: 4px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 1px 5px rgba(0,0,0,0.2);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
@@ -210,23 +210,27 @@
             background: #3d4a1f;
         }
 
-        /* Icônes de menu */
+        /* Icônes de menu en pixel art */
         .menu-icons {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: rgba(0,0,0,0.08);
             border-bottom: 2px solid rgba(0,0,0,0.15);
-            height: 35px;
+            height: 32px;
         }
 
         .menu-icon {
-            font-size: 16px;
-            opacity: 0.4;
+            width: 20px;
+            height: 20px;
+            opacity: 0.35;
             transition: opacity 0.2s;
             position: relative;
             cursor: pointer;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .menu-icon.selected {
@@ -236,16 +240,45 @@
         .menu-icon.selected::after {
             content: '▼';
             position: absolute;
-            bottom: -18px;
+            bottom: -16px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 10px;
+            font-size: 8px;
             color: rgba(0,0,0,0.7);
+        }
+
+        /* Icônes pixel art SVG */
+        .icon-food {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMiIgeT0iNCIgd2lkdGg9IjIiIGhlaWdodD0iMTIiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSI2IiB5PSI0IiB3aWR0aD0iMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjEwIiB5PSI0IiB3aWR0aD0iMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjE0IiB5PSI2IiB3aWR0aD0iNCIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iMTQiIHk9IjEwIiB3aWR0aD0iNCIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iMTQiIHk9IjE0IiB3aWR0aD0iNCIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PC9zdmc+');
+        }
+
+        .icon-light {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iOCIgeT0iMiIgd2lkdGg9IjQiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjYiIHk9IjQiIHdpZHRoPSI4IiBoZWlnaHQ9IjIiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSI0IiB5PSI2IiB3aWR0aD0iMTIiIGhlaWdodD0iNiIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjYiIHk9IjEyIiB3aWR0aD0iOCIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iOCIgeT0iMTQiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMwMDAiLz48L3N2Zz4=');
+        }
+
+        .icon-game {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iNCIgeT0iNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iNiIgeT0iOSIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjEyIiB5PSI5IiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PC9zdmc+');
+        }
+
+        .icon-health {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMTIiIHk9IjQiIHdpZHRoPSIyIiBoZWlnaHQ9IjgiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSI4IiB5PSI2IiB3aWR0aD0iOCIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iMTAiIHk9IjEyIiB3aWR0aD0iNiIgaGVpZ2h0PSIyIiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iOCIgeT0iMTQiIHdpZHRoPSI0IiBoZWlnaHQ9IjIiIGZpbGw9IiMwMDAiLz48L3N2Zz4=');
+        }
+
+        .icon-toilet {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iNiIgeT0iNCIgd2lkdGg9IjgiIGhlaWdodD0iMiIgZmlsbD0iIzAwMCIvPjxyZWN0IHg9IjQiIHk9IjYiIHdpZHRoPSIxMiIgaGVpZ2h0PSI2IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjYiIHk9IjEyIiB3aWR0aD0iOCIgaGVpZ2h0PSI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==');
+        }
+
+        .icon-stats {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMiIgeT0iNCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjUiIHk9IjciIHdpZHRoPSIzIiBoZWlnaHQ9IjYiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSI5IiB5PSI5IiB3aWR0aD0iMyIgaGVpZ2h0PSI0IiBmaWxsPSIjMDAwIi8+PHJlY3QgeD0iMTMiIHk9IjgiIHdpZHRoPSIzIiBoZWlnaHQ9IjUiIGZpbGw9IiMwMDAiLz48L3N2Zz4=');
+        }
+
+        .icon-discipline {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjEyIiBoZWlnaHQ9IjEyIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjciIHk9IjciIHdpZHRoPSIyIiBoZWlnaHQ9IjYiIGZpbGw9IiMwMDAiLz48cmVjdCB4PSIxMSIgeT0iNyIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzAwMCIvPjwvc3ZnPg==');
         }
 
         /* Zone de jeu */
         .game-area {
-            height: 155px;
+            height: 133px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -280,37 +313,37 @@
 
         .poop {
             position: absolute;
-            font-size: 20px;
-            bottom: 15px;
+            font-size: 18px;
+            bottom: 12px;
         }
 
         .hearts-display {
             position: absolute;
-            top: 8px;
-            left: 10px;
-            font-size: 11px;
-            line-height: 1.5;
+            top: 6px;
+            left: 8px;
+            font-size: 10px;
+            line-height: 1.4;
             font-weight: bold;
         }
 
         .heart-line {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
         }
 
         .status-bar {
             position: absolute;
-            bottom: 8px;
-            right: 10px;
-            font-size: 11px;
+            bottom: 6px;
+            right: 8px;
+            font-size: 10px;
             font-weight: bold;
             text-align: right;
         }
 
         .info-overlay {
             position: absolute;
-            top: 35px;
+            top: 32px;
             left: 0;
             right: 0;
             bottom: 30px;
@@ -320,7 +353,7 @@
             justify-content: center;
             align-items: center;
             padding: 15px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -339,7 +372,7 @@
         .feed-menu, .game-screen {
             display: none;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
             align-items: center;
         }
@@ -349,9 +382,9 @@
         }
 
         .feed-option {
-            font-size: 40px;
-            padding: 10px 20px;
-            border-radius: 8px;
+            font-size: 35px;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
             opacity: 0.4;
             transition: 0.2s;
@@ -359,7 +392,7 @@
 
         .feed-option.selected {
             opacity: 1;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.08);
         }
 
         .message-popup {
@@ -368,10 +401,10 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(255,255,255,0.95);
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 8px 14px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.3);
             display: none;
             z-index: 20;
@@ -383,24 +416,24 @@
 
         .sleep-zzz {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
+            top: 12px;
+            right: 12px;
+            font-size: 22px;
             animation: float 2.2s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
         .game-options {
             display: flex;
-            gap: 25px;
+            gap: 20px;
         }
 
         .game-choice {
-            font-size: 45px;
+            font-size: 40px;
             opacity: 0.4;
             transition: 0.2s;
         }
@@ -420,7 +453,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: rgba(0,0,0,0.08);
             border-top: 2px solid rgba(0,0,0,0.15);
             height: 30px;
@@ -431,64 +464,61 @@
         }
 
         .action-icon {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.5;
         }
 
-        /* Boutons intégrés */
+        /* Boutons intégrés et rapprochés */
         .control-buttons {
             display: flex;
             justify-content: center;
-            gap: 32px;
-            margin-top: 22px;
+            gap: 20px;
+            margin-top: 18px;
         }
 
         .tama-btn {
-            width: 60px;
-            height: 60px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            font-weight: bold;
             font-size: 0;
-            font-family: 'Courier New', monospace;
             box-shadow: 
-                0 5px 0 rgba(0,0,0,0.3),
-                0 8px 15px rgba(0,0,0,0.15),
-                inset 0 -3px 8px rgba(0,0,0,0.2),
-                inset 0 1px 4px rgba(255,255,255,0.4);
+                0 4px 0 rgba(0,0,0,0.35),
+                0 6px 12px rgba(0,0,0,0.2),
+                inset 0 -2px 6px rgba(0,0,0,0.25),
+                inset 0 1px 3px rgba(255,255,255,0.4);
             position: relative;
             top: 0;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .tama-btn:active {
-            top: 4px;
+            top: 3px;
             box-shadow: 
-                0 1px 0 rgba(0,0,0,0.3),
-                0 3px 8px rgba(0,0,0,0.15),
-                inset 0 -3px 8px rgba(0,0,0,0.2);
+                0 1px 0 rgba(0,0,0,0.35),
+                0 2px 5px rgba(0,0,0,0.2),
+                inset 0 -2px 6px rgba(0,0,0,0.25);
         }
 
         .btn-a {
-            background: radial-gradient(circle at 35% 35%, #ffd700, #daa520);
+            background: radial-gradient(circle at 35% 35%, #ffd700, #cc9900);
         }
 
         .btn-b {
-            background: radial-gradient(circle at 35% 35%, #ff6b9d, #d94f7a);
+            background: radial-gradient(circle at 35% 35%, #ff85a8, #d94f7a);
         }
 
         .btn-c {
-            background: radial-gradient(circle at 35% 35%, #4fc3f7, #0288d1);
+            background: radial-gradient(circle at 35% 35%, #5eb8f5, #0288d1);
         }
 
         .btn-label {
             position: absolute;
-            bottom: -20px;
+            bottom: -18px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
             color: rgba(255,255,255,0.95);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
@@ -497,10 +527,13 @@
 
         @media (max-width: 450px) {
             .tamagotchi-device {
-                width: 340px;
+                width: 330px;
             }
             .screen {
-                height: 200px;
+                height: 180px;
+            }
+            .game-area {
+                height: 120px;
             }
         }
     </style>
@@ -516,10 +549,10 @@
         <div class="menu-dropdown" id="menu-dropdown">
             <div class="menu-section-title">🎨 Couleur de Coque</div>
             <div class="color-grid">
-                <div class="color-option selected" style="background: linear-gradient(145deg, #6a5acd, #483d8b);" data-color="purple" title="Violet"></div>
+                <div class="color-option selected" style="background: linear-gradient(145deg, #5b7dd4, #3d5a9e);" data-color="blue" title="Bleu"></div>
                 <div class="color-option" style="background: linear-gradient(145deg, #ff69b4, #ff1493);" data-color="pink" title="Rose"></div>
                 <div class="color-option" style="background: linear-gradient(145deg, rgba(255,182,193,0.7), rgba(255,105,180,0.7));" data-color="pink-trans" title="Rose Transparent"></div>
-                <div class="color-option" style="background: linear-gradient(145deg, #4169e1, #1e3a8a);" data-color="blue" title="Bleu"></div>
+                <div class="color-option" style="background: linear-gradient(145deg, #6a5acd, #483d8b);" data-color="purple" title="Violet"></div>
                 <div class="color-option" style="background: linear-gradient(145deg, #ffd700, #ff8c00);" data-color="yellow" title="Jaune"></div>
                 <div class="color-option" style="background: linear-gradient(145deg, rgba(127,255,212,0.6), rgba(64,224,208,0.6));" data-color="green-trans" title="Vert Transparent"></div>
                 <div class="color-option" style="background: linear-gradient(145deg, #ff4500, #dc143c);" data-color="red" title="Rouge"></div>
@@ -541,15 +574,15 @@
         <div class="screen-wrapper">
             <div class="screen-border">
                 <div class="screen" id="screen">
-                    <!-- Icônes de menu -->
+                    <!-- Icônes de menu pixel art -->
                     <div class="menu-icons">
-                        <div class="menu-icon" data-index="0">🍖</div>
-                        <div class="menu-icon" data-index="1">💡</div>
-                        <div class="menu-icon" data-index="2">🎮</div>
-                        <div class="menu-icon" data-index="3">💊</div>
-                        <div class="menu-icon" data-index="4">🧻</div>
-                        <div class="menu-icon" data-index="5">📊</div>
-                        <div class="menu-icon" data-index="6">📏</div>
+                        <div class="menu-icon icon-food" data-index="0" title="Nourrir"></div>
+                        <div class="menu-icon icon-light" data-index="1" title="Lumière"></div>
+                        <div class="menu-icon icon-game" data-index="2" title="Jouer"></div>
+                        <div class="menu-icon icon-health" data-index="3" title="Soigner"></div>
+                        <div class="menu-icon icon-toilet" data-index="4" title="Nettoyer"></div>
+                        <div class="menu-icon icon-stats" data-index="5" title="Stats"></div>
+                        <div class="menu-icon icon-discipline" data-index="6" title="Discipline"></div>
                     </div>
 
                     <!-- Zone principale -->
@@ -566,7 +599,7 @@
                         </div>
                         <div class="pet-pixel" id="pet"></div>
                         <div class="status-bar">
-                            <div id="age-info">Age: 0</div>
+                            <div id="age-info">Age: 0j</div>
                             <div id="weight-info">5g</div>
                         </div>
                     </div>
@@ -593,7 +626,7 @@
 
                     <!-- Écran de jeu -->
                     <div class="game-screen" id="game-screen">
-                        <div style="font-size: 14px; font-weight: bold;">GAUCHE ou DROITE?</div>
+                        <div style="font-size: 13px; font-weight: bold;">GAUCHE ou DROITE?</div>
                         <div class="game-options">
                             <div class="game-choice" data-dir="left">⬅️</div>
                             <div class="game-choice" data-dir="right">➡️</div>
@@ -629,10 +662,10 @@
 
     <script>
         const shellColors = {
-            purple: 'linear-gradient(145deg, #6a5acd, #483d8b)',
+            blue: 'linear-gradient(145deg, #5b7dd4, #3d5a9e)',
             pink: 'linear-gradient(145deg, #ff69b4, #ff1493)',
             'pink-trans': 'linear-gradient(145deg, rgba(255,182,193,0.8), rgba(255,105,180,0.8))',
-            blue: 'linear-gradient(145deg, #4169e1, #1e3a8a)',
+            purple: 'linear-gradient(145deg, #6a5acd, #483d8b)',
             yellow: 'linear-gradient(145deg, #ffd700, #ff8c00)',
             'green-trans': 'linear-gradient(145deg, rgba(127,255,212,0.7), rgba(64,224,208,0.7))',
             red: 'linear-gradient(145deg, #ff4500, #dc143c)',
@@ -640,7 +673,7 @@
             green: 'linear-gradient(145deg, #32cd32, #228b22)'
         };
 
-        // Sprites pixel art en base64
+        // Sprites pixel art
         const sprites = {
             egg: 'data:image/svg+xml;base64,' + btoa(`
                 <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
@@ -719,7 +752,7 @@
             `)
         };
 
-        let currentShell = 'purple';
+        let currentShell = 'blue';
 
         let tamagotchi = {
             stage: 'egg',
@@ -779,10 +812,10 @@
             if (currentMenu === -1) {
                 currentMenu = 0;
                 updateMenuSelection();
-            } else if (currentMenu === 0) {
+            } else if (currentMenu === 0 && document.getElementById('feed-menu').classList.contains('active')) {
                 currentSubMenu = (currentSubMenu + 1) % 2;
                 updateFeedSelection();
-            } else if (currentMenu === 2) {
+            } else if (currentMenu === 2 && document.getElementById('game-screen').classList.contains('active')) {
                 currentSubMenu = (currentSubMenu + 1) % 2;
                 updateGameSelection();
             } else {
@@ -824,39 +857,46 @@
         }
 
         function executeMenuAction() {
-            if (tamagotchi.stage === 'dead') {
+            if (tamagotchi.stage === 'dead' && currentMenu !== 5 && currentMenu !== 6) {
                 showMessage('💀 RIP');
                 return;
             }
 
             switch(currentMenu) {
-                case 0:
+                case 0: // Feed
                     if (!document.getElementById('feed-menu').classList.contains('active')) {
                         closeAllScreens();
                         document.getElementById('game-area').style.display = 'none';
                         document.getElementById('feed-menu').classList.add('active');
+                        currentSubMenu = 0;
                         updateFeedSelection();
                     } else {
                         currentSubMenu === 0 ? feed() : giveSnack();
                         handleButtonC();
                     }
                     break;
-                case 1: toggleLight(); break;
-                case 2:
+                case 1: // Light
+                    toggleLight();
+                    break;
+                case 2: // Game
                     if (!document.getElementById('game-screen').classList.contains('active')) {
                         startGame();
                     } else {
                         playGame();
                     }
                     break;
-                case 3: giveMedicine(); break;
-                case 4: clean(); break;
-                case 5:
+                case 3: // Medicine
+                    giveMedicine();
+                    break;
+                case 4: // Bathroom
+                    clean();
+                    break;
+                case 5: // Stats
                     closeAllScreens();
                     document.getElementById('stats-screen').classList.add('active');
                     updateStatsDisplay();
                     break;
-                case 6:
+                case 6: // Discipline
                     closeAllScreens();
                     document.getElementById('disc-screen').classList.add('active');
                     document.getElementById('disc-value').textContent = tamagotchi.discipline + '%';
@@ -910,6 +950,10 @@
         }
 
         function feed() {
+            if (tamagotchi.stage === 'egg') {
+                showMessage('Encore un œuf!');
+                return;
+            }
             if (tamagotchi.hunger < 4) {
                 tamagotchi.hunger = Math.min(4, tamagotchi.hunger + 1);
                 tamagotchi.weight += 1;
@@ -922,6 +966,10 @@
         }
 
         function giveSnack() {
+            if (tamagotchi.stage === 'egg') {
+                showMessage('Encore un œuf!');
+                return;
+            }
             if (tamagotchi.happiness < 4) {
                 tamagotchi.happiness = Math.min(4, tamagotchi.happiness + 1);
                 tamagotchi.weight += 2;
@@ -992,7 +1040,7 @@
             document.querySelectorAll('.sleep-zzz').forEach(s => s.remove());
 
             // Sprite pixel art
-            const spriteKey = tamagotchi.stage === 'good_adult' || tamagotchi.stage === 'perfect_adult' ? 'adult' : tamagotchi.stage;
+            const spriteKey = tamagotchi.stage;
             petEl.style.backgroundImage = `url("${sprites[spriteKey]}")`;
             petEl.className = tamagotchi.stage === 'dead' ? 'pet-pixel skull' : 'pet-pixel';
 
@@ -1054,15 +1102,16 @@
         }
 
         function checkAge() {
-            const hoursSinceBirth = (Date.now() - tamagotchi.birthTime) / 3600000;
+            const msSinceBirth = Date.now() - tamagotchi.birthTime;
+            const hoursSinceBirth = msSinceBirth / 3600000;
             tamagotchi.age = Math.floor(hoursSinceBirth);
             tamagotchi.ageInDays = Math.floor(hoursSinceBirth / 24);
         }
 
         function checkEvolution() {
-            const hours = tamagotchi.age;
+            const hours = (Date.now() - tamagotchi.birthTime) / 3600000;
 
-            if (tamagotchi.stage === 'egg' && hours >= 0.05) {
+            if (tamagotchi.stage === 'egg' && hours >= 0.02) { // 1 minute pour test
                 tamagotchi.stage = 'baby';
                 showMessage('✨ BÉBÉ!');
             } else if (tamagotchi.stage === 'baby' && hours >= 24) {
@@ -1137,6 +1186,8 @@
                     tamagotchi = JSON.parse(e.target.result);
                     tamagotchi.lastUpdate = Date.now();
                     saveToLocalStorage();
+                    checkAge();
+                    checkEvolution();
                     updateDisplay();
                     showMessage('📂 Importé!');
                 } catch {
@@ -1162,6 +1213,8 @@
 
         window.onload = () => {
             loadFromLocalStorage();
+            checkAge();
+            checkEvolution();
             updateDisplay();
             setInterval(gameLoop, 30000);
         };
