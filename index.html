@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamagotchi Virtual Pet</title>
+    <title>Tamagotchi Original</title>
     <style>
         * {
             margin: 0;
@@ -19,69 +19,166 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
+        /* Menu hamburger */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .hamburger-btn {
+            background: white;
+            border: none;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .hamburger-btn span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            min-width: 200px;
+            overflow: hidden;
+        }
+
+        .menu-dropdown.active {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Device Tamagotchi */
         .tamagotchi-device {
-            background: #ffd700;
-            border-radius: 40% 40% 45% 45% / 50% 50% 40% 40%;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 -5px 20px rgba(0,0,0,0.2);
-            max-width: 400px;
+            background: linear-gradient(145deg, #ff69b4, #ff1493);
+            border-radius: 45% 45% 48% 48% / 45% 45% 42% 42%;
+            padding: 25px;
+            box-shadow: 
+                0 25px 60px rgba(0,0,0,0.4),
+                inset 0 -8px 25px rgba(0,0,0,0.15),
+                inset 0 3px 15px rgba(255,255,255,0.3);
+            max-width: 320px;
             width: 100%;
+            position: relative;
         }
 
-        .screen-container {
+        .tamagotchi-device::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 15px;
+            background: #ddd;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Écran LCD */
+        .screen-wrapper {
+            background: #e8e8e8;
+            border-radius: 15px;
+            padding: 12px;
+            margin: 30px 0 25px 0;
+            box-shadow: 
+                inset 0 3px 10px rgba(0,0,0,0.2),
+                0 2px 5px rgba(255,255,255,0.5);
+            position: relative;
+        }
+
+        .screen-border {
             background: #2a2a2a;
-            border: 8px solid #1a1a1a;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 30px;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.8);
+            border-radius: 10px;
+            padding: 8px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
         }
 
         .screen {
             background: #9bc700;
             width: 100%;
-            height: 280px;
-            border-radius: 10px;
+            height: 200px;
+            border-radius: 5px;
             position: relative;
             overflow: hidden;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.15);
         }
 
-        .status-bar {
-            background: rgba(0,0,0,0.1);
-            padding: 8px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: bold;
+        .screen.light-off {
+            background: #2a4d14;
         }
 
-        .hearts {
-            display: flex;
-            gap: 3px;
+        /* Icônes de menu en haut */
+        .menu-icons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 5px;
+            background: rgba(0,0,0,0.05);
+            gap: 8px;
         }
 
-        .heart {
-            width: 16px;
-            height: 16px;
-            display: inline-block;
+        .menu-icon {
+            text-align: center;
+            font-size: 20px;
+            padding: 4px;
+            border-radius: 4px;
+            opacity: 0.4;
+            transition: 0.2s;
         }
 
-        .heart.full::before {
-            content: '♥';
-            color: #000;
+        .menu-icon.selected {
+            opacity: 1;
+            background: rgba(0,0,0,0.2);
         }
 
-        .heart.empty::before {
-            content: '♡';
-            color: rgba(0,0,0,0.3);
-        }
-
+        /* Zone de jeu */
         .game-area {
-            height: 220px;
+            height: 140px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -90,529 +187,614 @@
         }
 
         .pet {
-            font-size: 80px;
+            font-size: 60px;
             animation: bounce 2s ease-in-out infinite;
-            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+            filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.2));
         }
 
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .poop {
-            position: absolute;
-            font-size: 30px;
-            animation: wiggle 0.5s ease-in-out infinite;
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
-        }
-
-        .info-text {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            background: rgba(255,255,255,0.9);
-            padding: 5px 10px;
-            border-radius: 5px;
-            white-space: nowrap;
-        }
-
-        .age-display {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .buttons-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background: #ff6b9d;
-            border: none;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3), inset 0 -3px 8px rgba(0,0,0,0.2);
-            transition: all 0.1s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-
-        .btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .btn:hover {
-            background: #ff8ab3;
-        }
-
-        .btn-label {
-            font-size: 10px;
-            margin-top: 3px;
-        }
-
-        .save-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .save-btn {
-            flex: 1;
-            padding: 12px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-        }
-
-        .save-btn:hover {
-            background: #45a049;
-        }
-
-        .save-btn.load {
-            background: #2196F3;
-        }
-
-        .save-btn.load:hover {
-            background: #0b7dda;
-        }
-
-        .game-modal {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 10;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .game-modal.active {
-            display: block;
-        }
-
-        .game-modal button {
-            margin: 5px;
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background: #667eea;
-            color: white;
-            font-weight: bold;
-        }
-
-        .game-modal button:hover {
-            background: #5568d3;
-        }
-
-        .stats {
-            background: rgba(255,255,255,0.3);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 14px;
-            font-weight: bold;
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.05); }
         }
 
         .skull {
-            font-size: 100px;
-            animation: fade 1s ease-in-out infinite;
+            animation: fade 1.5s ease-in-out infinite;
         }
 
         @keyframes fade {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.3; }
         }
 
-        .sleep {
-            font-size: 40px;
+        .poop {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            font-size: 20px;
+            bottom: 15px;
+        }
+
+        .hearts-display {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .heart-line {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .heart {
+            font-size: 10px;
+        }
+
+        .info-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(155, 199, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .info-overlay.active {
+            display: flex;
+        }
+
+        .info-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            padding: 2px 5px;
+        }
+
+        .feed-menu {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feed-menu.active {
+            display: flex;
+        }
+
+        .feed-option {
+            font-size: 35px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            opacity: 0.5;
+        }
+
+        .feed-option.selected {
+            opacity: 1;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .message-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .message-popup.active {
+            display: block;
+        }
+
+        .sleep-zzz {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 25px;
             animation: float 2s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-10px); }
         }
 
-        input[type="file"] {
+        .age-info {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Boutons A, B, C */
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+
+        .tama-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            box-shadow: 
+                0 6px 0 rgba(0,0,0,0.3),
+                0 8px 15px rgba(0,0,0,0.2),
+                inset 0 -3px 8px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            position: relative;
+            top: 0;
+        }
+
+        .tama-btn:active {
+            top: 4px;
+            box-shadow: 
+                0 2px 0 rgba(0,0,0,0.3),
+                0 4px 8px rgba(0,0,0,0.2),
+                inset 0 -3px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-a {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+        }
+
+        .btn-b {
+            background: linear-gradient(145deg, #ff6347, #ff8570);
+        }
+
+        .btn-c {
+            background: linear-gradient(145deg, #4169e1, #6a8aff);
+        }
+
+        .btn-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .game-screen {
             display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        .game-options {
+            display: flex;
+            gap: 20px;
+        }
+
+        .game-choice {
+            font-size: 40px;
+            opacity: 0.4;
+        }
+
+        .game-choice.selected {
+            opacity: 1;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
     </style>
 </head>
 <body>
+    <!-- Menu Hamburger -->
+    <div class="hamburger-menu">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="menu-dropdown" id="menu-dropdown">
+            <div class="menu-item" onclick="exportToJSON()">
+                📥 Exporter JSON
+            </div>
+            <label class="menu-item" for="import-file">
+                📤 Importer JSON
+            </label>
+            <div class="menu-item" onclick="resetPet()">
+                🔄 Nouveau Tamagotchi
+            </div>
+        </div>
+    </div>
+    <input type="file" id="import-file" accept=".json" onchange="importFromJSON(event)">
+
+    <!-- Device Tamagotchi -->
     <div class="tamagotchi-device">
-        <div class="screen-container">
-            <div class="screen">
-                <div class="status-bar">
-                    <div>
-                        <div style="margin-bottom: 3px;">🍖 
-                            <span class="hearts" id="hunger-hearts"></span>
+        <div class="screen-wrapper">
+            <div class="screen-border">
+                <div class="screen" id="screen">
+                    <!-- Icônes de menu -->
+                    <div class="menu-icons" id="menu-icons">
+                        <div class="menu-icon" data-index="0">🍖</div>
+                        <div class="menu-icon" data-index="1">💡</div>
+                        <div class="menu-icon" data-index="2">🎮</div>
+                        <div class="menu-icon" data-index="3">💊</div>
+                        <div class="menu-icon" data-index="4">🚽</div>
+                        <div class="menu-icon" data-index="5">📊</div>
+                        <div class="menu-icon" data-index="6">📏</div>
+                    </div>
+
+                    <!-- Zone principale -->
+                    <div class="game-area" id="game-area">
+                        <div class="hearts-display">
+                            <div class="heart-line">
+                                <span>🍖</span>
+                                <span id="hunger-hearts"></span>
+                            </div>
+                            <div class="heart-line">
+                                <span>😊</span>
+                                <span id="happy-hearts"></span>
+                            </div>
                         </div>
-                        <div>😊 
-                            <span class="hearts" id="happy-hearts"></span>
+                        <div class="pet" id="pet">🥚</div>
+                        <div class="age-info" id="age-info">0h</div>
+                    </div>
+
+                    <!-- Menu Feed -->
+                    <div class="feed-menu" id="feed-menu">
+                        <div class="feed-option" data-type="meal">🍖</div>
+                        <div class="feed-option" data-type="snack">🍰</div>
+                    </div>
+
+                    <!-- Écran Stats -->
+                    <div class="info-overlay" id="stats-screen">
+                        <div class="info-row">
+                            <span>ÂGE:</span>
+                            <span id="stat-age">0h</span>
+                        </div>
+                        <div class="info-row">
+                            <span>POIDS:</span>
+                            <span id="stat-weight">5g</span>
+                        </div>
+                        <div class="info-row">
+                            <span>SANTÉ:</span>
+                            <span id="stat-health">100%</span>
+                        </div>
+                        <div class="info-row">
+                            <span>STADE:</span>
+                            <span id="stat-stage">Œuf</span>
                         </div>
                     </div>
-                    <div style="text-align: right;">
-                        <div id="clock">00:00</div>
-                        <div id="stage">Œuf</div>
+
+                    <!-- Écran Discipline -->
+                    <div class="info-overlay" id="disc-screen">
+                        <div class="info-row">
+                            <span>DISCIPLINE</span>
+                        </div>
+                        <div class="info-row">
+                            <span id="disc-value">0%</span>
+                        </div>
                     </div>
+
+                    <!-- Écran de jeu -->
+                    <div class="game-screen" id="game-screen">
+                        <div style="font-size: 14px; font-weight: bold;">GAUCHE ou DROITE?</div>
+                        <div class="game-options">
+                            <div class="game-choice" data-dir="left">⬅️</div>
+                            <div class="game-choice" data-dir="right">➡️</div>
+                        </div>
+                    </div>
+
+                    <!-- Message popup -->
+                    <div class="message-popup" id="message-popup"></div>
                 </div>
-                <div class="game-area" id="game-area">
-                    <div class="pet" id="pet">🥚</div>
-                    <div class="age-display" id="age-display">Âge: 0</div>
-                </div>
-
-                <div class="game-modal" id="game-modal">
-                    <h3 id="game-title">Devinez!</h3>
-                    <div id="game-content"></div>
-                </div>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-row">
-                <span>Poids:</span>
-                <span id="weight">5g</span>
-            </div>
-            <div class="stat-row">
-                <span>Discipline:</span>
-                <span id="discipline">0%</span>
-            </div>
-            <div class="stat-row">
-                <span>Santé:</span>
-                <span id="health">100%</span>
-            </div>
-        </div>
-
-        <div class="buttons-container">
-            <button class="btn" onclick="feed()" title="Nourrir">
-                🍖
-                <span class="btn-label">REPAS</span>
+        <!-- Boutons A, B, C -->
+        <div class="control-buttons">
+            <button class="tama-btn btn-a" onclick="handleButtonA()">
+                A
+                <span class="btn-label">SELECT</span>
             </button>
-            <button class="btn" onclick="giveSnack()" title="Snack">
-                🍬
-                <span class="btn-label">SNACK</span>
+            <button class="tama-btn btn-b" onclick="handleButtonB()">
+                B
+                <span class="btn-label">DECIDE</span>
             </button>
-            <button class="btn" onclick="clean()" title="Nettoyer">
-                🧹
-                <span class="btn-label">PROPRE</span>
+            <button class="tama-btn btn-c" onclick="handleButtonC()">
+                C
+                <span class="btn-label">CANCEL</span>
             </button>
-            <button class="btn" onclick="playGame()" title="Jouer">
-                🎮
-                <span class="btn-label">JOUER</span>
-            </button>
-            <button class="btn" onclick="giveMedicine()" title="Soigner">
-                💊
-                <span class="btn-label">SOIN</span>
-            </button>
-            <button class="btn" onclick="toggleLight()" title="Lumière">
-                💡
-                <span class="btn-label">LUMIÈRE</span>
-            </button>
-        </div>
-
-        <div class="save-controls">
-            <button class="save-btn" onclick="exportToJSON()">📥 Exporter JSON</button>
-            <label class="save-btn load" for="import-file">📤 Importer JSON</label>
-            <input type="file" id="import-file" accept=".json" onchange="importFromJSON(event)">
-        </div>
-        <div class="save-controls">
-            <button class="save-btn" onclick="resetPet()" style="background: #f44336;">🔄 Nouveau Tamagotchi</button>
         </div>
     </div>
 
     <script>
-        // État du Tamagotchi
         let tamagotchi = {
-            stage: 'egg',           // egg, baby, child, teen, adult
-            age: 0,                 // en heures
-            hunger: 4,              // 0-4 cœurs
-            happiness: 4,           // 0-4 cœurs
-            weight: 5,              // en grammes
-            discipline: 0,          // 0-100%
-            health: 100,            // 0-100%
+            stage: 'egg',
+            age: 0,
+            hunger: 4,
+            happiness: 4,
+            weight: 5,
+            discipline: 0,
+            health: 100,
             isSick: false,
             poopCount: 0,
             isSleeping: false,
             lightOn: true,
             lastUpdate: Date.now(),
             birthTime: Date.now(),
-            careErrors: 0,
-            wins: 0
+            careErrors: 0
         };
 
         const stageSprites = {
-            egg: '🥚',
-            baby: '🐣',
-            child: '🐥',
-            teen: '🐤',
-            adult: '🐦',
-            good_adult: '🦜',
-            perfect_adult: '🦚',
-            dead: '💀'
+            egg: '🥚', baby: '🐣', child: '🐥', 
+            teen: '🐤', adult: '🐦', good_adult: '🦜', 
+            perfect_adult: '🦚', dead: '💀'
         };
 
         const stageNames = {
-            egg: 'Œuf',
-            baby: 'Bébé',
-            child: 'Enfant',
-            teen: 'Ado',
-            adult: 'Adulte',
-            good_adult: 'Bon Adulte',
-            perfect_adult: 'Adulte Parfait',
-            dead: 'Décédé'
+            egg: 'Œuf', baby: 'Bébé', child: 'Enfant',
+            teen: 'Ado', adult: 'Adulte', good_adult: 'Bon',
+            perfect_adult: 'Parfait', dead: 'Mort'
         };
 
-        // Initialisation
-        function init() {
-            loadFromLocalStorage();
-            updateDisplay();
-            setInterval(updateClock, 1000);
-            setInterval(gameLoop, 30000); // Toutes les 30 secondes
+        let currentMenu = -1; // -1 = aucun menu
+        let currentSubMenu = 0;
+        let gameCorrectAnswer = '';
+
+        // Menu hamburger
+        function toggleMenu() {
+            document.getElementById('menu-dropdown').classList.toggle('active');
         }
 
-        // Boucle de jeu
-        function gameLoop() {
-            if (tamagotchi.stage === 'dead' || tamagotchi.stage === 'egg') return;
+        // Fermer le menu si on clique ailleurs
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.hamburger-menu')) {
+                document.getElementById('menu-dropdown').classList.remove('active');
+            }
+        });
 
-            const now = Date.now();
-            const timeDiff = now - tamagotchi.lastUpdate;
-            const minutesPassed = Math.floor(timeDiff / 60000);
+        // Bouton A - Sélection
+        function handleButtonA() {
+            if (currentMenu === -1) {
+                // Navigation dans le menu principal
+                currentMenu = (currentMenu + 1) % 7;
+                updateMenuSelection();
+            } else if (currentMenu === 0) {
+                // Menu Feed - alterner entre meal et snack
+                currentSubMenu = (currentSubMenu + 1) % 2;
+                updateFeedSelection();
+            } else if (currentMenu === 2) {
+                // Menu Game - alterner choix
+                currentSubMenu = (currentSubMenu + 1) % 2;
+                updateGameSelection();
+            } else {
+                // Passer au menu suivant
+                currentMenu = (currentMenu + 1) % 7;
+                closeAllScreens();
+                updateMenuSelection();
+            }
+        }
 
-            if (minutesPassed > 0) {
-                // Diminution de la faim et du bonheur
-                if (!tamagotchi.isSleeping) {
-                    if (minutesPassed >= 5) {
-                        tamagotchi.hunger = Math.max(0, tamagotchi.hunger - 1);
-                    }
-                    if (minutesPassed >= 7) {
-                        tamagotchi.happiness = Math.max(0, tamagotchi.happiness - 1);
-                    }
+        // Bouton B - Confirmation
+        function handleButtonB() {
+            if (currentMenu === -1) {
+                // Ouvrir le premier menu
+                currentMenu = 0;
+                updateMenuSelection();
+            } else {
+                executeMenuAction();
+            }
+        }
 
-                    // Génération de caca
-                    if (Math.random() < 0.3 && tamagotchi.poopCount < 4) {
-                        tamagotchi.poopCount++;
-                    }
+        // Bouton C - Annulation
+        function handleButtonC() {
+            currentMenu = -1;
+            currentSubMenu = 0;
+            closeAllScreens();
+            updateMenuSelection();
+        }
 
-                    // Maladie si trop de caca ou mauvais soins
-                    if (tamagotchi.poopCount >= 2 && Math.random() < 0.4) {
-                        tamagotchi.isSick = true;
-                        tamagotchi.health = Math.max(0, tamagotchi.health - 10);
-                    }
+        // Mettre à jour la sélection du menu
+        function updateMenuSelection() {
+            const icons = document.querySelectorAll('.menu-icon');
+            icons.forEach((icon, index) => {
+                icon.classList.toggle('selected', index === currentMenu);
+            });
+        }
 
-                    // Mort si santé à 0
-                    if (tamagotchi.health <= 0) {
-                        tamagotchi.stage = 'dead';
-                    }
+        // Fermer tous les écrans
+        function closeAllScreens() {
+            document.getElementById('feed-menu').classList.remove('active');
+            document.getElementById('stats-screen').classList.remove('active');
+            document.getElementById('disc-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('game-area').style.display = 'flex';
+        }
 
-                    // Erreur de soin si faim ou bonheur à 0
-                    if (tamagotchi.hunger === 0 || tamagotchi.happiness === 0) {
-                        tamagotchi.careErrors++;
-                        tamagotchi.health = Math.max(0, tamagotchi.health - 5);
-                    }
-                }
-
-                tamagotchi.lastUpdate = now;
+        // Exécuter l'action du menu
+        function executeMenuAction() {
+            if (tamagotchi.stage === 'dead') {
+                showMessage('💀 RIP');
+                return;
             }
 
-            // Vérifier l'âge et l'évolution
-            checkAge();
-            checkEvolution();
-            checkSleepTime();
+            switch(currentMenu) {
+                case 0: // Feed
+                    if (!document.getElementById('feed-menu').classList.contains('active')) {
+                        closeAllScreens();
+                        document.getElementById('game-area').style.display = 'none';
+                        document.getElementById('feed-menu').classList.add('active');
+                        updateFeedSelection();
+                    } else {
+                        // Confirmer le choix
+                        if (currentSubMenu === 0) {
+                            feed();
+                        } else {
+                            giveSnack();
+                        }
+                        handleButtonC();
+                    }
+                    break;
+                case 1: // Light
+                    toggleLight();
+                    break;
+                case 2: // Game
+                    if (!document.getElementById('game-screen').classList.contains('active')) {
+                        startGame();
+                    } else {
+                        playGame();
+                    }
+                    break;
+                case 3: // Medicine
+                    giveMedicine();
+                    break;
+                case 4: // Bathroom
+                    clean();
+                    break;
+                case 5: // Stats
+                    closeAllScreens();
+                    document.getElementById('stats-screen').classList.add('active');
+                    updateStatsDisplay();
+                    break;
+                case 6: // Discipline
+                    closeAllScreens();
+                    document.getElementById('disc-screen').classList.add('active');
+                    document.getElementById('disc-value').textContent = tamagotchi.discipline + '%';
+                    break;
+            }
+        }
+
+        // Mettre à jour la sélection Feed
+        function updateFeedSelection() {
+            const options = document.querySelectorAll('.feed-option');
+            options.forEach((opt, index) => {
+                opt.classList.toggle('selected', index === currentSubMenu);
+            });
+        }
+
+        // Démarrer le jeu
+        function startGame() {
+            if (tamagotchi.stage === 'egg' || tamagotchi.isSleeping) {
+                showMessage('Impossible');
+                return;
+            }
+            closeAllScreens();
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('game-screen').classList.add('active');
+            gameCorrectAnswer = Math.random() < 0.5 ? 'left' : 'right';
+            currentSubMenu = 0;
+            updateGameSelection();
+        }
+
+        // Mettre à jour la sélection du jeu
+        function updateGameSelection() {
+            const choices = document.querySelectorAll('.game-choice');
+            choices.forEach((choice, index) => {
+                choice.classList.toggle('selected', index === currentSubMenu);
+            });
+        }
+
+        // Jouer
+        function playGame() {
+            const playerChoice = currentSubMenu === 0 ? 'left' : 'right';
+            const won = playerChoice === gameCorrectAnswer;
+
+            if (won) {
+                tamagotchi.happiness = Math.min(4, tamagotchi.happiness + 1);
+                tamagotchi.weight = Math.max(1, tamagotchi.weight - 1);
+                tamagotchi.discipline = Math.min(100, tamagotchi.discipline + 5);
+                showMessage('🎉 GAGNÉ!');
+            } else {
+                showMessage('😢 PERDU');
+            }
+
+            handleButtonC();
             updateDisplay();
             saveToLocalStorage();
         }
 
-        // Vérifier l'âge
-        function checkAge() {
-            const ageInHours = Math.floor((Date.now() - tamagotchi.birthTime) / 3600000);
-            tamagotchi.age = ageInHours;
-        }
-
-        // Vérifier l'évolution
-        function checkEvolution() {
-            if (tamagotchi.stage === 'egg' && tamagotchi.age >= 0.02) { // ~1 minute pour test
-                evolve('baby');
-            } else if (tamagotchi.stage === 'baby' && tamagotchi.age >= 1) {
-                evolve('child');
-            } else if (tamagotchi.stage === 'child' && tamagotchi.age >= 3) {
-                evolve('teen');
-            } else if (tamagotchi.stage === 'teen' && tamagotchi.age >= 5) {
-                // Évolution basée sur les soins
-                if (tamagotchi.careErrors === 0 && tamagotchi.discipline >= 75) {
-                    evolve('perfect_adult');
-                } else if (tamagotchi.careErrors <= 2) {
-                    evolve('good_adult');
-                } else {
-                    evolve('adult');
-                }
-            }
-        }
-
-        // Évolution
-        function evolve(newStage) {
-            tamagotchi.stage = newStage;
-            showMessage('✨ Évolution! ✨');
-            setTimeout(() => updateDisplay(), 2000);
-        }
-
-        // Vérifier l'heure de sommeil
-        function checkSleepTime() {
-            const hour = new Date().getHours();
-            const shouldSleep = hour >= 21 || hour < 8;
-
-            if (shouldSleep && !tamagotchi.isSleeping && tamagotchi.lightOn) {
-                tamagotchi.isSleeping = true;
-            } else if (!shouldSleep && tamagotchi.isSleeping) {
-                tamagotchi.isSleeping = false;
-            }
-        }
-
         // Nourrir
         function feed() {
-            if (tamagotchi.stage === 'dead' || tamagotchi.stage === 'egg') return;
-
             if (tamagotchi.hunger < 4) {
                 tamagotchi.hunger = Math.min(4, tamagotchi.hunger + 1);
                 tamagotchi.weight += 1;
-                showMessage('Miam! 🍖');
+                showMessage('🍖 Miam!');
                 updateDisplay();
                 saveToLocalStorage();
             } else {
-                showMessage('Pas faim!');
+                showMessage('Pas faim');
             }
         }
 
-        // Donner un snack
+        // Snack
         function giveSnack() {
-            if (tamagotchi.stage === 'dead' || tamagotchi.stage === 'egg') return;
-
             if (tamagotchi.happiness < 4) {
                 tamagotchi.happiness = Math.min(4, tamagotchi.happiness + 1);
                 tamagotchi.weight += 2;
-                showMessage('Délicieux! 🍬');
+                showMessage('🍰 Yum!');
                 updateDisplay();
                 saveToLocalStorage();
             } else {
-                showMessage('Assez heureux!');
+                showMessage('Assez!');
             }
         }
 
         // Nettoyer
         function clean() {
-            if (tamagotchi.stage === 'dead' || tamagotchi.stage === 'egg') return;
-
             if (tamagotchi.poopCount > 0) {
                 tamagotchi.poopCount = 0;
-                showMessage('Tout propre! ✨');
+                showMessage('✨ Propre!');
                 updateDisplay();
                 saveToLocalStorage();
             } else {
-                showMessage('Déjà propre!');
+                showMessage('Déjà propre');
             }
         }
 
-        // Jouer
-        function playGame() {
-            if (tamagotchi.stage === 'dead' || tamagotchi.stage === 'egg' || tamagotchi.isSleeping) {
-                showMessage('Impossible!');
-                return;
-            }
-
-            const gameModal = document.getElementById('game-modal');
-            const gameContent = document.getElementById('game-content');
-            const gameTitle = document.getElementById('game-title');
-
-            // Jeu: Gauche ou Droite
-            gameTitle.textContent = 'Gauche ou Droite?';
-            const correctSide = Math.random() < 0.5 ? 'left' : 'right';
-
-            gameContent.innerHTML = `
-                <p>Devinez de quel côté je vais aller!</p>
-                <button onclick="guessGame('left', '${correctSide}')">⬅️ GAUCHE</button>
-                <button onclick="guessGame('right', '${correctSide}')">➡️ DROITE</button>
-            `;
-
-            gameModal.classList.add('active');
-        }
-
-        // Deviner dans le jeu
-        function guessGame(guess, correct) {
-            const gameModal = document.getElementById('game-modal');
-            gameModal.classList.remove('active');
-
-            if (guess === correct) {
-                tamagotchi.happiness = Math.min(4, tamagotchi.happiness + 1);
-                tamagotchi.weight = Math.max(1, tamagotchi.weight - 1);
-                tamagotchi.discipline = Math.min(100, tamagotchi.discipline + 5);
-                tamagotchi.wins++;
-                showMessage('🎉 Gagné!');
-            } else {
-                showMessage('😢 Perdu!');
-            }
-
-            updateDisplay();
-            saveToLocalStorage();
-        }
-
-        // Donner un médicament
+        // Médecine
         function giveMedicine() {
-            if (tamagotchi.stage === 'dead' || tamagotchi.stage === 'egg') return;
-
             if (tamagotchi.isSick) {
                 tamagotchi.isSick = false;
                 tamagotchi.health = Math.min(100, tamagotchi.health + 20);
-                showMessage('Guéri! 💊');
+                showMessage('💊 Guéri!');
                 updateDisplay();
                 saveToLocalStorage();
             } else {
-                showMessage('Pas malade!');
+                showMessage('Pas malade');
             }
         }
 
-        // Basculer la lumière
+        // Lumière
         function toggleLight() {
             tamagotchi.lightOn = !tamagotchi.lightOn;
-
             if (!tamagotchi.lightOn) {
                 tamagotchi.isSleeping = true;
                 showMessage('💤 Dodo');
@@ -621,156 +803,173 @@
                 if (hour < 21 && hour >= 8) {
                     tamagotchi.isSleeping = false;
                 }
-                showMessage('💡 Lumière');
+                showMessage('💡 Allumé');
             }
-
             updateDisplay();
             saveToLocalStorage();
         }
 
-        // Afficher un message
+        // Afficher message
         function showMessage(msg) {
-            const gameArea = document.getElementById('game-area');
-            const existingMsg = document.querySelector('.info-text');
-            if (existingMsg) existingMsg.remove();
-
-            const msgEl = document.createElement('div');
-            msgEl.className = 'info-text';
-            msgEl.textContent = msg;
-            gameArea.appendChild(msgEl);
-
-            setTimeout(() => msgEl.remove(), 2000);
+            const popup = document.getElementById('message-popup');
+            popup.textContent = msg;
+            popup.classList.add('active');
+            setTimeout(() => popup.classList.remove('active'), 1500);
         }
 
         // Mettre à jour l'affichage
         function updateDisplay() {
-            // Cœurs de faim
+            // Hearts
             const hungerEl = document.getElementById('hunger-hearts');
-            hungerEl.innerHTML = '';
-            for (let i = 0; i < 4; i++) {
-                const heart = document.createElement('span');
-                heart.className = i < tamagotchi.hunger ? 'heart full' : 'heart empty';
-                hungerEl.appendChild(heart);
-            }
-
-            // Cœurs de bonheur
             const happyEl = document.getElementById('happy-hearts');
-            happyEl.innerHTML = '';
-            for (let i = 0; i < 4; i++) {
-                const heart = document.createElement('span');
-                heart.className = i < tamagotchi.happiness ? 'heart full' : 'heart empty';
-                happyEl.appendChild(heart);
-            }
+            hungerEl.innerHTML = '♥'.repeat(tamagotchi.hunger) + '♡'.repeat(4 - tamagotchi.hunger);
+            happyEl.innerHTML = '♥'.repeat(tamagotchi.happiness) + '♡'.repeat(4 - tamagotchi.happiness);
 
-            // Sprite du pet
+            // Pet sprite
             const petEl = document.getElementById('pet');
             const gameArea = document.getElementById('game-area');
 
-            // Nettoyer les cacas existants
+            // Nettoyer
             document.querySelectorAll('.poop').forEach(p => p.remove());
-            document.querySelectorAll('.sleep').forEach(s => s.remove());
+            document.querySelectorAll('.sleep-zzz').forEach(s => s.remove());
 
             if (tamagotchi.stage === 'dead') {
                 petEl.textContent = stageSprites.dead;
                 petEl.className = 'pet skull';
             } else {
-                let sprite = stageSprites[tamagotchi.stage] || '🐣';
-                if (tamagotchi.isSick) {
-                    sprite = '🤒';
-                }
-                petEl.textContent = sprite;
+                petEl.textContent = tamagotchi.isSick ? '🤒' : stageSprites[tamagotchi.stage];
                 petEl.className = 'pet';
 
-                // Ajouter les cacas
+                // Cacas
                 for (let i = 0; i < tamagotchi.poopCount; i++) {
                     const poop = document.createElement('div');
                     poop.className = 'poop';
                     poop.textContent = '💩';
-                    poop.style.left = (20 + i * 30) + '%';
-                    poop.style.bottom = '20px';
+                    poop.style.left = (10 + i * 22) + '%';
                     gameArea.appendChild(poop);
                 }
 
-                // Ajouter Zzz si dort
+                // Sommeil
                 if (tamagotchi.isSleeping) {
-                    const sleep = document.createElement('div');
-                    sleep.className = 'sleep';
-                    sleep.textContent = 'Zzz';
-                    gameArea.appendChild(sleep);
+                    const zzz = document.createElement('div');
+                    zzz.className = 'sleep-zzz';
+                    zzz.textContent = 'Zzz';
+                    gameArea.appendChild(zzz);
                 }
             }
 
-            // Fond d'écran
-            const screen = document.querySelector('.screen');
-            screen.style.background = tamagotchi.lightOn ? '#9bc700' : '#2a4d14';
+            // Écran
+            document.getElementById('screen').classList.toggle('light-off', !tamagotchi.lightOn);
 
-            // Stats
-            document.getElementById('age-display').textContent = `Âge: ${tamagotchi.age}h`;
-            document.getElementById('stage').textContent = stageNames[tamagotchi.stage] || 'Inconnu';
-            document.getElementById('weight').textContent = tamagotchi.weight + 'g';
-            document.getElementById('discipline').textContent = tamagotchi.discipline + '%';
-            document.getElementById('health').textContent = tamagotchi.health + '%';
+            // Age
+            document.getElementById('age-info').textContent = tamagotchi.age + 'h';
         }
 
-        // Horloge
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+        // Mettre à jour l'écran stats
+        function updateStatsDisplay() {
+            document.getElementById('stat-age').textContent = tamagotchi.age + 'h';
+            document.getElementById('stat-weight').textContent = tamagotchi.weight + 'g';
+            document.getElementById('stat-health').textContent = tamagotchi.health + '%';
+            document.getElementById('stat-stage').textContent = stageNames[tamagotchi.stage];
         }
 
-        // Sauvegarder en LocalStorage
+        // Boucle de jeu
+        function gameLoop() {
+            if (tamagotchi.stage === 'dead') return;
+
+            const now = Date.now();
+            const timeDiff = now - tamagotchi.lastUpdate;
+            const minutesPassed = Math.floor(timeDiff / 60000);
+
+            if (minutesPassed > 0 && tamagotchi.stage !== 'egg') {
+                if (!tamagotchi.isSleeping) {
+                    if (minutesPassed >= 5) tamagotchi.hunger = Math.max(0, tamagotchi.hunger - 1);
+                    if (minutesPassed >= 7) tamagotchi.happiness = Math.max(0, tamagotchi.happiness - 1);
+                    if (Math.random() < 0.3 && tamagotchi.poopCount < 4) tamagotchi.poopCount++;
+                    if (tamagotchi.poopCount >= 2 && Math.random() < 0.4) {
+                        tamagotchi.isSick = true;
+                        tamagotchi.health = Math.max(0, tamagotchi.health - 10);
+                    }
+                    if (tamagotchi.health <= 0) tamagotchi.stage = 'dead';
+                    if (tamagotchi.hunger === 0 || tamagotchi.happiness === 0) {
+                        tamagotchi.careErrors++;
+                        tamagotchi.health = Math.max(0, tamagotchi.health - 5);
+                    }
+                }
+                tamagotchi.lastUpdate = now;
+            }
+
+            checkAge();
+            checkEvolution();
+            updateDisplay();
+            saveToLocalStorage();
+        }
+
+        // Vérifier l'âge
+        function checkAge() {
+            tamagotchi.age = Math.floor((Date.now() - tamagotchi.birthTime) / 3600000);
+        }
+
+        // Vérifier l'évolution
+        function checkEvolution() {
+            if (tamagotchi.stage === 'egg' && tamagotchi.age >= 0.02) {
+                tamagotchi.stage = 'baby';
+                showMessage('✨ BÉBÉ!');
+            } else if (tamagotchi.stage === 'baby' && tamagotchi.age >= 1) {
+                tamagotchi.stage = 'child';
+                showMessage('✨ ENFANT!');
+            } else if (tamagotchi.stage === 'child' && tamagotchi.age >= 3) {
+                tamagotchi.stage = 'teen';
+                showMessage('✨ ADO!');
+            } else if (tamagotchi.stage === 'teen' && tamagotchi.age >= 5) {
+                if (tamagotchi.careErrors === 0 && tamagotchi.discipline >= 75) {
+                    tamagotchi.stage = 'perfect_adult';
+                } else if (tamagotchi.careErrors <= 2) {
+                    tamagotchi.stage = 'good_adult';
+                } else {
+                    tamagotchi.stage = 'adult';
+                }
+                showMessage('✨ ADULTE!');
+            }
+        }
+
+        // Sauvegarder
         function saveToLocalStorage() {
             localStorage.setItem('tamagotchi', JSON.stringify(tamagotchi));
         }
 
-        // Charger depuis LocalStorage
+        // Charger
         function loadFromLocalStorage() {
             const saved = localStorage.getItem('tamagotchi');
             if (saved) {
-                const loaded = JSON.parse(saved);
-                tamagotchi = loaded;
-
-                // Calculer le temps écoulé depuis la dernière visite
+                tamagotchi = JSON.parse(saved);
                 const now = Date.now();
-                const timeDiff = now - tamagotchi.lastUpdate;
-                const minutesPassed = Math.floor(timeDiff / 60000);
+                const minutesPassed = Math.floor((now - tamagotchi.lastUpdate) / 60000);
 
-                // Appliquer les changements en fonction du temps écoulé
                 if (minutesPassed > 0 && tamagotchi.stage !== 'dead' && tamagotchi.stage !== 'egg') {
-                    const hungerLoss = Math.floor(minutesPassed / 5);
-                    const happyLoss = Math.floor(minutesPassed / 7);
+                    tamagotchi.hunger = Math.max(0, tamagotchi.hunger - Math.floor(minutesPassed / 5));
+                    tamagotchi.happiness = Math.max(0, tamagotchi.happiness - Math.floor(minutesPassed / 7));
+                    tamagotchi.poopCount = Math.min(4, tamagotchi.poopCount + Math.floor(minutesPassed / 30));
 
-                    tamagotchi.hunger = Math.max(0, tamagotchi.hunger - hungerLoss);
-                    tamagotchi.happiness = Math.max(0, tamagotchi.happiness - happyLoss);
-
-                    // Cacas pendant l'absence
-                    const poopAdded = Math.min(4, Math.floor(minutesPassed / 30));
-                    tamagotchi.poopCount = Math.min(4, tamagotchi.poopCount + poopAdded);
-
-                    // Maladie potentielle
                     if (tamagotchi.poopCount >= 2 && minutesPassed > 60) {
                         tamagotchi.isSick = true;
                         tamagotchi.health = Math.max(0, tamagotchi.health - 20);
                     }
 
-                    // Mort si négligé trop longtemps
-                    if (minutesPassed > 300 && (tamagotchi.hunger === 0 || tamagotchi.isSick)) {
+                    if (minutesPassed > 300 && tamagotchi.hunger === 0) {
                         tamagotchi.stage = 'dead';
                         tamagotchi.health = 0;
                     }
                 }
-
                 tamagotchi.lastUpdate = now;
             }
         }
 
-        // Exporter en JSON
+        // Export JSON
         function exportToJSON() {
             const dataStr = JSON.stringify(tamagotchi, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             link.download = `tamagotchi_${Date.now()}.json`;
@@ -779,22 +978,20 @@
             showMessage('💾 Exporté!');
         }
 
-        // Importer depuis JSON
+        // Import JSON
         function importFromJSON(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 try {
-                    const imported = JSON.parse(e.target.result);
-                    tamagotchi = imported;
+                    tamagotchi = JSON.parse(e.target.result);
                     tamagotchi.lastUpdate = Date.now();
                     saveToLocalStorage();
                     updateDisplay();
                     showMessage('📂 Importé!');
-                } catch (error) {
-                    alert('Erreur d'importation: fichier invalide');
+                } catch {
+                    alert('Fichier invalide');
                 }
             };
             reader.readAsText(file);
@@ -802,32 +999,25 @@
 
         // Réinitialiser
         function resetPet() {
-            if (confirm('Voulez-vous vraiment recommencer avec un nouveau Tamagotchi?')) {
+            if (confirm('Nouveau Tamagotchi?')) {
                 tamagotchi = {
-                    stage: 'egg',
-                    age: 0,
-                    hunger: 4,
-                    happiness: 4,
-                    weight: 5,
-                    discipline: 0,
-                    health: 100,
-                    isSick: false,
-                    poopCount: 0,
-                    isSleeping: false,
-                    lightOn: true,
-                    lastUpdate: Date.now(),
-                    birthTime: Date.now(),
-                    careErrors: 0,
-                    wins: 0
+                    stage: 'egg', age: 0, hunger: 4, happiness: 4,
+                    weight: 5, discipline: 0, health: 100, isSick: false,
+                    poopCount: 0, isSleeping: false, lightOn: true,
+                    lastUpdate: Date.now(), birthTime: Date.now(), careErrors: 0
                 };
                 saveToLocalStorage();
                 updateDisplay();
-                showMessage('🥚 Nouveau départ!');
+                showMessage('🥚 Nouveau!');
             }
         }
 
-        // Démarrer
-        window.onload = init;
+        // Init
+        window.onload = () => {
+            loadFromLocalStorage();
+            updateDisplay();
+            setInterval(gameLoop, 30000);
+        };
     </script>
 </body>
 </html>
