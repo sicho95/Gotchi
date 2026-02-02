@@ -277,17 +277,20 @@
             100% { transform: scale(0); opacity: 0; }
         }
 
-        /* DEATH ANIMATION */
+        /* DEATH - Cercueil */
         .dead-creature {
-            width: 90px;
-            height: 90px;
+            width: 100px;
+            height: 100px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             animation: death 1.5s ease-out;
         }
         @keyframes death {
             0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            50% { transform: scale(0.8) rotate(-20deg); opacity: 0.5; }
-            100% { transform: scale(0.6) rotate(-30deg); opacity: 0.3; }
+            50% { transform: scale(0.9) rotate(-5deg); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 0.9; }
         }
 
         /* CREATURE ANIMATIONS */
@@ -360,31 +363,33 @@
             font-size: 18px;
         }
 
+        /* Fumée horizontale (rotation -90°) */
         .poop-sprite.stinky::after {
             content: '💨';
             position: absolute;
-            top: -6px;
+            top: -2px;
             left: 50%;
             font-size: 12px;
+            transform: rotate(-90deg);
             animation: smoke 1s ease-in-out infinite;
         }
         @keyframes smoke {
-            0% { transform: translateY(0) translateX(-50%); opacity: 1; }
-            100% { transform: translateY(-12px) translateX(-50%); opacity: 0; }
+            0% { transform: translateX(-50%) rotate(-90deg); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-12px) rotate(-90deg); opacity: 0; }
         }
 
-        /* FLIES */
+        /* FLIES - Animation aller-retour fluide */
         .fly {
             position: absolute;
             font-size: 10px;
-            animation: flyAround 2s ease-in-out infinite;
+            animation: flyAround 3s ease-in-out infinite;
         }
         @keyframes flyAround {
             0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(12px, -8px) rotate(90deg); }
-            50% { transform: translate(0, -15px) rotate(180deg); }
-            75% { transform: translate(-12px, -8px) rotate(270deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+            25% { transform: translate(15px, -10px) rotate(45deg); }
+            50% { transform: translate(25px, -5px) rotate(90deg); }
+            75% { transform: translate(15px, -10px) rotate(135deg); }
+            100% { transform: translate(0, 0) rotate(180deg); }
         }
 
         /* TEXT OVERLAY */
@@ -409,31 +414,39 @@
         }
         .lcd-msg.show { display: block; }
 
-        /* STATS VIEW - Compact vertical */
+        /* STATS VIEW - Ultra compact en 2 colonnes */
         .stats-view {
             display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            width: 90%;
-            padding: 5px 8px;
-            font-size: 10px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 180px;
+            padding: 3px 5px;
+            font-size: 8.5px;
             color: #2d3436;
             font-weight: 600;
             font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(5px);
+            border-radius: 6px;
+            z-index: 12;
         }
-        .stats-view.show { display: flex; }
+        .stats-view.show { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 4px; }
         .stats-view .stat-line { 
-            margin: 2px 0;
             display: flex; 
             justify-content: space-between; 
-            width: 100%;
-            background: rgba(255,255,255,0.35);
-            padding: 3px 6px;
-            border-radius: 4px;
+            background: rgba(255,255,255,0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
         }
-        .stats-view .stat-line strong { color: #0984e3; font-size: 10px; }
-        .stats-view .stat-line span { font-size: 10px; }
+        .stats-view .stat-line.full-width {
+            grid-column: 1 / -1;
+        }
+        .stats-view .stat-line strong { color: #0984e3; font-size: 8.5px; }
+        .stats-view .stat-line span { font-size: 8.5px; }
 
         /* BUTTONS */
         .buttons-area {
@@ -540,7 +553,7 @@
                 <div class="game-stage" id="stage">
                     <div class="lcd-msg" id="msg"></div>
 
-                    <!-- Stats View -->
+                    <!-- Stats View - Position absolue centrée -->
                     <div class="stats-view" id="statsView">
                         <div id="statsContent"></div>
                     </div>
@@ -595,12 +608,12 @@
             lightOn: true,
             menuIdx: -1,
             lastAnim: Date.now(),
-            lastPoopIncrease: Date.now(), // Nouveau timer
+            lastPoopIncrease: Date.now(),
             dead: false,
             showingStats: false
         };
 
-        let msgTimeout = null; // Timer pour effacer le message
+        let msgTimeout = null;
 
         // INIT
         const saved = localStorage.getItem('gotchi_modern');
@@ -635,29 +648,25 @@
                 if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
                 if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
 
-                // POOP - avec timer pour éviter augmentation trop rapide
                 const timeSinceLastPoop = now - STATE.lastPoopIncrease;
-                if(Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) { // 15s minimum entre chaque caca
+                if(Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) {
                     STATE.poops++;
                     STATE.lastPoopIncrease = now;
                     if(!STATE.poopTime) STATE.poopTime = now;
                 }
 
-                // MALADIE
                 if((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
                     STATE.sick = true;
                     STATE.sickTime = now;
                     uiMsg("🤒 Malade!");
                 }
 
-                // MORT
                 const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
                 if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
                     die();
                 }
             }
 
-            // RANDOM ANIMATIONS
             if(STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
                 randomAnimation();
                 STATE.lastAnim = now;
@@ -704,10 +713,8 @@
             const container = document.getElementById('creatureContainer');
             const statsView = document.getElementById('statsView');
 
-            // Hearts
             renderHearts();
 
-            // Stats view
             if(STATE.showingStats) {
                 statsView.classList.add('show');
                 container.style.display = 'none';
@@ -718,12 +725,28 @@
 
             if(STATE.dead) {
                 container.innerHTML = `<div class="dead-creature">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="30" y="40" width="40" height="50" rx="10" ry="10" fill="#636e72" opacity="0.8"/>
-                        <circle cx="50" cy="40" r="20" fill="#636e72" opacity="0.8"/>
-                        <rect x="47" y="48" width="6" height="25" fill="#fff"/>
-                        <rect x="40" y="57" width="20" height="6" fill="#fff"/>
-                        <text x="50" y="70" font-size="10" fill="#fff" text-anchor="middle" font-family="serif">RIP</text>
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Croix -->
+                        <rect x="52" y="5" width="16" height="50" rx="2" fill="#8b7355" opacity="0.9"/>
+                        <rect x="40" y="20" width="40" height="16" rx="2" fill="#8b7355" opacity="0.9"/>
+
+                        <!-- RIP texte -->
+                        <text x="60" y="72" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle" font-family="serif">RIP</text>
+
+                        <!-- Cercueil -->
+                        <path d="M 35 80 L 25 100 L 25 130 Q 25 135 30 135 L 90 135 Q 95 135 95 130 L 95 100 L 85 80 Z" 
+                              fill="#654321" stroke="#4a3017" stroke-width="2"/>
+
+                        <!-- Détails cercueil -->
+                        <rect x="50" y="95" width="20" height="30" rx="2" fill="#8b6914" opacity="0.4"/>
+                        <circle cx="45" cy="90" r="3" fill="#ffd700"/>
+                        <circle cx="75" cy="90" r="3" fill="#ffd700"/>
+                        <circle cx="45" cy="120" r="3" fill="#ffd700"/>
+                        <circle cx="75" cy="120" r="3" fill="#ffd700"/>
+
+                        <!-- Poignées -->
+                        <ellipse cx="32" cy="105" rx="4" ry="6" fill="#c0c0c0"/>
+                        <ellipse cx="88" cy="105" rx="4" ry="6" fill="#c0c0c0"/>
                     </svg>
                 </div>`;
             } else if(STATE.stage === 'egg') {
@@ -736,22 +759,18 @@
                 container.innerHTML = `<div class="creature">${getCreatureSVG()}</div>`;
             }
 
-            // Icons
             for(let i=0; i<8; i++) {
                 const el = document.getElementById('i'+i);
                 el.classList.remove('selected', 'active');
                 if(STATE.menuIdx === i) el.classList.add('selected');
             }
 
-            // Attention
             if(STATE.hunger < 2 || STATE.happy < 2 || STATE.poops > 2 || STATE.sick) {
                 document.getElementById('i7').classList.add('active');
             }
 
-            // Poops
             renderPoops();
 
-            // Lights
             document.getElementById('lcd').style.background = STATE.lightOn 
                 ? 'linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%)' 
                 : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
@@ -793,7 +812,6 @@
                 p.className = 'poop-sprite';
                 p.innerText = '💩';
 
-                // Fumant après 30s
                 if(poopAge > 30) {
                     p.classList.add('stinky');
                 }
@@ -801,7 +819,6 @@
                 pZone.appendChild(p);
             }
 
-            // Mouches après 60s
             if(poopAge > 60 && STATE.poops >= 3) {
                 for(let i=0; i<3; i++) {
                     const fly = document.createElement('div');
@@ -809,7 +826,7 @@
                     fly.innerText = '🪰';
                     fly.style.left = (10 + i*20) + 'px';
                     fly.style.top = (-20 + i*10) + 'px';
-                    fly.style.animationDelay = (i * 0.3) + 's';
+                    fly.style.animationDelay = (i * 0.4) + 's';
                     pZone.appendChild(fly);
                 }
             }
@@ -987,12 +1004,12 @@
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v2.6");
+                    uiMsg("Gotchi v3.0");
                     break;
                 case 7: // Attention
                     let issues = [];
                     if(STATE.hunger < 2) issues.push("Faim");
-                    if(STATE.happy < 2) issues.push("Tristesse");
+                    if(STATE.happy < 2) issues.push("Triste");
                     if(STATE.poops > 2) issues.push("Sale");
                     if(STATE.sick) issues.push("Malade");
                     uiMsg(issues.length ? "⚠️ " + issues.join(", ") : "✅ OK");
@@ -1016,13 +1033,12 @@
             const genderIcon = STATE.gender === 'male' ? '♂️' : STATE.gender === 'female' ? '♀️' : '';
 
             content.innerHTML = `
-                <div class="stat-line"><strong>Espèce:</strong> <span>${speciesInfo} ${genderIcon}</span></div>
-                <div class="stat-line"><strong>Stade:</strong> <span>${STATE.stage}</span></div>
-                <div class="stat-line"><strong>Âge:</strong> <span>${age}min</span></div>
-                <div class="stat-line"><strong>Poids:</strong> <span>${STATE.weight}g</span></div>
-                <div class="stat-line"><strong>Faim:</strong> <span>${STATE.hunger}/5</span></div>
-                <div class="stat-line"><strong>Joie:</strong> <span>${STATE.happy}/5</span></div>
-                <div class="stat-line"><strong>État:</strong> <span>${STATE.sick ? '🤒' : '✅'}</span></div>
+                <div class="stat-line full-width"><strong>Esp:</strong><span>${speciesInfo}${genderIcon}</span></div>
+                <div class="stat-line"><strong>Âge:</strong><span>${age}m</span></div>
+                <div class="stat-line"><strong>Poid:</strong><span>${STATE.weight}g</span></div>
+                <div class="stat-line"><strong>Faim:</strong><span>${STATE.hunger}/5</span></div>
+                <div class="stat-line"><strong>Joie:</strong><span>${STATE.happy}/5</span></div>
+                <div class="stat-line full-width"><strong>État:</strong><span>${STATE.sick ? '🤒' : '✅'}</span></div>
             `;
             STATE.showingStats = true;
             render();
@@ -1031,7 +1047,6 @@
         function uiMsg(txt) {
             const el = document.getElementById('msg');
 
-            // Clear previous timeout
             if(msgTimeout) {
                 clearTimeout(msgTimeout);
                 msgTimeout = null;
@@ -1040,7 +1055,6 @@
             el.innerText = txt;
             el.classList.add('show');
 
-            // Auto-hide after 2 seconds
             msgTimeout = setTimeout(() => {
                 el.classList.remove('show');
                 msgTimeout = null;
