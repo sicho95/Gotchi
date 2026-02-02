@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gotchi - Modern Edition</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* MENU HAMBURGER */
+        .hamburger { 
+            position: fixed; top: 20px; left: 20px; z-index: 1000; cursor: pointer; 
+            padding: 12px; background: rgba(255,255,255,0.2); border-radius: 12px; 
+            backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .hamburger:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+        .hamburger div { width: 28px; height: 3px; background: #fff; margin: 5px 0; border-radius: 3px; transition: 0.3s; }
+
+        .menu-dropdown { 
+            display: none; position: fixed; top: 80px; left: 20px; 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+            border-radius: 16px; z-index: 1001; min-width: 220px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .menu-dropdown.active { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .menu-item { 
+            padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); 
+            cursor: pointer; font-size: 15px; color: #333; 
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s;
+        }
+        .menu-item:hover { background: rgba(103,126,234,0.1); padding-left: 25px; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item input { display: none; }
+
+        /* DEVICE CONTAINER */
+        .device-container {
+            width: 360px;
+            height: 480px;
+            position: relative;
+            background: var(--shell-gradient, linear-gradient(135deg, #6a5acd 0%, #483d8b 100%));
+            border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
+            box-shadow: 
+                inset -10px -10px 30px rgba(0,0,0,0.3),
+                inset 10px 10px 30px rgba(255,255,255,0.2),
+                0 0 0 3px rgba(255,255,255,0.1),
+                0 40px 80px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 25px 55px 25px;
+            transition: background 0.5s ease;
+        }
+
+        /* Keychain Loop */
+        .keychain-loop {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 55px; height: 55px; border-radius: 50%; 
+            border: 7px solid rgba(150,150,150,0.8);
+            z-index: -1; 
+            box-shadow: 
+                inset 0 3px 8px rgba(0,0,0,0.3),
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* BRANDING */
+        .brand {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            font-weight: bold;
+            font-size: 28px;
+            letter-spacing: 3px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.3),
+                0 0 20px rgba(255,255,255,0.3);
+            transform: scaleY(0.85);
+        }
+
+        /* SCREEN BEZEL */
+        .screen-bezel {
+            background: linear-gradient(145deg, #e8e8e8, #f5f5f5);
+            width: 260px;
+            height: 260px;
+            border-radius: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                inset 3px 3px 8px rgba(0,0,0,0.12),
+                0 6px 15px rgba(0,0,0,0.2);
+            padding: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* LCD SCREEN */
+        .lcd {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%);
+            border: 3px solid #7ab89d;
+            border-radius: 22px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: inset 4px 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Subtle gradient overlay */
+        .lcd::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ICONS ROWS */
+        .icons-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 10px;
+            height: 38px;
+            z-index: 10;
+            position: relative;
+            background: rgba(255,255,255,0.15);
+        }
+        .icons-row.top { border-bottom: 2px solid rgba(255,255,255,0.3); }
+        .icons-row.bottom { border-top: 2px solid rgba(255,255,255,0.3); }
+
+        /* EMOJI ICONS - COLORÉS */
+        .icon {
+            font-size: 24px;
+            line-height: 28px;
+            opacity: 0.4;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            filter: grayscale(80%);
+        }
+        .icon:hover { transform: scale(1.2); filter: grayscale(0%); opacity: 0.8; }
+        .icon.active, .icon.selected { 
+            opacity: 1; 
+            filter: grayscale(0%); 
+            transform: scale(1.15);
+            animation: pulse 0.6s ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1.15); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Selection Indicator */
+        .icon.selected::after {
+            content: '▼';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .top .icon.selected::after { bottom: -14px; }
+        .bottom .icon.selected::after { top: -14px; content: '▲'; }
+
+        /* MAIN GAME AREA */
+        .game-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* CREATURE SPRITE */
+        .creature {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* EGG ANIMATIONS */
+        .egg-container {
+            width: 70px;
+            height: 85px;
+            position: relative;
+            animation: eggWiggle 2s ease-in-out infinite;
+        }
+        @keyframes eggWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .egg {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 50%, #e0e0e0 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 
+                inset -5px -5px 15px rgba(0,0,0,0.1),
+                inset 5px 5px 15px rgba(255,255,255,0.8),
+                0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* Spots on egg */
+        .egg::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 15px;
+            background: rgba(255,182,193,0.4);
+            border-radius: 50%;
+            top: 20%;
+            left: 30%;
+        }
+        .egg::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 18px;
+            background: rgba(173,216,230,0.4);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+        }
+
+        /* Hatching animation */
+        .egg.hatching {
+            animation: crack 0.8s ease-in-out;
+        }
+        @keyframes crack {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.05) rotate(5deg); }
+            40% { transform: scale(0.95) rotate(-5deg); }
+            60% { transform: scale(1.05); opacity: 1; }
+            80% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* CREATURE ANIMATIONS */
+        .bounce { animation: bounce 0.6s ease; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .move-left { animation: moveLeft 0.8s ease; }
+        @keyframes moveLeft {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-30px); }
+            100% { transform: translateX(0); }
+        }
+
+        .move-right { animation: moveRight 0.8s ease; }
+        @keyframes moveRight {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+            100% { transform: translateX(0); }
+        }
+
+        .happy { animation: happy 0.5s ease; }
+        @keyframes happy {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-10deg) scale(1.1); }
+            75% { transform: rotate(10deg) scale(1.1); }
+        }
+
+        .eat { animation: eat 0.6s ease; }
+        @keyframes eat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* POOP */
+        .poop-sprite { 
+            position: absolute; 
+            bottom: 12px; 
+            font-size: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+
+        /* TEXT OVERLAY */
+        .lcd-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 14px;
+            color: #fff;
+            background: rgba(50,50,50,0.85);
+            backdrop-filter: blur(5px);
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: none;
+            z-index: 20;
+            text-align: center;
+            white-space: pre-line;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .lcd-msg.show { display: block; animation: fadeIn 0.3s ease; }
+
+        /* BUTTONS */
+        .buttons-area {
+            display: flex;
+            gap: 24px;
+            margin-top: auto;
+        }
+
+        .btn-group { position: relative; width: 48px; height: 48px; }
+
+        .phys-btn {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 5px 0 rgba(0,0,0,0.3), 
+                0 10px 15px rgba(0,0,0,0.25),
+                inset 0 -2px 8px rgba(0,0,0,0.2),
+                inset 0 2px 8px rgba(255,255,255,0.4);
+            transition: all 0.1s;
+            position: relative;
+            top: 0;
+        }
+        .phys-btn:hover { 
+            box-shadow: 
+                0 5px 0 rgba(0,0,0,0.3), 
+                0 10px 20px rgba(0,0,0,0.3),
+                inset 0 -2px 8px rgba(0,0,0,0.2),
+                inset 0 2px 8px rgba(255,255,255,0.5);
+        }
+        .phys-btn:active { 
+            top: 5px; 
+            box-shadow: 
+                0 0 0 rgba(0,0,0,0.3),
+                0 3px 8px rgba(0,0,0,0.3),
+                inset 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-yellow { background: radial-gradient(circle at 35% 35%, #ffe66d, #ffd93d); }
+        .btn-red { background: radial-gradient(circle at 35% 35%, #ff6b9d, #ff4757); }
+        .btn-blue { background: radial-gradient(circle at 35% 35%, #74b9ff, #0984e3); }
+
+        .btn-label {
+            position: absolute; 
+            bottom: -22px; 
+            width: 100%; 
+            text-align: center;
+            font-size: 10px; 
+            font-weight: bold; 
+            color: rgba(255,255,255,0.85); 
+            letter-spacing: 1.5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* INFO BUTTON */
+        .info-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        .info-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1) rotate(20deg);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HAMBURGER MENU -->
+    <div class="hamburger" onclick="toggleSysMenu()">
+        <div></div><div></div><div></div>
+    </div>
+    <div class="menu-dropdown" id="sysMenu">
+        <div class="menu-item" onclick="setShell('purple')">🟣 Violet Classique</div>
+        <div class="menu-item" onclick="setShell('blue')">🔵 Bleu Océan</div>
+        <div class="menu-item" onclick="setShell('pink')">💗 Rose Bonbon</div>
+        <div class="menu-item" onclick="setShell('valentine')">💝 St-Valentin</div>
+        <div class="menu-item" onclick="setShell('white')">⚪ Blanc Perle</div>
+        <div class="menu-item" onclick="setShell('black')">⚫ Noir Galaxie</div>
+        <div class="menu-item" onclick="saveData()">💾 Sauvegarder</div>
+        <label class="menu-item">📂 Charger <input type="file" onchange="loadData(this)"></label>
+        <div class="menu-item" onclick="resetData()">🔄 Recommencer</div>
+    </div>
+
+    <!-- INFO BUTTON -->
+    <div class="info-btn" onclick="showAbout()" title="À propos">ℹ️</div>
+
+    <!-- DEVICE -->
+    <div class="device-container" id="device">
+        <div class="keychain-loop"></div>
+        <div class="brand">GOTCHI</div>
+
+        <div class="screen-bezel">
+            <div class="lcd" id="lcd">
+                <!-- Top Icons Row -->
+                <div class="icons-row top">
+                    <div class="icon" id="i0">🍖</div>
+                    <div class="icon" id="i1">💡</div>
+                    <div class="icon" id="i2">🎮</div>
+                    <div class="icon" id="i3">💊</div>
+                </div>
+
+                <!-- Game Stage -->
+                <div class="game-stage" id="stage">
+                    <div class="lcd-msg" id="msg"></div>
+                    <div id="creatureContainer"></div>
+                    <div id="poopZone"></div>
+                </div>
+
+                <!-- Bottom Icons Row -->
+                <div class="icons-row bottom">
+                    <div class="icon" id="i4">🚿</div>
+                    <div class="icon" id="i5">📊</div>
+                    <div class="icon" id="i6">📖</div>
+                    <div class="icon" id="i7">⚠️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons-area">
+            <div class="btn-group">
+                <button class="phys-btn btn-yellow" onclick="btnA()"></button>
+                <div class="btn-label">SELECT</div>
+            </div>
+            <div class="btn-group">
+                <button class="phys-btn btn-red" onclick="btnB()"></button>
+                <div class="btn-label">DECIDE</div>
+            </div>
+            <div class="btn-group">
+                <button class="phys-btn btn-blue" onclick="btnC()"></button>
+                <div class="btn-label">CANCEL</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // EVOLUTION TREE STRUCTURE
+        const EVOLUTION_TREE = {
+            baby: {
+                'BubblyBaby': { species: 'BubblyBaby', gender: null },
+                'FluffyBaby': { species: 'FluffyBaby', gender: null }
+            },
+            child: {
+                // From BubblyBaby
+                'BubbleKid_M': { species: 'BubbleKid', gender: 'male', parent: 'BubblyBaby' },
+                'BubbleKid_F': { species: 'BubbleKid', gender: 'female', parent: 'BubblyBaby' },
+                // From FluffyBaby
+                'FluffyKid_M': { species: 'FluffyKid', gender: 'male', parent: 'FluffyBaby' },
+                'FluffyKid_F': { species: 'FluffyKid', gender: 'female', parent: 'FluffyBaby' }
+            },
+            teen: {
+                // From BubbleKid
+                'BubbleTeen_M': { species: 'BubbleTeen', gender: 'male', parent: 'BubbleKid' },
+                'BubbleTeen_F': { species: 'BubbleTeen', gender: 'female', parent: 'BubbleKid' },
+                // From FluffyKid
+                'FluffyTeen_M': { species: 'FluffyTeen', gender: 'male', parent: 'FluffyKid' },
+                'FluffyTeen_F': { species: 'FluffyTeen', gender: 'female', parent: 'FluffyKid' }
+            },
+            adult: {
+                // From BubbleTeen
+                'BubbleKing_M': { species: 'BubbleKing', gender: 'male', parent: 'BubbleTeen' },
+                'BubbleQueen_F': { species: 'BubbleQueen', gender: 'female', parent: 'BubbleTeen' },
+                // From FluffyTeen
+                'FluffyLord_M': { species: 'FluffyLord', gender: 'male', parent: 'FluffyTeen' },
+                'FluffyLady_F': { species: 'FluffyLady', gender: 'female', parent: 'FluffyTeen' }
+            }
+        };
+
+        // STATE
+        const STATE = {
+            stage: 'egg',
+            speciesId: null,
+            birth: Date.now(),
+            hunger: 3,
+            happy: 3,
+            weight: 5,
+            poops: 0,
+            sick: false,
+            lightOn: true,
+            menuIdx: -1,
+            lastAnim: Date.now()
+        };
+
+        // INIT
+        const saved = localStorage.getItem('gotchi_modern');
+        if(saved) Object.assign(STATE, JSON.parse(saved));
+
+        // GAME LOOP
+        setInterval(() => {
+            const now = Date.now();
+            const age = (now - STATE.birth) / 1000;
+
+            // EVOLUTION
+            if(STATE.stage === 'egg' && age > 15) {
+                hatchEgg();
+            } else if(STATE.stage === 'baby' && age > 45) {
+                evolve('child');
+            } else if(STATE.stage === 'child' && age > 90) {
+                evolve('teen');
+            } else if(STATE.stage === 'teen' && age > 150) {
+                evolve('adult');
+            }
+
+            // NEEDS
+            if(STATE.stage !== 'egg') {
+                if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
+                if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
+                if(Math.random() < 0.01) STATE.poops = Math.min(4, STATE.poops + 1);
+            }
+
+            // RANDOM ANIMATIONS
+            if(STATE.stage !== 'egg' && now - STATE.lastAnim > 5000 && Math.random() < 0.3) {
+                randomAnimation();
+                STATE.lastAnim = now;
+            }
+
+            render();
+            localStorage.setItem('gotchi_modern', JSON.stringify(STATE));
+        }, 1000);
+
+        function hatchEgg() {
+            // Crack animation
+            const egg = document.querySelector('.egg');
+            if(egg) {
+                egg.classList.add('hatching');
+                setTimeout(() => {
+                    STATE.stage = 'baby';
+                    const babyOptions = Object.keys(EVOLUTION_TREE.baby);
+                    STATE.speciesId = babyOptions[Math.floor(Math.random() * babyOptions.length)];
+                    uiMsg("🐣 ÉCLOSION!");
+                    render();
+                }, 800);
+            }
+        }
+
+        function evolve(newStage) {
+            const currentInfo = EVOLUTION_TREE[STATE.stage][STATE.speciesId];
+            const options = Object.entries(EVOLUTION_TREE[newStage])
+                .filter(([id, info]) => {
+                    if(STATE.stage === 'baby') return info.parent === currentInfo.species;
+                    return info.parent === currentInfo.species;
+                });
+
+            if(options.length > 0) {
+                const [newId] = options[Math.floor(Math.random() * options.length)];
+                STATE.stage = newStage;
+                STATE.speciesId = newId;
+                uiMsg(`✨ ÉVOLUTION!
+${newStage.toUpperCase()}`);
+            }
+        }
+
+        function randomAnimation() {
+            const container = document.getElementById('creatureContainer');
+            const anims = ['bounce', 'move-left', 'move-right', 'happy'];
+            const anim = anims[Math.floor(Math.random() * anims.length)];
+            container.classList.add(anim);
+            setTimeout(() => container.classList.remove(anim), 1000);
+        }
+
+        // RENDER
+        function render() {
+            const container = document.getElementById('creatureContainer');
+
+            if(STATE.stage === 'egg') {
+                container.innerHTML = `
+                    <div class="egg-container">
+                        <div class="egg"></div>
+                    </div>
+                `;
+            } else {
+                const info = EVOLUTION_TREE[STATE.stage][STATE.speciesId];
+                container.innerHTML = `<div class="creature">${getCreatureSVG(STATE.stage, info)}</div>`;
+            }
+
+            // Icons
+            for(let i=0; i<8; i++) {
+                const el = document.getElementById('i'+i);
+                el.classList.remove('selected', 'active');
+                if(STATE.menuIdx === i) el.classList.add('selected');
+            }
+
+            // Attention icon
+            if(STATE.hunger < 2 || STATE.happy < 2 || STATE.poops > 2 || STATE.sick) {
+                document.getElementById('i7').classList.add('active');
+            }
+
+            // Poops
+            const pZone = document.getElementById('poopZone');
+            pZone.innerHTML = '';
+            for(let i=0; i<STATE.poops; i++) {
+                const p = document.createElement('div');
+                p.className = 'poop-sprite';
+                p.innerText = '💩';
+                p.style.right = (15 + i*25) + 'px';
+                pZone.appendChild(p);
+            }
+
+            // Lights
+            document.getElementById('lcd').style.background = STATE.lightOn 
+                ? 'linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%)' 
+                : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
+        }
+
+        function getCreatureSVG(stage, info) {
+            const genderColor = info.gender === 'male' ? '#74b9ff' : info.gender === 'female' ? '#ff6b9d' : '#ffeaa7';
+
+            // Simplified cute creatures
+            if(stage === 'baby') {
+                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="45" r="25" fill="${info.species === 'BubblyBaby' ? '#74b9ff' : '#ffeaa7'}"/>
+                    <circle cx="32" cy="40" r="4" fill="#2d3436"/>
+                    <circle cx="48" cy="40" r="4" fill="#2d3436"/>
+                    <path d="M 32 52 Q 40 58 48 52" stroke="#2d3436" stroke-width="2" fill="none"/>
+                </svg>`;
+            }
+
+            if(stage === 'child') {
+                const hairLength = info.gender === 'female' ? 15 : 8;
+                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="45" r="22" fill="${genderColor}"/>
+                    <rect x="35" y="${20-hairLength}" width="10" height="${hairLength}" fill="#2d3436" rx="5"/>
+                    <circle cx="33" cy="42" r="3" fill="#2d3436"/>
+                    <circle cx="47" cy="42" r="3" fill="#2d3436"/>
+                    <ellipse cx="40" cy="52" rx="8" ry="4" fill="#e17055"/>
+                </svg>`;
+            }
+
+            if(stage === 'teen') {
+                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="40" cy="50" rx="28" ry="25" fill="${genderColor}"/>
+                    ${info.gender === 'female' ? '<path d="M 20 35 Q 25 25 30 35" fill="#2d3436"/><path d="M 50 35 Q 55 25 60 35" fill="#2d3436"/>' : '<rect x="25" y="30" width="6" height="10" fill="#2d3436" rx="3"/><rect x="49" y="30" width="6" height="10" fill="#2d3436" rx="3"/>'}
+                    <circle cx="32" cy="45" r="4" fill="#2d3436"/>
+                    <circle cx="48" cy="45" r="4" fill="#2d3436"/>
+                    <path d="M 32 58 Q 40 64 48 58" stroke="#2d3436" stroke-width="3" fill="none"/>
+                </svg>`;
+            }
+
+            if(stage === 'adult') {
+                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="40" cy="50" rx="30" ry="28" fill="${genderColor}"/>
+                    ${info.gender === 'male' ? '<polygon points="35,15 40,5 45,15" fill="#ffd700"/>' : '<circle cx="30" cy="20" r="8" fill="#ff6b9d" opacity="0.6"/><circle cx="50" cy="20" r="8" fill="#ff6b9d" opacity="0.6"/>'}
+                    <circle cx="30" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="50" cy="45" r="5" fill="#2d3436"/>
+                    <path d="M 30 60 Q 40 68 50 60" stroke="#2d3436" stroke-width="3" fill="none"/>
+                    <circle cx="32" cy="46" r="2" fill="#fff"/>
+                    <circle cx="52" cy="46" r="2" fill="#fff"/>
+                </svg>`;
+            }
+        }
+
+        // INPUTS
+        function btnA() {
+            if(STATE.stage === 'egg') return;
+            STATE.menuIdx = (STATE.menuIdx === -1) ? 0 : (STATE.menuIdx + 1) % 8;
+            render();
+        }
+
+        function btnB() {
+            if(STATE.stage === 'egg') return;
+            if(STATE.menuIdx === -1) {
+                showStats();
+            } else {
+                doAction(STATE.menuIdx);
+            }
+        }
+
+        function btnC() {
+            STATE.menuIdx = -1;
+            document.getElementById('msg').classList.remove('show');
+            render();
+        }
+
+        function doAction(idx) {
+            const container = document.getElementById('creatureContainer');
+
+            switch(idx) {
+                case 0: // Feed
+                    uiMsg("😋 MIAM!");
+                    container.classList.add('eat');
+                    setTimeout(() => container.classList.remove('eat'), 600);
+                    STATE.hunger = Math.min(4, STATE.hunger + 1);
+                    STATE.weight++;
+                    break;
+                case 1: // Light
+                    STATE.lightOn = !STATE.lightOn;
+                    uiMsg(STATE.lightOn ? "💡 ON" : "🌙 OFF");
+                    break;
+                case 2: // Game
+                    uiMsg("🎮 YOUPI!");
+                    container.classList.add('happy');
+                    setTimeout(() => container.classList.remove('happy'), 500);
+                    STATE.happy = Math.min(4, STATE.happy + 1);
+                    STATE.weight = Math.max(1, STATE.weight - 1);
+                    break;
+                case 3: // Meds
+                    if(STATE.sick) { 
+                        STATE.sick = false; 
+                        uiMsg("💊 GUÉRI!"); 
+                    } else {
+                        uiMsg("💊 OK");
+                    }
+                    break;
+                case 4: // Clean
+                    STATE.poops = 0;
+                    uiMsg("✨ PROPRE!");
+                    break;
+                case 5: // Stats
+                    showStats();
+                    break;
+                case 6: // About
+                    showAbout();
+                    break;
+            }
+            STATE.menuIdx = -1;
+            render();
+        }
+
+        function showStats() {
+            const age = Math.floor((Date.now() - STATE.birth) / 60000);
+            const info = STATE.stage !== 'egg' ? EVOLUTION_TREE[STATE.stage][STATE.speciesId] : null;
+            const name = info ? info.species : 'Œuf';
+            const gender = info && info.gender ? (info.gender === 'male' ? '♂️' : '♀️') : '';
+
+            uiMsg(`📊 STATS
+━━━━━━━━
+${name} ${gender}
+Âge: ${age}min
+Poids: ${STATE.weight}g
+Faim: ${STATE.hunger}/4
+Joie: ${STATE.happy}/4`);
+        }
+
+        function showAbout() {
+            window.open('about.txt', '_blank');
+        }
+
+        function uiMsg(txt) {
+            const el = document.getElementById('msg');
+            el.innerText = txt;
+            el.classList.add('show');
+            if(!txt.includes('STATS')) {
+                setTimeout(() => el.classList.remove('show'), 2500);
+            }
+        }
+
+        // SYSTEM
+        function toggleSysMenu() { 
+            document.getElementById('sysMenu').classList.toggle('active'); 
+        }
+
+        function setShell(color) {
+            const d = document.getElementById('device');
+            const shells = {
+                purple: 'linear-gradient(135deg, #6a5acd 0%, #483d8b 100%)',
+                blue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                pink: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                valentine: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)',
+                white: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                black: 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)'
+            };
+            d.style.setProperty('--shell-gradient', shells[color]);
+
+            // Add hearts for valentine
+            if(color === 'valentine') {
+                addHearts(d);
+            }
+            toggleSysMenu();
+        }
+
+        function addHearts(container) {
+            // Clear existing hearts
+            container.querySelectorAll('.heart').forEach(h => h.remove());
+
+            const hearts = ['💗', '💖', '💝', '💕'];
+            for(let i=0; i<8; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerText = hearts[i % hearts.length];
+                heart.style.cssText = `
+                    position: absolute;
+                    font-size: ${15 + Math.random()*10}px;
+                    opacity: 0.4;
+                    top: ${Math.random()*100}%;
+                    left: ${Math.random()*100}%;
+                    pointer-events: none;
+                `;
+                container.appendChild(heart);
+            }
+        }
+
+        function saveData() { 
+            const blob = new Blob([JSON.stringify(STATE)], {type:'application/json'});
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(blob); 
+            a.download='gotchi_save.json'; 
+            a.click();
+            uiMsg("💾 SAUVEGARDÉ!");
+        }
+
+        function loadData(input) {
+            const r = new FileReader();
+            r.onload = e => { 
+                Object.assign(STATE, JSON.parse(e.target.result)); 
+                render(); 
+                toggleSysMenu();
+                uiMsg("📂 CHARGÉ!");
+            };
+            r.readAsText(input.files[0]);
+        }
+
+        function resetData() { 
+            if(confirm("🔄 Recommencer depuis le début ?")) {
+                localStorage.removeItem('gotchi_modern'); 
+                location.reload(); 
+            }
+        }
+
+        // START
+        render();
+
+    </script>
+</body>
+</html>
