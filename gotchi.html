@@ -137,6 +137,42 @@
             z-index: 1;
         }
 
+        /* STATUS BARS - Coin haut gauche */
+        .status-bars {
+            position: absolute;
+            top: 45px;
+            left: 8px;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(255,255,255,0.3);
+            padding: 3px 6px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+        .status-icon {
+            font-size: 14px;
+        }
+        .hearts-container {
+            display: flex;
+            gap: 2px;
+        }
+        .heart {
+            font-size: 12px;
+            filter: grayscale(100%);
+            opacity: 0.3;
+        }
+        .heart.filled {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
         /* ICONS ROWS */
         .icons-row {
             display: flex;
@@ -312,14 +348,20 @@
             100% { transform: scale(0); opacity: 0; }
         }
 
-        /* POOP - Multiple avec effets */
-        .poop-sprite { 
-            position: absolute; 
-            bottom: 15px; 
-            font-size: 22px;
-            animation: fadeIn 0.3s ease;
+        /* POOP - Plus bas, sans clignotement */
+        .poop-zone {
+            position: absolute;
+            bottom: 50px; /* Plus bas */
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 8;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+        .poop-sprite { 
+            position: relative;
+            font-size: 22px;
+            /* Pas d'animation de clignotement */
+        }
 
         .poop-sprite.stinky::after {
             content: '💨';
@@ -368,7 +410,13 @@
             white-space: nowrap;
             box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         }
-        .lcd-msg.show { display: block; animation: fadeIn 0.3s ease; }
+        .lcd-msg.show { display: block; animation: fadeInOut 2s ease; }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
 
         /* STATS VIEW - Remplace la créature */
         .stats-view {
@@ -377,19 +425,19 @@
             justify-content: center;
             align-items: flex-start;
             width: 100%;
-            padding: 15px;
-            font-size: 13px;
+            padding: 10px;
+            font-size: 12px;
             color: #2d3436;
             font-weight: 600;
             font-family: 'Courier New', monospace;
         }
         .stats-view.show { display: flex; }
         .stats-view .stat-line { 
-            margin: 4px 0; 
+            margin: 3px 0; 
             display: flex; 
             justify-content: space-between; 
             width: 100%;
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.4);
             padding: 4px 8px;
             border-radius: 5px;
         }
@@ -476,6 +524,18 @@
 
         <div class="screen-bezel">
             <div class="lcd" id="lcd">
+                <!-- Status Bars -->
+                <div class="status-bars" id="statusBars">
+                    <div class="status-bar">
+                        <span class="status-icon">🍖</span>
+                        <div class="hearts-container" id="hungerHearts"></div>
+                    </div>
+                    <div class="status-bar">
+                        <span class="status-icon">😊</span>
+                        <div class="hearts-container" id="happyHearts"></div>
+                    </div>
+                </div>
+
                 <!-- Top Icons Row -->
                 <div class="icons-row top">
                     <div class="icon" id="i0">🍖</div>
@@ -488,14 +548,14 @@
                 <div class="game-stage" id="stage">
                     <div class="lcd-msg" id="msg"></div>
 
-                    <!-- Stats View (remplace la créature) -->
+                    <!-- Stats View -->
                     <div class="stats-view" id="statsView">
                         <div id="statsContent"></div>
                     </div>
 
                     <!-- Normal View -->
                     <div id="creatureContainer"></div>
-                    <div id="poopZone"></div>
+                    <div class="poop-zone" id="poopZone"></div>
                     <div id="foodZone"></div>
                 </div>
 
@@ -533,17 +593,18 @@
             speciesLine: null,
             gender: null,
             birth: Date.now(),
-            hunger: 3,
-            happy: 3,
+            hunger: 4,
+            happy: 4,
             weight: 5,
             poops: 0,
-            poopTime: null, // Timestamp du dernier caca
+            poopTime: null,
             sick: false,
             sickTime: null,
             lightOn: true,
             menuIdx: -1,
             lastAnim: Date.now(),
-            dead: false
+            dead: false,
+            showingStats: false
         };
 
         // INIT
@@ -558,7 +619,7 @@
 
         // GAME LOOP
         setInterval(() => {
-            if(STATE.dead) return; // Stop si mort
+            if(STATE.dead) return;
 
             const now = Date.now();
             const age = (now - STATE.birth) / 1000;
@@ -576,25 +637,23 @@
 
             // NEEDS
             if(STATE.stage !== 'egg') {
-                if(Math.random() < 0.02) STATE.hunger = Math.max(0, STATE.hunger - 1);
-                if(Math.random() < 0.02) STATE.happy = Math.max(0, STATE.happy - 1);
-                if(Math.random() < 0.012) {
+                if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
+                if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
+                if(Math.random() < 0.01) {
                     STATE.poops = Math.min(5, STATE.poops + 1);
                     if(!STATE.poopTime) STATE.poopTime = now;
                 }
 
-                // MALADIE si conditions dégradées
-                if((STATE.hunger === 0 || STATE.poops >= 4) && !STATE.sick) {
+                // MALADIE
+                if((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
                     STATE.sick = true;
                     STATE.sickTime = now;
                     uiMsg("🤒 Malade!");
                 }
 
-                // MORT si négligence prolongée
+                // MORT
                 const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
-                const hungerZeroTime = STATE.hunger === 0 ? age : 0;
-
-                if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && hungerZeroTime > 60) || STATE.poops >= 5) {
+                if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
                     die();
                 }
             }
@@ -646,21 +705,25 @@
             const container = document.getElementById('creatureContainer');
             const statsView = document.getElementById('statsView');
 
-            // Hide stats if not in stats mode
-            if(STATE.menuIdx !== 5) {
+            // Hearts
+            renderHearts();
+
+            // Stats view
+            if(STATE.showingStats) {
+                statsView.classList.add('show');
+                container.style.display = 'none';
+            } else {
                 statsView.classList.remove('show');
+                container.style.display = 'block';
             }
 
             if(STATE.dead) {
                 container.innerHTML = `<div class="dead-creature">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Tombstone -->
                         <rect x="30" y="40" width="40" height="50" rx="10" ry="10" fill="#636e72" opacity="0.8"/>
                         <circle cx="50" cy="40" r="20" fill="#636e72" opacity="0.8"/>
-                        <!-- Cross -->
                         <rect x="47" y="48" width="6" height="25" fill="#fff"/>
                         <rect x="40" y="57" width="20" height="6" fill="#fff"/>
-                        <!-- RIP -->
                         <text x="50" y="70" font-size="10" fill="#fff" text-anchor="middle" font-family="serif">RIP</text>
                     </svg>
                 </div>`;
@@ -681,18 +744,42 @@
                 if(STATE.menuIdx === i) el.classList.add('selected');
             }
 
-            // Attention icon - clignote si problème
+            // Attention
             if(STATE.hunger < 2 || STATE.happy < 2 || STATE.poops > 2 || STATE.sick) {
                 document.getElementById('i7').classList.add('active');
             }
 
-            // Poops avec effets
+            // Poops
             renderPoops();
 
             // Lights
             document.getElementById('lcd').style.background = STATE.lightOn 
                 ? 'linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%)' 
                 : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
+        }
+
+        function renderHearts() {
+            const hungerContainer = document.getElementById('hungerHearts');
+            const happyContainer = document.getElementById('happyHearts');
+
+            hungerContainer.innerHTML = '';
+            happyContainer.innerHTML = '';
+
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('span');
+                h.className = 'heart';
+                h.innerText = '❤️';
+                if(i < STATE.hunger) h.classList.add('filled');
+                hungerContainer.appendChild(h);
+            }
+
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('span');
+                h.className = 'heart';
+                h.innerText = '💛';
+                if(i < STATE.happy) h.classList.add('filled');
+                happyContainer.appendChild(h);
+            }
         }
 
         function renderPoops() {
@@ -706,7 +793,6 @@
                 const p = document.createElement('div');
                 p.className = 'poop-sprite';
                 p.innerText = '💩';
-                p.style.right = (15 + i*23) + 'px';
 
                 // Fumant après 30s
                 if(poopAge > 30) {
@@ -717,13 +803,13 @@
             }
 
             // Mouches après 60s
-            if(poopAge > 60 && STATE.poops > 2) {
+            if(poopAge > 60 && STATE.poops >= 3) {
                 for(let i=0; i<3; i++) {
                     const fly = document.createElement('div');
                     fly.className = 'fly';
                     fly.innerText = '🪰';
-                    fly.style.right = (30 + i*15) + 'px';
-                    fly.style.bottom = (30 + i*10) + 'px';
+                    fly.style.left = (10 + i*20) + 'px';
+                    fly.style.top = (-20 + i*10) + 'px';
                     fly.style.animationDelay = (i * 0.3) + 's';
                     pZone.appendChild(fly);
                 }
@@ -734,18 +820,22 @@
             const genderColor = STATE.gender === 'male' ? '#74b9ff' : '#ff6b9d';
             const secondaryColor = STATE.speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
 
-            // Montrer signe de maladie
-            const sickIndicator = STATE.sick ? '<text x="45" y="20" font-size="18" text-anchor="middle">🤒</text>' : '';
+            // Modifier couleur et bouche si malade ou triste
+            const sickTint = STATE.sick ? 'filter: hue-rotate(80deg) saturate(0.7);' : '';
+            const mouthPath = STATE.sick 
+                ? 'M 38 56 Q 42 59 45 56 Q 48 59 52 56' // Vague
+                : STATE.happy <= 1
+                ? 'M 38 56 Q 45 52 52 56' // Triste
+                : 'M 38 56 Q 45 60 52 56'; // Normal
 
             if(STATE.stage === 'baby') {
-                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    ${sickIndicator}
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
                     <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
                     <circle cx="38" cy="45" r="5" fill="#2d3436"/>
                     <circle cx="52" cy="45" r="5" fill="#2d3436"/>
                     <circle cx="39.5" cy="44" r="2" fill="#fff"/>
                     <circle cx="53.5" cy="44" r="2" fill="#fff"/>
-                    <path d="M 38 56 Q 45 60 52 56" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="${mouthPath}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
                     <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
                     ${STATE.gender === 'female' ? '<ellipse cx="45" cy="28" rx="8" ry="5" fill="#ff6b9d" opacity="0.5"/>' : '<rect x="42" y="25" width="6" height="8" rx="3" fill="#74b9ff" opacity="0.5"/>'}
@@ -754,8 +844,12 @@
 
             if(STATE.stage === 'child') {
                 const hairLength = STATE.gender === 'female' ? 18 : 10;
-                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    ${sickIndicator}
+                const childMouth = STATE.sick 
+                    ? 'M 38 58 Q 42 61 45 58 Q 48 61 52 58'
+                    : STATE.happy <= 1
+                    ? 'M 38 58 Q 45 54 52 58'
+                    : 'M 38 58 Q 45 62 52 58';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
                     <ellipse cx="45" cy="52" rx="26" ry="24" fill="${genderColor}"/>
                     <ellipse cx="45" cy="52" rx="22" ry="20" fill="${secondaryColor}" opacity="0.6"/>
                     ${STATE.gender === 'female' 
@@ -768,7 +862,7 @@
                     <circle cx="52" cy="48" r="4.5" fill="#2d3436"/>
                     <circle cx="39" cy="47" r="2" fill="#fff"/>
                     <circle cx="53" cy="47" r="2" fill="#fff"/>
-                    <ellipse cx="45" cy="58" rx="9" ry="5" fill="#e17055"/>
+                    <path d="${childMouth}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     <ellipse cx="32" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
                     <ellipse cx="58" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
                     <circle cx="35" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
@@ -777,8 +871,12 @@
             }
 
             if(STATE.stage === 'teen') {
-                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    ${sickIndicator}
+                const teenMouth = STATE.sick 
+                    ? 'M 35 62 Q 40 66 45 62 Q 50 66 55 62'
+                    : STATE.happy <= 1
+                    ? 'M 35 62 Q 45 58 55 62'
+                    : 'M 35 62 Q 45 69 55 62';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
                     <ellipse cx="45" cy="54" rx="30" ry="28" fill="${genderColor}"/>
                     <ellipse cx="45" cy="54" rx="25" ry="23" fill="${secondaryColor}" opacity="0.5"/>
                     ${STATE.gender === 'female'
@@ -793,15 +891,19 @@
                     <circle cx="54" cy="50" r="5" fill="#2d3436"/>
                     <circle cx="37.5" cy="49" r="2.5" fill="#fff"/>
                     <circle cx="55.5" cy="49" r="2.5" fill="#fff"/>
-                    <path d="M 35 62 Q 45 69 55 62" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <path d="${teenMouth}" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
                     <ellipse cx="28" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
                     <ellipse cx="62" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
                 </svg>`;
             }
 
             if(STATE.stage === 'adult') {
-                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    ${sickIndicator}
+                const adultMouth = STATE.sick 
+                    ? 'M 33 65 Q 39 70 45 65 Q 51 70 57 65'
+                    : STATE.happy <= 1
+                    ? 'M 33 65 Q 45 61 57 65'
+                    : 'M 33 65 Q 45 73 57 65';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
                     <ellipse cx="45" cy="55" rx="32" ry="30" fill="${genderColor}"/>
                     <ellipse cx="45" cy="55" rx="28" ry="26" fill="${secondaryColor}" opacity="0.4"/>
                     ${STATE.gender === 'male'
@@ -815,7 +917,7 @@
                     <circle cx="55" cy="50" r="6" fill="#2d3436"/>
                     <circle cx="37" cy="49" r="3" fill="#fff"/>
                     <circle cx="57" cy="49" r="3" fill="#fff"/>
-                    <path d="M 33 65 Q 45 73 57 65" stroke="#2d3436" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                    <path d="${adultMouth}" stroke="#2d3436" stroke-width="3.5" fill="none" stroke-linecap="round"/>
                     <ellipse cx="26" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
                     <ellipse cx="64" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
                     <circle cx="38" cy="40" r="2.5" fill="${secondaryColor}"/>
@@ -842,7 +944,7 @@
 
         function btnC() {
             STATE.menuIdx = -1;
-            document.getElementById('statsView').classList.remove('show');
+            STATE.showingStats = false;
             render();
         }
 
@@ -855,7 +957,7 @@
                     container.classList.add('eating');
                     setTimeout(() => container.classList.remove('eating'), 1200);
                     uiMsg("Miam!");
-                    STATE.hunger = Math.min(4, STATE.hunger + 1);
+                    STATE.hunger = Math.min(5, STATE.hunger + 1);
                     STATE.weight++;
                     break;
                 case 1: // Light
@@ -866,7 +968,7 @@
                     container.classList.add('happy');
                     setTimeout(() => container.classList.remove('happy'), 500);
                     uiMsg("Youpi!");
-                    STATE.happy = Math.min(4, STATE.happy + 1);
+                    STATE.happy = Math.min(5, STATE.happy + 1);
                     STATE.weight = Math.max(1, STATE.weight - 1);
                     break;
                 case 3: // Meds
@@ -887,15 +989,15 @@
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v2.0");
+                    uiMsg("Gotchi v2.5");
                     break;
-                case 7: // Attention - Affiche ce qui ne va pas
+                case 7: // Attention
                     let issues = [];
                     if(STATE.hunger < 2) issues.push("Faim");
                     if(STATE.happy < 2) issues.push("Tristesse");
                     if(STATE.poops > 2) issues.push("Sale");
                     if(STATE.sick) issues.push("Malade");
-                    uiMsg(issues.length ? "⚠️ " + issues.join(", ") : "✅ Tout va bien");
+                    uiMsg(issues.length ? "⚠️ " + issues.join(", ") : "✅ OK");
                     break;
             }
             STATE.menuIdx = -1;
@@ -910,7 +1012,6 @@
 
         function showStats() {
             const age = Math.floor((Date.now() - STATE.birth) / 60000);
-            const view = document.getElementById('statsView');
             const content = document.getElementById('statsContent');
 
             const speciesInfo = STATE.speciesLine || 'Œuf';
@@ -921,29 +1022,21 @@
                 <div class="stat-line"><strong>Stade:</strong> <span>${STATE.stage}</span></div>
                 <div class="stat-line"><strong>Âge:</strong> <span>${age} min</span></div>
                 <div class="stat-line"><strong>Poids:</strong> <span>${STATE.weight}g</span></div>
-                <div class="stat-line"><strong>Faim:</strong> <span>${STATE.hunger}/4</span></div>
-                <div class="stat-line"><strong>Joie:</strong> <span>${STATE.happy}/4</span></div>
+                <div class="stat-line"><strong>Faim:</strong> <span>${STATE.hunger}/5</span></div>
+                <div class="stat-line"><strong>Joie:</strong> <span>${STATE.happy}/5</span></div>
                 <div class="stat-line"><strong>État:</strong> <span>${STATE.sick ? '🤒 Malade' : '✅ OK'}</span></div>
             `;
-            view.classList.add('show');
-
-            // Hide creature
-            document.getElementById('creatureContainer').style.display = 'none';
-            document.getElementById('poopZone').style.display = 'none';
+            STATE.showingStats = true;
+            render();
         }
 
         function uiMsg(txt) {
-            // Restore creature display if stats was open
-            if(document.getElementById('statsView').classList.contains('show')) {
-                document.getElementById('statsView').classList.remove('show');
-                document.getElementById('creatureContainer').style.display = 'block';
-                document.getElementById('poopZone').style.display = 'block';
-            }
-
             const el = document.getElementById('msg');
             el.innerText = txt;
+            el.classList.remove('show');
+            // Force reflow
+            void el.offsetWidth;
             el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 2000);
         }
 
         // SYSTEM
@@ -1010,6 +1103,7 @@
             a.download='gotchi_save.json'; 
             a.click();
             uiMsg("Sauvegardé!");
+            toggleSysMenu();
         }
 
         function loadData(input) {
@@ -1026,14 +1120,13 @@
         function resetData() {
             if(confirm("Recommencer depuis le début ?")) {
                 localStorage.removeItem('gotchi_modern');
-                // Reset state
                 Object.assign(STATE, {
                     stage: 'egg',
                     speciesLine: null,
                     gender: null,
                     birth: Date.now(),
-                    hunger: 3,
-                    happy: 3,
+                    hunger: 4,
+                    happy: 4,
                     weight: 5,
                     poops: 0,
                     poopTime: null,
@@ -1042,10 +1135,12 @@
                     lightOn: true,
                     menuIdx: -1,
                     lastAnim: Date.now(),
-                    dead: false
+                    dead: false,
+                    showingStats: false
                 });
                 render();
                 uiMsg("Nouveau départ!");
+                toggleSysMenu();
             }
         }
 
