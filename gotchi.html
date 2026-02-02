@@ -383,6 +383,7 @@
             position: absolute;
             font-size: 11px;
             animation: flyAround 5s ease-in-out infinite;
+            pointer-events: none;
         }
         @keyframes flyAround {
             0% { transform: translate(0px, 0px) rotate(0deg); }
@@ -396,10 +397,10 @@
             100% { transform: translate(0px, 0px) rotate(360deg); }
         }
 
-        /* TEXT OVERLAY */
+        /* TEXT OVERLAY - EN DESSOUS DE LA CRÉATURE */
         .lcd-msg {
             position: absolute;
-            top: 10px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Courier New', monospace;
@@ -436,7 +437,7 @@
             background: rgba(255,255,255,0.35);
             padding: 2px 5px;
             border-radius: 3px;
-            white-space: nowrap;
+            whitespace: nowrap;
             font-size: 8.5px;
             color: #2d3436;
             font-weight: 600;
@@ -608,7 +609,8 @@
             lastAnim: Date.now(),
             lastPoopIncrease: Date.now(),
             dead: false,
-            showingStats: false
+            showingStats: false,
+            lastPoopCount: 0  // Pour éviter de recréer les mouches
         };
 
         let msgTimeout = null;
@@ -800,25 +802,42 @@
 
         function renderPoops() {
             const pZone = document.getElementById('poopZone');
-            pZone.innerHTML = '';
 
             const now = Date.now();
             const poopAge = STATE.poopTime ? (now - STATE.poopTime) / 1000 : 0;
+            const needFlies = poopAge > 60 && STATE.poops >= 3;
 
-            for(let i=0; i<STATE.poops; i++) {
-                const p = document.createElement('div');
-                p.className = 'poop-sprite';
-                p.innerText = '💩';
+            // OPTIMISATION : Ne recréer que si le nombre de poops a changé
+            if(STATE.lastPoopCount !== STATE.poops) {
+                pZone.innerHTML = '';
 
-                if(poopAge > 30) {
-                    p.classList.add('stinky');
+                // Créer les poops
+                for(let i=0; i<STATE.poops; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'poop-sprite';
+                    if(poopAge > 30) p.classList.add('stinky');
+                    p.innerText = '💩';
+                    pZone.appendChild(p);
                 }
 
-                pZone.appendChild(p);
+                STATE.lastPoopCount = STATE.poops;
+            } else {
+                // Juste mettre à jour les classes stinky
+                const poops = pZone.querySelectorAll('.poop-sprite');
+                poops.forEach(p => {
+                    if(poopAge > 30) {
+                        p.classList.add('stinky');
+                    } else {
+                        p.classList.remove('stinky');
+                    }
+                });
             }
 
-            // Mouches avec positions mieux espacées et délais différents
-            if(poopAge > 60 && STATE.poops >= 3) {
+            // Gérer les mouches séparément
+            const existingFlies = pZone.querySelectorAll('.fly');
+
+            if(needFlies && existingFlies.length === 0) {
+                // Créer les mouches SEULEMENT si elles n'existent pas
                 const flyPositions = [
                     { left: 5, top: -25, delay: 0 },
                     { left: 18, top: -18, delay: 1.7 },
@@ -834,6 +853,9 @@
                     fly.style.animationDelay = pos.delay + 's';
                     pZone.appendChild(fly);
                 });
+            } else if(!needFlies && existingFlies.length > 0) {
+                // Supprimer les mouches si plus nécessaires
+                existingFlies.forEach(fly => fly.remove());
             }
         }
 
@@ -1003,13 +1025,14 @@
                 case 4: // Clean
                     STATE.poops = 0;
                     STATE.poopTime = null;
+                    STATE.lastPoopCount = 0;  // Reset pour recréer les poops
                     uiMsg("Propre!");
                     break;
                 case 5: // Stats
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v3.2");
+                    uiMsg("Gotchi v3.3");
                     break;
                 case 7: // Attention
                     let issues = [];
@@ -1164,7 +1187,8 @@
                     lastAnim: Date.now(),
                     lastPoopIncrease: Date.now(),
                     dead: false,
-                    showingStats: false
+                    showingStats: false,
+                    lastPoopCount: 0
                 });
                 render();
                 uiMsg("Nouveau départ!");
