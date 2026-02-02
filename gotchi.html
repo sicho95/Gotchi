@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
         body {
-            background-color: #000; /* Fond noir uni */
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -52,7 +52,7 @@
             width: 360px;
             height: 480px;
             position: relative;
-            background: var(--shell-color, #6a5acd); /* Couleur unie */
+            background: var(--shell-color, #6a5acd);
             border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
             box-shadow: 
                 inset -10px -10px 30px rgba(0,0,0,0.3),
@@ -66,29 +66,12 @@
             transition: background 0.5s ease;
         }
 
-        /* Valentine hearts pattern */
-        .device-container.valentine::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 
-                radial-gradient(circle at 20% 30%, transparent 8px, transparent 10px),
-                radial-gradient(circle at 80% 50%, transparent 6px, transparent 8px),
-                radial-gradient(circle at 40% 70%, transparent 7px, transparent 9px),
-                radial-gradient(circle at 70% 20%, transparent 5px, transparent 7px),
-                radial-gradient(circle at 30% 90%, transparent 6px, transparent 8px);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* SVG Hearts for Valentine */
         .heart-decoration {
             position: absolute;
             opacity: 0.3;
             pointer-events: none;
         }
 
-        /* Keychain Loop */
         .keychain-loop {
             position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
             width: 55px; height: 55px; border-radius: 50%; 
@@ -99,7 +82,6 @@
                 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        /* BRANDING */
         .brand {
             font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
             font-weight: bold;
@@ -146,7 +128,6 @@
             box-shadow: inset 4px 4px 12px rgba(0,0,0,0.15);
         }
 
-        /* Subtle gradient overlay */
         .lcd::before {
             content: '';
             position: absolute;
@@ -170,7 +151,6 @@
         .icons-row.top { border-bottom: 2px solid rgba(255,255,255,0.3); }
         .icons-row.bottom { border-top: 2px solid rgba(255,255,255,0.3); }
 
-        /* EMOJI ICONS - COLORÉS (pas de triangle) */
         .icon {
             font-size: 24px;
             line-height: 28px;
@@ -205,7 +185,7 @@
             transition: all 0.3s ease;
         }
 
-        /* EGG ANIMATIONS */
+        /* EGG */
         .egg-container {
             width: 70px;
             height: 85px;
@@ -230,7 +210,6 @@
             position: relative;
         }
 
-        /* Spots on egg */
         .egg::before {
             content: '';
             position: absolute;
@@ -252,7 +231,6 @@
             right: 25%;
         }
 
-        /* Hatching animation */
         .egg.hatching {
             animation: crack 0.8s ease-in-out forwards;
         }
@@ -263,6 +241,19 @@
             60% { transform: scale(1.05); opacity: 1; }
             80% { transform: scale(0.8); opacity: 0.5; }
             100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* DEATH ANIMATION */
+        .dead-creature {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: death 1.5s ease-out;
+        }
+        @keyframes death {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(0.8) rotate(-20deg); opacity: 0.5; }
+            100% { transform: scale(0.6) rotate(-30deg); opacity: 0.3; }
         }
 
         /* CREATURE ANIMATIONS */
@@ -321,16 +312,43 @@
             100% { transform: scale(0); opacity: 0; }
         }
 
-        /* POOP */
+        /* POOP - Multiple avec effets */
         .poop-sprite { 
             position: absolute; 
-            bottom: 12px; 
-            font-size: 20px;
+            bottom: 15px; 
+            font-size: 22px;
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
 
-        /* TEXT OVERLAY - DISCRET en haut */
+        .poop-sprite.stinky::after {
+            content: '💨';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            font-size: 14px;
+            animation: smoke 1s ease-in-out infinite;
+        }
+        @keyframes smoke {
+            0% { transform: translateY(0) translateX(-50%); opacity: 1; }
+            100% { transform: translateY(-15px) translateX(-50%); opacity: 0; }
+        }
+
+        /* FLIES */
+        .fly {
+            position: absolute;
+            font-size: 12px;
+            animation: flyAround 2s ease-in-out infinite;
+        }
+        @keyframes flyAround {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(15px, -10px) rotate(90deg); }
+            50% { transform: translate(0, -20px) rotate(180deg); }
+            75% { transform: translate(-15px, -10px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* TEXT OVERLAY */
         .lcd-msg {
             position: absolute;
             top: 10px;
@@ -352,25 +370,30 @@
         }
         .lcd-msg.show { display: block; animation: fadeIn 0.3s ease; }
 
-        /* STATS OVERLAY - Plus grand */
-        .stats-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        /* STATS VIEW - Remplace la créature */
+        .stats-view {
             display: none;
-            z-index: 25;
-            font-size: 14px;
-            color: #333;
-            min-width: 180px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            padding: 15px;
+            font-size: 13px;
+            color: #2d3436;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
         }
-        .stats-overlay.show { display: block; animation: fadeIn 0.3s ease; }
-        .stats-overlay h3 { margin-bottom: 10px; text-align: center; color: #6a5acd; }
-        .stats-overlay .stat-line { margin: 5px 0; display: flex; justify-content: space-between; }
+        .stats-view.show { display: flex; }
+        .stats-view .stat-line { 
+            margin: 4px 0; 
+            display: flex; 
+            justify-content: space-between; 
+            width: 100%;
+            background: rgba(255,255,255,0.3);
+            padding: 4px 8px;
+            border-radius: 5px;
+        }
+        .stats-view .stat-line strong { color: #0984e3; }
 
         /* BUTTONS */
         .buttons-area {
@@ -464,10 +487,13 @@
                 <!-- Game Stage -->
                 <div class="game-stage" id="stage">
                     <div class="lcd-msg" id="msg"></div>
-                    <div class="stats-overlay" id="statsOverlay">
-                        <h3>📊 STATISTIQUES</h3>
+
+                    <!-- Stats View (remplace la créature) -->
+                    <div class="stats-view" id="statsView">
                         <div id="statsContent"></div>
                     </div>
+
+                    <!-- Normal View -->
                     <div id="creatureContainer"></div>
                     <div id="poopZone"></div>
                     <div id="foodZone"></div>
@@ -501,48 +527,39 @@
     </div>
 
     <script>
-        // EVOLUTION TREE STRUCTURE
-        const EVOLUTION_TREE = {
-            baby: {
-                'BubblyBaby': { species: 'Bubbly', name: 'Bubbly' },
-                'FluffyBaby': { species: 'Fluffy', name: 'Fluffy' }
-            },
-            child: {
-                'BubbleKid': { species: 'Bubbly', name: 'BubbleKid' },
-                'FluffyKid': { species: 'Fluffy', name: 'FluffyKid' }
-            },
-            teen: {
-                'BubbleTeen': { species: 'Bubbly', name: 'BubbleTeen' },
-                'FluffyTeen': { species: 'Fluffy', name: 'FluffyTeen' }
-            },
-            adult: {
-                'BubbleRoyal': { species: 'Bubbly', name: 'BubbleRoyal' },
-                'FluffyRoyal': { species: 'Fluffy', name: 'FluffyRoyal' }
-            }
-        };
-
         // STATE
         const STATE = {
             stage: 'egg',
-            speciesLine: null, // 'Bubbly' or 'Fluffy'
-            gender: null, // 'male' or 'female' - déterminé à l'éclosion
+            speciesLine: null,
+            gender: null,
             birth: Date.now(),
             hunger: 3,
             happy: 3,
             weight: 5,
             poops: 0,
+            poopTime: null, // Timestamp du dernier caca
             sick: false,
+            sickTime: null,
             lightOn: true,
             menuIdx: -1,
-            lastAnim: Date.now()
+            lastAnim: Date.now(),
+            dead: false
         };
 
         // INIT
         const saved = localStorage.getItem('gotchi_modern');
-        if(saved) Object.assign(STATE, JSON.parse(saved));
+        if(saved) {
+            try {
+                Object.assign(STATE, JSON.parse(saved));
+            } catch(e) {
+                console.error('Erreur chargement save:', e);
+            }
+        }
 
         // GAME LOOP
         setInterval(() => {
+            if(STATE.dead) return; // Stop si mort
+
             const now = Date.now();
             const age = (now - STATE.birth) / 1000;
 
@@ -559,13 +576,31 @@
 
             // NEEDS
             if(STATE.stage !== 'egg') {
-                if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
-                if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
-                if(Math.random() < 0.01) STATE.poops = Math.min(4, STATE.poops + 1);
+                if(Math.random() < 0.02) STATE.hunger = Math.max(0, STATE.hunger - 1);
+                if(Math.random() < 0.02) STATE.happy = Math.max(0, STATE.happy - 1);
+                if(Math.random() < 0.012) {
+                    STATE.poops = Math.min(5, STATE.poops + 1);
+                    if(!STATE.poopTime) STATE.poopTime = now;
+                }
+
+                // MALADIE si conditions dégradées
+                if((STATE.hunger === 0 || STATE.poops >= 4) && !STATE.sick) {
+                    STATE.sick = true;
+                    STATE.sickTime = now;
+                    uiMsg("🤒 Malade!");
+                }
+
+                // MORT si négligence prolongée
+                const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
+                const hungerZeroTime = STATE.hunger === 0 ? age : 0;
+
+                if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && hungerZeroTime > 60) || STATE.poops >= 5) {
+                    die();
+                }
             }
 
             // RANDOM ANIMATIONS
-            if(STATE.stage !== 'egg' && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
+            if(STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
                 randomAnimation();
                 STATE.lastAnim = now;
             }
@@ -579,11 +614,9 @@
             if(egg) {
                 egg.classList.add('hatching');
                 setTimeout(() => {
-                    // Déterminer espèce et sexe à la naissance
                     STATE.stage = 'baby';
                     STATE.speciesLine = Math.random() < 0.5 ? 'Bubbly' : 'Fluffy';
                     STATE.gender = Math.random() < 0.5 ? 'male' : 'female';
-
                     uiMsg("🐣 Éclosion!");
                     render();
                 }, 800);
@@ -593,6 +626,11 @@
         function evolve(newStage) {
             STATE.stage = newStage;
             uiMsg("✨ Évolution!");
+        }
+
+        function die() {
+            STATE.dead = true;
+            uiMsg("💀 Décédé...");
         }
 
         function randomAnimation() {
@@ -606,8 +644,27 @@
         // RENDER
         function render() {
             const container = document.getElementById('creatureContainer');
+            const statsView = document.getElementById('statsView');
 
-            if(STATE.stage === 'egg') {
+            // Hide stats if not in stats mode
+            if(STATE.menuIdx !== 5) {
+                statsView.classList.remove('show');
+            }
+
+            if(STATE.dead) {
+                container.innerHTML = `<div class="dead-creature">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Tombstone -->
+                        <rect x="30" y="40" width="40" height="50" rx="10" ry="10" fill="#636e72" opacity="0.8"/>
+                        <circle cx="50" cy="40" r="20" fill="#636e72" opacity="0.8"/>
+                        <!-- Cross -->
+                        <rect x="47" y="48" width="6" height="25" fill="#fff"/>
+                        <rect x="40" y="57" width="20" height="6" fill="#fff"/>
+                        <!-- RIP -->
+                        <text x="50" y="70" font-size="10" fill="#fff" text-anchor="middle" font-family="serif">RIP</text>
+                    </svg>
+                </div>`;
+            } else if(STATE.stage === 'egg') {
                 container.innerHTML = `
                     <div class="egg-container">
                         <div class="egg"></div>
@@ -624,21 +681,13 @@
                 if(STATE.menuIdx === i) el.classList.add('selected');
             }
 
-            // Attention icon
+            // Attention icon - clignote si problème
             if(STATE.hunger < 2 || STATE.happy < 2 || STATE.poops > 2 || STATE.sick) {
                 document.getElementById('i7').classList.add('active');
             }
 
-            // Poops
-            const pZone = document.getElementById('poopZone');
-            pZone.innerHTML = '';
-            for(let i=0; i<STATE.poops; i++) {
-                const p = document.createElement('div');
-                p.className = 'poop-sprite';
-                p.innerText = '💩';
-                p.style.right = (15 + i*25) + 'px';
-                pZone.appendChild(p);
-            }
+            // Poops avec effets
+            renderPoops();
 
             // Lights
             document.getElementById('lcd').style.background = STATE.lightOn 
@@ -646,67 +695,92 @@
                 : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
         }
 
+        function renderPoops() {
+            const pZone = document.getElementById('poopZone');
+            pZone.innerHTML = '';
+
+            const now = Date.now();
+            const poopAge = STATE.poopTime ? (now - STATE.poopTime) / 1000 : 0;
+
+            for(let i=0; i<STATE.poops; i++) {
+                const p = document.createElement('div');
+                p.className = 'poop-sprite';
+                p.innerText = '💩';
+                p.style.right = (15 + i*23) + 'px';
+
+                // Fumant après 30s
+                if(poopAge > 30) {
+                    p.classList.add('stinky');
+                }
+
+                pZone.appendChild(p);
+            }
+
+            // Mouches après 60s
+            if(poopAge > 60 && STATE.poops > 2) {
+                for(let i=0; i<3; i++) {
+                    const fly = document.createElement('div');
+                    fly.className = 'fly';
+                    fly.innerText = '🪰';
+                    fly.style.right = (30 + i*15) + 'px';
+                    fly.style.bottom = (30 + i*10) + 'px';
+                    fly.style.animationDelay = (i * 0.3) + 's';
+                    pZone.appendChild(fly);
+                }
+            }
+        }
+
         function getCreatureSVG() {
             const genderColor = STATE.gender === 'male' ? '#74b9ff' : '#ff6b9d';
             const secondaryColor = STATE.speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
 
-            // Baby stage
+            // Montrer signe de maladie
+            const sickIndicator = STATE.sick ? '<text x="45" y="20" font-size="18" text-anchor="middle">🤒</text>' : '';
+
             if(STATE.stage === 'baby') {
                 return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Body -->
+                    ${sickIndicator}
                     <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
-                    <!-- Eyes -->
                     <circle cx="38" cy="45" r="5" fill="#2d3436"/>
                     <circle cx="52" cy="45" r="5" fill="#2d3436"/>
                     <circle cx="39.5" cy="44" r="2" fill="#fff"/>
                     <circle cx="53.5" cy="44" r="2" fill="#fff"/>
-                    <!-- Mouth -->
                     <path d="M 38 56 Q 45 60 52 56" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    <!-- Cheeks -->
                     <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
                     <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
-                    <!-- Gender indicator -->
                     ${STATE.gender === 'female' ? '<ellipse cx="45" cy="28" rx="8" ry="5" fill="#ff6b9d" opacity="0.5"/>' : '<rect x="42" y="25" width="6" height="8" rx="3" fill="#74b9ff" opacity="0.5"/>'}
                 </svg>`;
             }
 
-            // Child stage
             if(STATE.stage === 'child') {
                 const hairLength = STATE.gender === 'female' ? 18 : 10;
                 return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Body -->
+                    ${sickIndicator}
                     <ellipse cx="45" cy="52" rx="26" ry="24" fill="${genderColor}"/>
                     <ellipse cx="45" cy="52" rx="22" ry="20" fill="${secondaryColor}" opacity="0.6"/>
-                    <!-- Hair/Head decoration -->
                     ${STATE.gender === 'female' 
                         ? `<ellipse cx="38" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
                            <ellipse cx="52" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
                            <circle cx="38" cy="${28-hairLength+3}" r="4" fill="#ff6b9d"/>`
                         : `<rect x="40" y="22" width="10" height="${hairLength}" rx="5" fill="#2d3436" opacity="0.8"/>`
                     }
-                    <!-- Eyes -->
                     <circle cx="38" cy="48" r="4.5" fill="#2d3436"/>
                     <circle cx="52" cy="48" r="4.5" fill="#2d3436"/>
                     <circle cx="39" cy="47" r="2" fill="#fff"/>
                     <circle cx="53" cy="47" r="2" fill="#fff"/>
-                    <!-- Mouth -->
                     <ellipse cx="45" cy="58" rx="9" ry="5" fill="#e17055"/>
-                    <!-- Cheeks -->
                     <ellipse cx="32" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
                     <ellipse cx="58" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
-                    <!-- Small spots -->
                     <circle cx="35" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
                     <circle cx="55" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
                 </svg>`;
             }
 
-            // Teen stage
             if(STATE.stage === 'teen') {
                 return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Body -->
+                    ${sickIndicator}
                     <ellipse cx="45" cy="54" rx="30" ry="28" fill="${genderColor}"/>
                     <ellipse cx="45" cy="54" rx="25" ry="23" fill="${secondaryColor}" opacity="0.5"/>
-                    <!-- Hair/Head features -->
                     ${STATE.gender === 'female'
                         ? `<path d="M 22 38 Q 28 25 35 38" fill="#2d3436"/>
                            <path d="M 55 38 Q 62 25 68 38" fill="#2d3436"/>
@@ -715,26 +789,21 @@
                         : `<rect x="28" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>
                            <rect x="54" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>`
                     }
-                    <!-- Eyes -->
                     <circle cx="36" cy="50" r="5" fill="#2d3436"/>
                     <circle cx="54" cy="50" r="5" fill="#2d3436"/>
                     <circle cx="37.5" cy="49" r="2.5" fill="#fff"/>
                     <circle cx="55.5" cy="49" r="2.5" fill="#fff"/>
-                    <!-- Mouth -->
                     <path d="M 35 62 Q 45 69 55 62" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
-                    <!-- Cheeks -->
                     <ellipse cx="28" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
                     <ellipse cx="62" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
                 </svg>`;
             }
 
-            // Adult stage
             if(STATE.stage === 'adult') {
                 return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Body -->
+                    ${sickIndicator}
                     <ellipse cx="45" cy="55" rx="32" ry="30" fill="${genderColor}"/>
                     <ellipse cx="45" cy="55" rx="28" ry="26" fill="${secondaryColor}" opacity="0.4"/>
-                    <!-- Crown/Royal feature -->
                     ${STATE.gender === 'male'
                         ? `<polygon points="38,18 45,8 52,18 50,22 40,22" fill="#ffd700"/>
                            <circle cx="45" cy="15" r="3" fill="#ff6b6b"/>`
@@ -742,17 +811,13 @@
                            <ellipse cx="60" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
                            <polygon points="35,20 45,10 55,20 52,25 38,25" fill="#ffd700"/>`
                     }
-                    <!-- Eyes -->
                     <circle cx="35" cy="50" r="6" fill="#2d3436"/>
                     <circle cx="55" cy="50" r="6" fill="#2d3436"/>
                     <circle cx="37" cy="49" r="3" fill="#fff"/>
                     <circle cx="57" cy="49" r="3" fill="#fff"/>
-                    <!-- Mouth -->
                     <path d="M 33 65 Q 45 73 57 65" stroke="#2d3436" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                    <!-- Cheeks -->
                     <ellipse cx="26" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
                     <ellipse cx="64" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
-                    <!-- Details -->
                     <circle cx="38" cy="40" r="2.5" fill="${secondaryColor}"/>
                     <circle cx="52" cy="40" r="2.5" fill="${secondaryColor}"/>
                 </svg>`;
@@ -761,15 +826,15 @@
 
         // INPUTS
         function btnA() {
-            if(STATE.stage === 'egg') return;
+            if(STATE.stage === 'egg' || STATE.dead) return;
             STATE.menuIdx = (STATE.menuIdx === -1) ? 0 : (STATE.menuIdx + 1) % 8;
             render();
         }
 
         function btnB() {
-            if(STATE.stage === 'egg') return;
+            if(STATE.stage === 'egg' || STATE.dead) return;
             if(STATE.menuIdx === -1) {
-                showStats();
+                // No action
             } else {
                 doAction(STATE.menuIdx);
             }
@@ -777,7 +842,7 @@
 
         function btnC() {
             STATE.menuIdx = -1;
-            document.getElementById('statsOverlay').classList.remove('show');
+            document.getElementById('statsView').classList.remove('show');
             render();
         }
 
@@ -806,7 +871,8 @@
                     break;
                 case 3: // Meds
                     if(STATE.sick) { 
-                        STATE.sick = false; 
+                        STATE.sick = false;
+                        STATE.sickTime = null;
                         uiMsg("Guéri!"); 
                     } else {
                         uiMsg("Ça va");
@@ -814,13 +880,22 @@
                     break;
                 case 4: // Clean
                     STATE.poops = 0;
+                    STATE.poopTime = null;
                     uiMsg("Propre!");
                     break;
                 case 5: // Stats
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v1.0");
+                    uiMsg("Gotchi v2.0");
+                    break;
+                case 7: // Attention - Affiche ce qui ne va pas
+                    let issues = [];
+                    if(STATE.hunger < 2) issues.push("Faim");
+                    if(STATE.happy < 2) issues.push("Tristesse");
+                    if(STATE.poops > 2) issues.push("Sale");
+                    if(STATE.sick) issues.push("Malade");
+                    uiMsg(issues.length ? "⚠️ " + issues.join(", ") : "✅ Tout va bien");
                     break;
             }
             STATE.menuIdx = -1;
@@ -835,12 +910,10 @@
 
         function showStats() {
             const age = Math.floor((Date.now() - STATE.birth) / 60000);
-            const overlay = document.getElementById('statsOverlay');
+            const view = document.getElementById('statsView');
             const content = document.getElementById('statsContent');
 
-            const speciesInfo = EVOLUTION_TREE[STATE.stage] 
-                ? (STATE.speciesLine === 'Bubbly' ? 'Bubbly' : 'Fluffy')
-                : 'Œuf';
+            const speciesInfo = STATE.speciesLine || 'Œuf';
             const genderIcon = STATE.gender === 'male' ? '♂️' : STATE.gender === 'female' ? '♀️' : '';
 
             content.innerHTML = `
@@ -850,11 +923,23 @@
                 <div class="stat-line"><strong>Poids:</strong> <span>${STATE.weight}g</span></div>
                 <div class="stat-line"><strong>Faim:</strong> <span>${STATE.hunger}/4</span></div>
                 <div class="stat-line"><strong>Joie:</strong> <span>${STATE.happy}/4</span></div>
+                <div class="stat-line"><strong>État:</strong> <span>${STATE.sick ? '🤒 Malade' : '✅ OK'}</span></div>
             `;
-            overlay.classList.add('show');
+            view.classList.add('show');
+
+            // Hide creature
+            document.getElementById('creatureContainer').style.display = 'none';
+            document.getElementById('poopZone').style.display = 'none';
         }
 
         function uiMsg(txt) {
+            // Restore creature display if stats was open
+            if(document.getElementById('statsView').classList.contains('show')) {
+                document.getElementById('statsView').classList.remove('show');
+                document.getElementById('creatureContainer').style.display = 'block';
+                document.getElementById('poopZone').style.display = 'block';
+            }
+
             const el = document.getElementById('msg');
             el.innerText = txt;
             el.classList.add('show');
@@ -868,7 +953,7 @@
 
         function setShell(color) {
             const d = document.getElementById('device');
-            d.className = 'device-container'; // Reset
+            d.className = 'device-container';
 
             const colors = {
                 purple: '#6a5acd',
@@ -880,9 +965,7 @@
 
             d.style.setProperty('--shell-color', colors[color]);
 
-            // Add hearts for valentine
             if(color === 'valentine') {
-                d.classList.add('valentine');
                 addValentineHearts(d);
             }
             toggleSysMenu();
@@ -940,10 +1023,29 @@
             r.readAsText(input.files[0]);
         }
 
-        function resetData() { 
+        function resetData() {
             if(confirm("Recommencer depuis le début ?")) {
-                localStorage.removeItem('gotchi_modern'); 
-                location.reload(); 
+                localStorage.removeItem('gotchi_modern');
+                // Reset state
+                Object.assign(STATE, {
+                    stage: 'egg',
+                    speciesLine: null,
+                    gender: null,
+                    birth: Date.now(),
+                    hunger: 3,
+                    happy: 3,
+                    weight: 5,
+                    poops: 0,
+                    poopTime: null,
+                    sick: false,
+                    sickTime: null,
+                    lightOn: true,
+                    menuIdx: -1,
+                    lastAnim: Date.now(),
+                    dead: false
+                });
+                render();
+                uiMsg("Nouveau départ!");
             }
         }
 
