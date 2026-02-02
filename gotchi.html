@@ -137,7 +137,7 @@
             z-index: 1;
         }
 
-        /* STATUS BARS - Plus compact, sans fond */
+        /* STATUS BARS */
         .status-bars {
             position: absolute;
             top: 42px;
@@ -152,7 +152,6 @@
             align-items: center;
             gap: 2px;
             padding: 1px 3px;
-            /* Pas de fond */
         }
         .status-icon {
             font-size: 10px;
@@ -209,12 +208,12 @@
             justify-content: center;
             align-items: center;
             z-index: 5;
-            padding-top: 10px; /* Descend la créature */
+            padding-top: 10px;
         }
 
         /* CREATURE SPRITE */
         .creature {
-            width: 80px; /* Un peu plus petit */
+            width: 80px;
             height: 80px;
             position: relative;
             transition: all 0.3s ease;
@@ -347,10 +346,10 @@
             100% { transform: scale(0); opacity: 0; }
         }
 
-        /* POOP - Tout en bas */
+        /* POOP */
         .poop-zone {
             position: absolute;
-            bottom: 5px; /* Juste au-dessus de la barre du bas */
+            bottom: 5px;
             right: 10px;
             display: flex;
             gap: 4px;
@@ -398,7 +397,7 @@
             font-weight: bold;
             font-size: 12px;
             color: #fff;
-            background: rgba(50,50,50,0.75);
+            background: rgba(50,50,50,0.85);
             backdrop-filter: blur(5px);
             padding: 6px 12px;
             border-radius: 8px;
@@ -408,38 +407,33 @@
             white-space: nowrap;
             box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         }
-        .lcd-msg.show { display: block; animation: fadeInOut 2s ease; }
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
-        }
+        .lcd-msg.show { display: block; }
 
-        /* STATS VIEW */
+        /* STATS VIEW - Compact vertical */
         .stats-view {
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
-            width: 100%;
-            padding: 10px;
-            font-size: 12px;
+            width: 90%;
+            padding: 5px 8px;
+            font-size: 10px;
             color: #2d3436;
             font-weight: 600;
             font-family: 'Courier New', monospace;
         }
         .stats-view.show { display: flex; }
         .stats-view .stat-line { 
-            margin: 3px 0; 
+            margin: 2px 0;
             display: flex; 
             justify-content: space-between; 
             width: 100%;
-            background: rgba(255,255,255,0.4);
-            padding: 4px 8px;
-            border-radius: 5px;
+            background: rgba(255,255,255,0.35);
+            padding: 3px 6px;
+            border-radius: 4px;
         }
-        .stats-view .stat-line strong { color: #0984e3; }
+        .stats-view .stat-line strong { color: #0984e3; font-size: 10px; }
+        .stats-view .stat-line span { font-size: 10px; }
 
         /* BUTTONS */
         .buttons-area {
@@ -522,7 +516,7 @@
 
         <div class="screen-bezel">
             <div class="lcd" id="lcd">
-                <!-- Status Bars - Sans fond, plus petit -->
+                <!-- Status Bars -->
                 <div class="status-bars" id="statusBars">
                     <div class="status-bar">
                         <span class="status-icon">🍖</span>
@@ -601,9 +595,12 @@
             lightOn: true,
             menuIdx: -1,
             lastAnim: Date.now(),
+            lastPoopIncrease: Date.now(), // Nouveau timer
             dead: false,
             showingStats: false
         };
+
+        let msgTimeout = null; // Timer pour effacer le message
 
         // INIT
         const saved = localStorage.getItem('gotchi_modern');
@@ -637,8 +634,12 @@
             if(STATE.stage !== 'egg') {
                 if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
                 if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
-                if(Math.random() < 0.01) {
-                    STATE.poops = Math.min(5, STATE.poops + 1);
+
+                // POOP - avec timer pour éviter augmentation trop rapide
+                const timeSinceLastPoop = now - STATE.lastPoopIncrease;
+                if(Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) { // 15s minimum entre chaque caca
+                    STATE.poops++;
+                    STATE.lastPoopIncrease = now;
                     if(!STATE.poopTime) STATE.poopTime = now;
                 }
 
@@ -818,13 +819,12 @@
             const genderColor = STATE.gender === 'male' ? '#74b9ff' : '#ff6b9d';
             const secondaryColor = STATE.speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
 
-            // Modifier couleur et bouche si malade ou triste
             const sickTint = STATE.sick ? 'filter: hue-rotate(80deg) saturate(0.7);' : '';
             const mouthPath = STATE.sick 
-                ? 'M 38 56 Q 42 59 45 56 Q 48 59 52 56' // Vague
+                ? 'M 38 56 Q 42 59 45 56 Q 48 59 52 56'
                 : STATE.happy <= 1
-                ? 'M 38 56 Q 45 52 52 56' // Triste
-                : 'M 38 56 Q 45 60 52 56'; // Normal
+                ? 'M 38 56 Q 45 52 52 56'
+                : 'M 38 56 Q 45 60 52 56';
 
             if(STATE.stage === 'baby') {
                 return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
@@ -987,7 +987,7 @@
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v2.5");
+                    uiMsg("Gotchi v2.6");
                     break;
                 case 7: // Attention
                     let issues = [];
@@ -1018,11 +1018,11 @@
             content.innerHTML = `
                 <div class="stat-line"><strong>Espèce:</strong> <span>${speciesInfo} ${genderIcon}</span></div>
                 <div class="stat-line"><strong>Stade:</strong> <span>${STATE.stage}</span></div>
-                <div class="stat-line"><strong>Âge:</strong> <span>${age} min</span></div>
+                <div class="stat-line"><strong>Âge:</strong> <span>${age}min</span></div>
                 <div class="stat-line"><strong>Poids:</strong> <span>${STATE.weight}g</span></div>
                 <div class="stat-line"><strong>Faim:</strong> <span>${STATE.hunger}/5</span></div>
                 <div class="stat-line"><strong>Joie:</strong> <span>${STATE.happy}/5</span></div>
-                <div class="stat-line"><strong>État:</strong> <span>${STATE.sick ? '🤒 Malade' : '✅ OK'}</span></div>
+                <div class="stat-line"><strong>État:</strong> <span>${STATE.sick ? '🤒' : '✅'}</span></div>
             `;
             STATE.showingStats = true;
             render();
@@ -1030,10 +1030,21 @@
 
         function uiMsg(txt) {
             const el = document.getElementById('msg');
+
+            // Clear previous timeout
+            if(msgTimeout) {
+                clearTimeout(msgTimeout);
+                msgTimeout = null;
+            }
+
             el.innerText = txt;
-            el.classList.remove('show');
-            void el.offsetWidth;
             el.classList.add('show');
+
+            // Auto-hide after 2 seconds
+            msgTimeout = setTimeout(() => {
+                el.classList.remove('show');
+                msgTimeout = null;
+            }, 2000);
         }
 
         // SYSTEM
@@ -1132,6 +1143,7 @@
                     lightOn: true,
                     menuIdx: -1,
                     lastAnim: Date.now(),
+                    lastPoopIncrease: Date.now(),
                     dead: false,
                     showingStats: false
                 });
