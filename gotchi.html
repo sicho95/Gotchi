@@ -363,11 +363,11 @@
             font-size: 18px;
         }
 
-        /* Fumée horizontale (rotation -90°) */
+        /* Fumée horizontale plus haute pour ne pas chevaucher le caca */
         .poop-sprite.stinky::after {
             content: '💨';
             position: absolute;
-            top: -2px;
+            top: -8px;
             left: 50%;
             font-size: 12px;
             transform: rotate(-90deg);
@@ -375,21 +375,25 @@
         }
         @keyframes smoke {
             0% { transform: translateX(-50%) rotate(-90deg); opacity: 1; }
-            100% { transform: translateX(-50%) translateY(-12px) rotate(-90deg); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(-15px) rotate(-90deg); opacity: 0; }
         }
 
-        /* FLIES - Animation aller-retour VRAIMENT fluide (6s) */
+        /* FLIES - Animation aller-retour vraiment fluide avec boucle parfaite */
         .fly {
             position: absolute;
-            font-size: 10px;
-            animation: flyAround 6s ease-in-out infinite;
+            font-size: 11px;
+            animation: flyAround 5s ease-in-out infinite;
         }
         @keyframes flyAround {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(18px, -12px) rotate(90deg); }
-            50% { transform: translate(30px, 0px) rotate(180deg); }
-            75% { transform: translate(18px, -12px) rotate(270deg); }
-            100% { transform: translate(0, 0) rotate(360deg); }
+            0% { transform: translate(0px, 0px) rotate(0deg); }
+            12.5% { transform: translate(10px, -8px) rotate(45deg); }
+            25% { transform: translate(20px, -12px) rotate(90deg); }
+            37.5% { transform: translate(28px, -8px) rotate(135deg); }
+            50% { transform: translate(32px, 0px) rotate(180deg); }
+            62.5% { transform: translate(28px, -8px) rotate(225deg); }
+            75% { transform: translate(20px, -12px) rotate(270deg); }
+            87.5% { transform: translate(10px, -8px) rotate(315deg); }
+            100% { transform: translate(0px, 0px) rotate(360deg); }
         }
 
         /* TEXT OVERLAY */
@@ -813,16 +817,23 @@
                 pZone.appendChild(p);
             }
 
+            // Mouches avec positions mieux espacées et délais différents
             if(poopAge > 60 && STATE.poops >= 3) {
-                for(let i=0; i<3; i++) {
+                const flyPositions = [
+                    { left: 5, top: -25, delay: 0 },
+                    { left: 18, top: -18, delay: 1.7 },
+                    { left: 30, top: -22, delay: 3.3 }
+                ];
+
+                flyPositions.forEach(pos => {
                     const fly = document.createElement('div');
                     fly.className = 'fly';
                     fly.innerText = '🪰';
-                    fly.style.left = (10 + i*20) + 'px';
-                    fly.style.top = (-20 + i*10) + 'px';
-                    fly.style.animationDelay = (i * 0.6) + 's';
+                    fly.style.left = pos.left + 'px';
+                    fly.style.top = pos.top + 'px';
+                    fly.style.animationDelay = pos.delay + 's';
                     pZone.appendChild(fly);
-                }
+                });
             }
         }
 
@@ -998,7 +1009,7 @@
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v3.1");
+                    uiMsg("Gotchi v3.2");
                     break;
                 case 7: // Attention
                     let issues = [];
