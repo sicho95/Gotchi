@@ -378,18 +378,18 @@
             100% { transform: translateX(-50%) translateY(-12px) rotate(-90deg); opacity: 0; }
         }
 
-        /* FLIES - Animation aller-retour fluide */
+        /* FLIES - Animation aller-retour VRAIMENT fluide (6s) */
         .fly {
             position: absolute;
             font-size: 10px;
-            animation: flyAround 3s ease-in-out infinite;
+            animation: flyAround 6s ease-in-out infinite;
         }
         @keyframes flyAround {
             0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(15px, -10px) rotate(45deg); }
-            50% { transform: translate(25px, -5px) rotate(90deg); }
-            75% { transform: translate(15px, -10px) rotate(135deg); }
-            100% { transform: translate(0, 0) rotate(180deg); }
+            25% { transform: translate(18px, -12px) rotate(90deg); }
+            50% { transform: translate(30px, 0px) rotate(180deg); }
+            75% { transform: translate(18px, -12px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
         }
 
         /* TEXT OVERLAY */
@@ -414,33 +414,29 @@
         }
         .lcd-msg.show { display: block; }
 
-        /* STATS VIEW - Ultra compact en 2 colonnes */
+        /* STATS VIEW - Plus bas et légèrement à droite, sans cadre */
         .stats-view {
             display: none;
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 58%;
+            left: 52%;
             transform: translate(-50%, -50%);
-            width: 85%;
-            max-width: 180px;
-            padding: 3px 5px;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 4px;
+            z-index: 12;
+        }
+        .stats-view.show { display: grid; }
+        .stats-view .stat-line { 
+            display: flex; 
+            justify-content: space-between; 
+            background: rgba(255,255,255,0.35);
+            padding: 2px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
             font-size: 8.5px;
             color: #2d3436;
             font-weight: 600;
             font-family: 'Courier New', monospace;
-            background: rgba(255,255,255,0.25);
-            backdrop-filter: blur(5px);
-            border-radius: 6px;
-            z-index: 12;
-        }
-        .stats-view.show { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 4px; }
-        .stats-view .stat-line { 
-            display: flex; 
-            justify-content: space-between; 
-            background: rgba(255,255,255,0.3);
-            padding: 2px 4px;
-            border-radius: 3px;
-            white-space: nowrap;
         }
         .stats-view .stat-line.full-width {
             grid-column: 1 / -1;
@@ -553,10 +549,8 @@
                 <div class="game-stage" id="stage">
                     <div class="lcd-msg" id="msg"></div>
 
-                    <!-- Stats View - Position absolue centrée -->
-                    <div class="stats-view" id="statsView">
-                        <div id="statsContent"></div>
-                    </div>
+                    <!-- Stats View - Sans conteneur extérieur -->
+                    <div class="stats-view" id="statsView"></div>
 
                     <!-- Normal View -->
                     <div id="creatureContainer"></div>
@@ -826,7 +820,7 @@
                     fly.innerText = '🪰';
                     fly.style.left = (10 + i*20) + 'px';
                     fly.style.top = (-20 + i*10) + 'px';
-                    fly.style.animationDelay = (i * 0.4) + 's';
+                    fly.style.animationDelay = (i * 0.6) + 's';
                     pZone.appendChild(fly);
                 }
             }
@@ -1004,7 +998,7 @@
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v3.0");
+                    uiMsg("Gotchi v3.1");
                     break;
                 case 7: // Attention
                     let issues = [];
@@ -1027,12 +1021,12 @@
 
         function showStats() {
             const age = Math.floor((Date.now() - STATE.birth) / 60000);
-            const content = document.getElementById('statsContent');
+            const statsView = document.getElementById('statsView');
 
             const speciesInfo = STATE.speciesLine || 'Œuf';
             const genderIcon = STATE.gender === 'male' ? '♂️' : STATE.gender === 'female' ? '♀️' : '';
 
-            content.innerHTML = `
+            statsView.innerHTML = `
                 <div class="stat-line full-width"><strong>Esp:</strong><span>${speciesInfo}${genderIcon}</span></div>
                 <div class="stat-line"><strong>Âge:</strong><span>${age}m</span></div>
                 <div class="stat-line"><strong>Poid:</strong><span>${STATE.weight}g</span></div>
