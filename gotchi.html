@@ -8,7 +8,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #000; /* Fond noir uni */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -52,7 +52,7 @@
             width: 360px;
             height: 480px;
             position: relative;
-            background: var(--shell-gradient, linear-gradient(135deg, #6a5acd 0%, #483d8b 100%));
+            background: var(--shell-color, #6a5acd); /* Couleur unie */
             border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
             box-shadow: 
                 inset -10px -10px 30px rgba(0,0,0,0.3),
@@ -66,12 +66,34 @@
             transition: background 0.5s ease;
         }
 
+        /* Valentine hearts pattern */
+        .device-container.valentine::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, transparent 8px, transparent 10px),
+                radial-gradient(circle at 80% 50%, transparent 6px, transparent 8px),
+                radial-gradient(circle at 40% 70%, transparent 7px, transparent 9px),
+                radial-gradient(circle at 70% 20%, transparent 5px, transparent 7px),
+                radial-gradient(circle at 30% 90%, transparent 6px, transparent 8px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* SVG Hearts for Valentine */
+        .heart-decoration {
+            position: absolute;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
         /* Keychain Loop */
         .keychain-loop {
             position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
             width: 55px; height: 55px; border-radius: 50%; 
             border: 7px solid rgba(150,150,150,0.8);
-            z-index: -1; 
+            z-index: 10; 
             box-shadow: 
                 inset 0 3px 8px rgba(0,0,0,0.3),
                 0 5px 15px rgba(0,0,0,0.2);
@@ -89,6 +111,7 @@
                 0 2px 4px rgba(0,0,0,0.3),
                 0 0 20px rgba(255,255,255,0.3);
             transform: scaleY(0.85);
+            z-index: 5;
         }
 
         /* SCREEN BEZEL */
@@ -105,6 +128,7 @@
                 0 6px 15px rgba(0,0,0,0.2);
             padding: 14px;
             margin-bottom: 24px;
+            z-index: 5;
         }
 
         /* LCD SCREEN */
@@ -146,7 +170,7 @@
         .icons-row.top { border-bottom: 2px solid rgba(255,255,255,0.3); }
         .icons-row.bottom { border-top: 2px solid rgba(255,255,255,0.3); }
 
-        /* EMOJI ICONS - COLORÉS */
+        /* EMOJI ICONS - COLORÉS (pas de triangle) */
         .icon {
             font-size: 24px;
             line-height: 28px;
@@ -161,25 +185,7 @@
             opacity: 1; 
             filter: grayscale(0%); 
             transform: scale(1.15);
-            animation: pulse 0.6s ease-in-out;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1.15); }
-            50% { transform: scale(1.3); }
-        }
-
-        /* Selection Indicator */
-        .icon.selected::after {
-            content: '▼';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        .top .icon.selected::after { bottom: -14px; }
-        .bottom .icon.selected::after { top: -14px; content: '▲'; }
 
         /* MAIN GAME AREA */
         .game-stage {
@@ -193,8 +199,8 @@
 
         /* CREATURE SPRITE */
         .creature {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             position: relative;
             transition: all 0.3s ease;
         }
@@ -248,10 +254,10 @@
 
         /* Hatching animation */
         .egg.hatching {
-            animation: crack 0.8s ease-in-out;
+            animation: crack 0.8s ease-in-out forwards;
         }
         @keyframes crack {
-            0% { transform: scale(1); }
+            0% { transform: scale(1); opacity: 1; }
             20% { transform: scale(1.05) rotate(5deg); }
             40% { transform: scale(0.95) rotate(-5deg); }
             60% { transform: scale(1.05); opacity: 1; }
@@ -287,10 +293,32 @@
             75% { transform: rotate(10deg) scale(1.1); }
         }
 
-        .eat { animation: eat 0.6s ease; }
-        @keyframes eat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+        .eating { animation: eating 1.2s ease; }
+        @keyframes eating {
+            0% { transform: translateX(0) scale(1); }
+            30% { transform: translateX(-15px) scale(1.05); }
+            50% { transform: translateX(-15px) scale(1.15); }
+            70% { transform: translateX(-15px) scale(1.05); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        /* FOOD ITEM */
+        .food-item {
+            position: absolute;
+            left: 20px;
+            font-size: 32px;
+            animation: foodAppear 0.3s ease, foodEaten 1.2s ease 0.3s forwards;
+            z-index: 3;
+        }
+        @keyframes foodAppear {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes foodEaten {
+            0% { transform: scale(1); opacity: 1; }
+            60% { transform: scale(1); opacity: 1; }
+            80% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
         }
 
         /* POOP */
@@ -302,33 +330,54 @@
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
 
-        /* TEXT OVERLAY */
+        /* TEXT OVERLAY - DISCRET en haut */
         .lcd-msg {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+            background: rgba(50,50,50,0.75);
+            backdrop-filter: blur(5px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: none;
+            z-index: 20;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+        .lcd-msg.show { display: block; animation: fadeIn 0.3s ease; }
+
+        /* STATS OVERLAY - Plus grand */
+        .stats-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            font-size: 14px;
-            color: #fff;
-            background: rgba(50,50,50,0.85);
-            backdrop-filter: blur(5px);
-            padding: 12px 20px;
-            border-radius: 12px;
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             display: none;
-            z-index: 20;
-            text-align: center;
-            white-space: pre-line;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 25;
+            font-size: 14px;
+            color: #333;
+            min-width: 180px;
         }
-        .lcd-msg.show { display: block; animation: fadeIn 0.3s ease; }
+        .stats-overlay.show { display: block; animation: fadeIn 0.3s ease; }
+        .stats-overlay h3 { margin-bottom: 10px; text-align: center; color: #6a5acd; }
+        .stats-overlay .stat-line { margin: 5px 0; display: flex; justify-content: space-between; }
 
         /* BUTTONS */
         .buttons-area {
             display: flex;
             gap: 24px;
             margin-top: auto;
+            z-index: 5;
         }
 
         .btn-group { position: relative; width: 48px; height: 48px; }
@@ -378,30 +427,6 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* INFO BUTTON */
-        .info-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 999;
-        }
-        .info-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1) rotate(20deg);
-        }
-
     </style>
 </head>
 <body>
@@ -411,19 +436,15 @@
         <div></div><div></div><div></div>
     </div>
     <div class="menu-dropdown" id="sysMenu">
-        <div class="menu-item" onclick="setShell('purple')">🟣 Violet Classique</div>
-        <div class="menu-item" onclick="setShell('blue')">🔵 Bleu Océan</div>
-        <div class="menu-item" onclick="setShell('pink')">💗 Rose Bonbon</div>
+        <div class="menu-item" onclick="setShell('purple')">🟣 Violet</div>
+        <div class="menu-item" onclick="setShell('blue')">🔵 Bleu</div>
+        <div class="menu-item" onclick="setShell('pink')">💗 Rose</div>
+        <div class="menu-item" onclick="setShell('white')">⚪ Blanc</div>
         <div class="menu-item" onclick="setShell('valentine')">💝 St-Valentin</div>
-        <div class="menu-item" onclick="setShell('white')">⚪ Blanc Perle</div>
-        <div class="menu-item" onclick="setShell('black')">⚫ Noir Galaxie</div>
         <div class="menu-item" onclick="saveData()">💾 Sauvegarder</div>
         <label class="menu-item">📂 Charger <input type="file" onchange="loadData(this)"></label>
         <div class="menu-item" onclick="resetData()">🔄 Recommencer</div>
     </div>
-
-    <!-- INFO BUTTON -->
-    <div class="info-btn" onclick="showAbout()" title="À propos">ℹ️</div>
 
     <!-- DEVICE -->
     <div class="device-container" id="device">
@@ -443,8 +464,13 @@
                 <!-- Game Stage -->
                 <div class="game-stage" id="stage">
                     <div class="lcd-msg" id="msg"></div>
+                    <div class="stats-overlay" id="statsOverlay">
+                        <h3>📊 STATISTIQUES</h3>
+                        <div id="statsContent"></div>
+                    </div>
                     <div id="creatureContainer"></div>
                     <div id="poopZone"></div>
+                    <div id="foodZone"></div>
                 </div>
 
                 <!-- Bottom Icons Row -->
@@ -478,39 +504,28 @@
         // EVOLUTION TREE STRUCTURE
         const EVOLUTION_TREE = {
             baby: {
-                'BubblyBaby': { species: 'BubblyBaby', gender: null },
-                'FluffyBaby': { species: 'FluffyBaby', gender: null }
+                'BubblyBaby': { species: 'Bubbly', name: 'Bubbly' },
+                'FluffyBaby': { species: 'Fluffy', name: 'Fluffy' }
             },
             child: {
-                // From BubblyBaby
-                'BubbleKid_M': { species: 'BubbleKid', gender: 'male', parent: 'BubblyBaby' },
-                'BubbleKid_F': { species: 'BubbleKid', gender: 'female', parent: 'BubblyBaby' },
-                // From FluffyBaby
-                'FluffyKid_M': { species: 'FluffyKid', gender: 'male', parent: 'FluffyBaby' },
-                'FluffyKid_F': { species: 'FluffyKid', gender: 'female', parent: 'FluffyBaby' }
+                'BubbleKid': { species: 'Bubbly', name: 'BubbleKid' },
+                'FluffyKid': { species: 'Fluffy', name: 'FluffyKid' }
             },
             teen: {
-                // From BubbleKid
-                'BubbleTeen_M': { species: 'BubbleTeen', gender: 'male', parent: 'BubbleKid' },
-                'BubbleTeen_F': { species: 'BubbleTeen', gender: 'female', parent: 'BubbleKid' },
-                // From FluffyKid
-                'FluffyTeen_M': { species: 'FluffyTeen', gender: 'male', parent: 'FluffyKid' },
-                'FluffyTeen_F': { species: 'FluffyTeen', gender: 'female', parent: 'FluffyKid' }
+                'BubbleTeen': { species: 'Bubbly', name: 'BubbleTeen' },
+                'FluffyTeen': { species: 'Fluffy', name: 'FluffyTeen' }
             },
             adult: {
-                // From BubbleTeen
-                'BubbleKing_M': { species: 'BubbleKing', gender: 'male', parent: 'BubbleTeen' },
-                'BubbleQueen_F': { species: 'BubbleQueen', gender: 'female', parent: 'BubbleTeen' },
-                // From FluffyTeen
-                'FluffyLord_M': { species: 'FluffyLord', gender: 'male', parent: 'FluffyTeen' },
-                'FluffyLady_F': { species: 'FluffyLady', gender: 'female', parent: 'FluffyTeen' }
+                'BubbleRoyal': { species: 'Bubbly', name: 'BubbleRoyal' },
+                'FluffyRoyal': { species: 'Fluffy', name: 'FluffyRoyal' }
             }
         };
 
         // STATE
         const STATE = {
             stage: 'egg',
-            speciesId: null,
+            speciesLine: null, // 'Bubbly' or 'Fluffy'
+            gender: null, // 'male' or 'female' - déterminé à l'éclosion
             birth: Date.now(),
             hunger: 3,
             happy: 3,
@@ -550,7 +565,7 @@
             }
 
             // RANDOM ANIMATIONS
-            if(STATE.stage !== 'egg' && now - STATE.lastAnim > 5000 && Math.random() < 0.3) {
+            if(STATE.stage !== 'egg' && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
                 randomAnimation();
                 STATE.lastAnim = now;
             }
@@ -560,35 +575,24 @@
         }, 1000);
 
         function hatchEgg() {
-            // Crack animation
             const egg = document.querySelector('.egg');
             if(egg) {
                 egg.classList.add('hatching');
                 setTimeout(() => {
+                    // Déterminer espèce et sexe à la naissance
                     STATE.stage = 'baby';
-                    const babyOptions = Object.keys(EVOLUTION_TREE.baby);
-                    STATE.speciesId = babyOptions[Math.floor(Math.random() * babyOptions.length)];
-                    uiMsg("🐣 ÉCLOSION!");
+                    STATE.speciesLine = Math.random() < 0.5 ? 'Bubbly' : 'Fluffy';
+                    STATE.gender = Math.random() < 0.5 ? 'male' : 'female';
+
+                    uiMsg("🐣 Éclosion!");
                     render();
                 }, 800);
             }
         }
 
         function evolve(newStage) {
-            const currentInfo = EVOLUTION_TREE[STATE.stage][STATE.speciesId];
-            const options = Object.entries(EVOLUTION_TREE[newStage])
-                .filter(([id, info]) => {
-                    if(STATE.stage === 'baby') return info.parent === currentInfo.species;
-                    return info.parent === currentInfo.species;
-                });
-
-            if(options.length > 0) {
-                const [newId] = options[Math.floor(Math.random() * options.length)];
-                STATE.stage = newStage;
-                STATE.speciesId = newId;
-                uiMsg(`✨ ÉVOLUTION!
-${newStage.toUpperCase()}`);
-            }
+            STATE.stage = newStage;
+            uiMsg("✨ Évolution!");
         }
 
         function randomAnimation() {
@@ -610,8 +614,7 @@ ${newStage.toUpperCase()}`);
                     </div>
                 `;
             } else {
-                const info = EVOLUTION_TREE[STATE.stage][STATE.speciesId];
-                container.innerHTML = `<div class="creature">${getCreatureSVG(STATE.stage, info)}</div>`;
+                container.innerHTML = `<div class="creature">${getCreatureSVG()}</div>`;
             }
 
             // Icons
@@ -643,49 +646,115 @@ ${newStage.toUpperCase()}`);
                 : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
         }
 
-        function getCreatureSVG(stage, info) {
-            const genderColor = info.gender === 'male' ? '#74b9ff' : info.gender === 'female' ? '#ff6b9d' : '#ffeaa7';
+        function getCreatureSVG() {
+            const genderColor = STATE.gender === 'male' ? '#74b9ff' : '#ff6b9d';
+            const secondaryColor = STATE.speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
 
-            // Simplified cute creatures
-            if(stage === 'baby') {
-                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="40" cy="45" r="25" fill="${info.species === 'BubblyBaby' ? '#74b9ff' : '#ffeaa7'}"/>
-                    <circle cx="32" cy="40" r="4" fill="#2d3436"/>
-                    <circle cx="48" cy="40" r="4" fill="#2d3436"/>
-                    <path d="M 32 52 Q 40 58 48 52" stroke="#2d3436" stroke-width="2" fill="none"/>
+            // Baby stage
+            if(STATE.stage === 'baby') {
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
+                    <!-- Eyes -->
+                    <circle cx="38" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="52" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="39.5" cy="44" r="2" fill="#fff"/>
+                    <circle cx="53.5" cy="44" r="2" fill="#fff"/>
+                    <!-- Mouth -->
+                    <path d="M 38 56 Q 45 60 52 56" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <!-- Cheeks -->
+                    <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+                    <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+                    <!-- Gender indicator -->
+                    ${STATE.gender === 'female' ? '<ellipse cx="45" cy="28" rx="8" ry="5" fill="#ff6b9d" opacity="0.5"/>' : '<rect x="42" y="25" width="6" height="8" rx="3" fill="#74b9ff" opacity="0.5"/>'}
                 </svg>`;
             }
 
-            if(stage === 'child') {
-                const hairLength = info.gender === 'female' ? 15 : 8;
-                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="40" cy="45" r="22" fill="${genderColor}"/>
-                    <rect x="35" y="${20-hairLength}" width="10" height="${hairLength}" fill="#2d3436" rx="5"/>
-                    <circle cx="33" cy="42" r="3" fill="#2d3436"/>
-                    <circle cx="47" cy="42" r="3" fill="#2d3436"/>
-                    <ellipse cx="40" cy="52" rx="8" ry="4" fill="#e17055"/>
+            // Child stage
+            if(STATE.stage === 'child') {
+                const hairLength = STATE.gender === 'female' ? 18 : 10;
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="45" cy="52" rx="26" ry="24" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="52" rx="22" ry="20" fill="${secondaryColor}" opacity="0.6"/>
+                    <!-- Hair/Head decoration -->
+                    ${STATE.gender === 'female' 
+                        ? `<ellipse cx="38" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
+                           <ellipse cx="52" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
+                           <circle cx="38" cy="${28-hairLength+3}" r="4" fill="#ff6b9d"/>`
+                        : `<rect x="40" y="22" width="10" height="${hairLength}" rx="5" fill="#2d3436" opacity="0.8"/>`
+                    }
+                    <!-- Eyes -->
+                    <circle cx="38" cy="48" r="4.5" fill="#2d3436"/>
+                    <circle cx="52" cy="48" r="4.5" fill="#2d3436"/>
+                    <circle cx="39" cy="47" r="2" fill="#fff"/>
+                    <circle cx="53" cy="47" r="2" fill="#fff"/>
+                    <!-- Mouth -->
+                    <ellipse cx="45" cy="58" rx="9" ry="5" fill="#e17055"/>
+                    <!-- Cheeks -->
+                    <ellipse cx="32" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="58" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
+                    <!-- Small spots -->
+                    <circle cx="35" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
+                    <circle cx="55" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
                 </svg>`;
             }
 
-            if(stage === 'teen') {
-                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="40" cy="50" rx="28" ry="25" fill="${genderColor}"/>
-                    ${info.gender === 'female' ? '<path d="M 20 35 Q 25 25 30 35" fill="#2d3436"/><path d="M 50 35 Q 55 25 60 35" fill="#2d3436"/>' : '<rect x="25" y="30" width="6" height="10" fill="#2d3436" rx="3"/><rect x="49" y="30" width="6" height="10" fill="#2d3436" rx="3"/>'}
-                    <circle cx="32" cy="45" r="4" fill="#2d3436"/>
-                    <circle cx="48" cy="45" r="4" fill="#2d3436"/>
-                    <path d="M 32 58 Q 40 64 48 58" stroke="#2d3436" stroke-width="3" fill="none"/>
+            // Teen stage
+            if(STATE.stage === 'teen') {
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="45" cy="54" rx="30" ry="28" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="54" rx="25" ry="23" fill="${secondaryColor}" opacity="0.5"/>
+                    <!-- Hair/Head features -->
+                    ${STATE.gender === 'female'
+                        ? `<path d="M 22 38 Q 28 25 35 38" fill="#2d3436"/>
+                           <path d="M 55 38 Q 62 25 68 38" fill="#2d3436"/>
+                           <ellipse cx="28" cy="30" rx="5" ry="10" fill="#2d3436" opacity="0.8"/>
+                           <ellipse cx="62" cy="30" rx="5" ry="10" fill="#2d3436" opacity="0.8"/>`
+                        : `<rect x="28" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>
+                           <rect x="54" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>`
+                    }
+                    <!-- Eyes -->
+                    <circle cx="36" cy="50" r="5" fill="#2d3436"/>
+                    <circle cx="54" cy="50" r="5" fill="#2d3436"/>
+                    <circle cx="37.5" cy="49" r="2.5" fill="#fff"/>
+                    <circle cx="55.5" cy="49" r="2.5" fill="#fff"/>
+                    <!-- Mouth -->
+                    <path d="M 35 62 Q 45 69 55 62" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <!-- Cheeks -->
+                    <ellipse cx="28" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="62" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
                 </svg>`;
             }
 
-            if(stage === 'adult') {
-                return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="40" cy="50" rx="30" ry="28" fill="${genderColor}"/>
-                    ${info.gender === 'male' ? '<polygon points="35,15 40,5 45,15" fill="#ffd700"/>' : '<circle cx="30" cy="20" r="8" fill="#ff6b9d" opacity="0.6"/><circle cx="50" cy="20" r="8" fill="#ff6b9d" opacity="0.6"/>'}
-                    <circle cx="30" cy="45" r="5" fill="#2d3436"/>
-                    <circle cx="50" cy="45" r="5" fill="#2d3436"/>
-                    <path d="M 30 60 Q 40 68 50 60" stroke="#2d3436" stroke-width="3" fill="none"/>
-                    <circle cx="32" cy="46" r="2" fill="#fff"/>
-                    <circle cx="52" cy="46" r="2" fill="#fff"/>
+            // Adult stage
+            if(STATE.stage === 'adult') {
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="45" cy="55" rx="32" ry="30" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="55" rx="28" ry="26" fill="${secondaryColor}" opacity="0.4"/>
+                    <!-- Crown/Royal feature -->
+                    ${STATE.gender === 'male'
+                        ? `<polygon points="38,18 45,8 52,18 50,22 40,22" fill="#ffd700"/>
+                           <circle cx="45" cy="15" r="3" fill="#ff6b6b"/>`
+                        : `<ellipse cx="30" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
+                           <ellipse cx="60" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
+                           <polygon points="35,20 45,10 55,20 52,25 38,25" fill="#ffd700"/>`
+                    }
+                    <!-- Eyes -->
+                    <circle cx="35" cy="50" r="6" fill="#2d3436"/>
+                    <circle cx="55" cy="50" r="6" fill="#2d3436"/>
+                    <circle cx="37" cy="49" r="3" fill="#fff"/>
+                    <circle cx="57" cy="49" r="3" fill="#fff"/>
+                    <!-- Mouth -->
+                    <path d="M 33 65 Q 45 73 57 65" stroke="#2d3436" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                    <!-- Cheeks -->
+                    <ellipse cx="26" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="64" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
+                    <!-- Details -->
+                    <circle cx="38" cy="40" r="2.5" fill="${secondaryColor}"/>
+                    <circle cx="52" cy="40" r="2.5" fill="${secondaryColor}"/>
                 </svg>`;
             }
         }
@@ -708,7 +777,7 @@ ${newStage.toUpperCase()}`);
 
         function btnC() {
             STATE.menuIdx = -1;
-            document.getElementById('msg').classList.remove('show');
+            document.getElementById('statsOverlay').classList.remove('show');
             render();
         }
 
@@ -717,72 +786,79 @@ ${newStage.toUpperCase()}`);
 
             switch(idx) {
                 case 0: // Feed
-                    uiMsg("😋 MIAM!");
-                    container.classList.add('eat');
-                    setTimeout(() => container.classList.remove('eat'), 600);
+                    showFood('🍖');
+                    container.classList.add('eating');
+                    setTimeout(() => container.classList.remove('eating'), 1200);
+                    uiMsg("Miam!");
                     STATE.hunger = Math.min(4, STATE.hunger + 1);
                     STATE.weight++;
                     break;
                 case 1: // Light
                     STATE.lightOn = !STATE.lightOn;
-                    uiMsg(STATE.lightOn ? "💡 ON" : "🌙 OFF");
+                    uiMsg(STATE.lightOn ? "Lumière ON" : "Lumière OFF");
                     break;
                 case 2: // Game
-                    uiMsg("🎮 YOUPI!");
                     container.classList.add('happy');
                     setTimeout(() => container.classList.remove('happy'), 500);
+                    uiMsg("Youpi!");
                     STATE.happy = Math.min(4, STATE.happy + 1);
                     STATE.weight = Math.max(1, STATE.weight - 1);
                     break;
                 case 3: // Meds
                     if(STATE.sick) { 
                         STATE.sick = false; 
-                        uiMsg("💊 GUÉRI!"); 
+                        uiMsg("Guéri!"); 
                     } else {
-                        uiMsg("💊 OK");
+                        uiMsg("Ça va");
                     }
                     break;
                 case 4: // Clean
                     STATE.poops = 0;
-                    uiMsg("✨ PROPRE!");
+                    uiMsg("Propre!");
                     break;
                 case 5: // Stats
                     showStats();
                     break;
                 case 6: // About
-                    showAbout();
+                    uiMsg("Gotchi v1.0");
                     break;
             }
             STATE.menuIdx = -1;
             render();
         }
 
-        function showStats() {
-            const age = Math.floor((Date.now() - STATE.birth) / 60000);
-            const info = STATE.stage !== 'egg' ? EVOLUTION_TREE[STATE.stage][STATE.speciesId] : null;
-            const name = info ? info.species : 'Œuf';
-            const gender = info && info.gender ? (info.gender === 'male' ? '♂️' : '♀️') : '';
-
-            uiMsg(`📊 STATS
-━━━━━━━━
-${name} ${gender}
-Âge: ${age}min
-Poids: ${STATE.weight}g
-Faim: ${STATE.hunger}/4
-Joie: ${STATE.happy}/4`);
+        function showFood(emoji) {
+            const zone = document.getElementById('foodZone');
+            zone.innerHTML = `<div class="food-item">${emoji}</div>`;
+            setTimeout(() => zone.innerHTML = '', 1500);
         }
 
-        function showAbout() {
-            window.open('about.txt', '_blank');
+        function showStats() {
+            const age = Math.floor((Date.now() - STATE.birth) / 60000);
+            const overlay = document.getElementById('statsOverlay');
+            const content = document.getElementById('statsContent');
+
+            const speciesInfo = EVOLUTION_TREE[STATE.stage] 
+                ? (STATE.speciesLine === 'Bubbly' ? 'Bubbly' : 'Fluffy')
+                : 'Œuf';
+            const genderIcon = STATE.gender === 'male' ? '♂️' : STATE.gender === 'female' ? '♀️' : '';
+
+            content.innerHTML = `
+                <div class="stat-line"><strong>Espèce:</strong> <span>${speciesInfo} ${genderIcon}</span></div>
+                <div class="stat-line"><strong>Stade:</strong> <span>${STATE.stage}</span></div>
+                <div class="stat-line"><strong>Âge:</strong> <span>${age} min</span></div>
+                <div class="stat-line"><strong>Poids:</strong> <span>${STATE.weight}g</span></div>
+                <div class="stat-line"><strong>Faim:</strong> <span>${STATE.hunger}/4</span></div>
+                <div class="stat-line"><strong>Joie:</strong> <span>${STATE.happy}/4</span></div>
+            `;
+            overlay.classList.add('show');
         }
 
         function uiMsg(txt) {
             const el = document.getElementById('msg');
             el.innerText = txt;
             el.classList.add('show');
-            if(!txt.includes('STATS')) {
-                setTimeout(() => el.classList.remove('show'), 2500);
-            }
+            setTimeout(() => el.classList.remove('show'), 2000);
         }
 
         // SYSTEM
@@ -792,42 +868,56 @@ Joie: ${STATE.happy}/4`);
 
         function setShell(color) {
             const d = document.getElementById('device');
-            const shells = {
-                purple: 'linear-gradient(135deg, #6a5acd 0%, #483d8b 100%)',
-                blue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                pink: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-                valentine: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)',
-                white: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-                black: 'linear-gradient(135deg, #2c3e50 0%, #000000 100%)'
+            d.className = 'device-container'; // Reset
+
+            const colors = {
+                purple: '#6a5acd',
+                blue: '#4169e1',
+                pink: '#ff69b4',
+                white: '#f0f0f0',
+                valentine: '#8b0000'
             };
-            d.style.setProperty('--shell-gradient', shells[color]);
+
+            d.style.setProperty('--shell-color', colors[color]);
 
             // Add hearts for valentine
             if(color === 'valentine') {
-                addHearts(d);
+                d.classList.add('valentine');
+                addValentineHearts(d);
             }
             toggleSysMenu();
         }
 
-        function addHearts(container) {
-            // Clear existing hearts
-            container.querySelectorAll('.heart').forEach(h => h.remove());
+        function addValentineHearts(container) {
+            container.querySelectorAll('.heart-decoration').forEach(h => h.remove());
 
-            const hearts = ['💗', '💖', '💝', '💕'];
-            for(let i=0; i<8; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'heart';
-                heart.innerText = hearts[i % hearts.length];
-                heart.style.cssText = `
-                    position: absolute;
-                    font-size: ${15 + Math.random()*10}px;
-                    opacity: 0.4;
-                    top: ${Math.random()*100}%;
-                    left: ${Math.random()*100}%;
-                    pointer-events: none;
+            const positions = [
+                {x: 15, y: 20, size: 15},
+                {x: 80, y: 35, size: 12},
+                {x: 25, y: 70, size: 10},
+                {x: 75, y: 80, size: 14},
+                {x: 50, y: 50, size: 8},
+                {x: 40, y: 25, size: 11}
+            ];
+
+            positions.forEach(pos => {
+                const heart = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                heart.setAttribute('class', 'heart-decoration');
+                heart.setAttribute('width', pos.size);
+                heart.setAttribute('height', pos.size);
+                heart.style.left = pos.x + '%';
+                heart.style.top = pos.y + '%';
+                heart.innerHTML = `
+                    <path d="M${pos.size/2},${pos.size*0.85} 
+                             L${pos.size*0.2},${pos.size*0.4} 
+                             Q${pos.size*0.1},${pos.size*0.2} ${pos.size*0.2},${pos.size*0.15}
+                             Q${pos.size*0.3},${pos.size*0.1} ${pos.size/2},${pos.size*0.25}
+                             Q${pos.size*0.7},${pos.size*0.1} ${pos.size*0.8},${pos.size*0.15}
+                             Q${pos.size*0.9},${pos.size*0.2} ${pos.size*0.8},${pos.size*0.4} Z" 
+                          fill="${Math.random() < 0.5 ? '#ffc0cb' : '#ffffff'}"/>
                 `;
                 container.appendChild(heart);
-            }
+            });
         }
 
         function saveData() { 
@@ -836,7 +926,7 @@ Joie: ${STATE.happy}/4`);
             a.href = URL.createObjectURL(blob); 
             a.download='gotchi_save.json'; 
             a.click();
-            uiMsg("💾 SAUVEGARDÉ!");
+            uiMsg("Sauvegardé!");
         }
 
         function loadData(input) {
@@ -845,13 +935,13 @@ Joie: ${STATE.happy}/4`);
                 Object.assign(STATE, JSON.parse(e.target.result)); 
                 render(); 
                 toggleSysMenu();
-                uiMsg("📂 CHARGÉ!");
+                uiMsg("Chargé!");
             };
             r.readAsText(input.files[0]);
         }
 
         function resetData() { 
-            if(confirm("🔄 Recommencer depuis le début ?")) {
+            if(confirm("Recommencer depuis le début ?")) {
                 localStorage.removeItem('gotchi_modern'); 
                 location.reload(); 
             }
