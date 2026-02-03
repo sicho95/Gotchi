@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gotchi - Modern Edition (Network)</title>
+    <title>Gotchi - Modern Edition</title>
     <style>
-        /* Ton CSS existant - copié depuis le fichier */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
         body {
@@ -450,45 +449,6 @@
         .stats-view .stat-line strong { color: #0984e3; font-size: 8.5px; }
         .stats-view .stat-line span { font-size: 8.5px; }
 
-        /* FRIEND SUGGESTION OVERLAY */
-        .friend-suggestion {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            z-index: 30;
-            max-width: 200px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            display: none;
-        }
-        .friend-suggestion.show { display: block; animation: popIn 0.3s ease; }
-        @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-        .friend-gotchi {
-            font-size: 24px;
-            margin: 10px 0;
-        }
-        .friend-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-        .friend-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .friend-btn.yes { background: #4ade80; color: white; }
-        .friend-btn.no { background: #f87171; color: white; }
-
         /* BUTTONS */
         .buttons-area {
             display: flex;
@@ -544,6 +504,151 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
+    
+
+        /* ENCOUNTER SCREEN (fits LCD) */
+        .encounter-screen {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(2px);
+            padding: 8px;
+        }
+        .encounter-screen.show { display: block; }
+
+        .encounter-card {
+            position: absolute;
+            inset: 46px 8px 46px 8px; /* leave icon rows visible */
+            background: rgba(255,255,255,0.55);
+            border: 2px solid rgba(255,255,255,0.45);
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .encounter-title {
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            font-size: 11px;
+            color: #2d3436;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.35);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .encounter-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+        }
+
+        .encounter-creature {
+            width: 78px;
+            height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .encounter-vs {
+            width: 32px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 12px;
+            color: rgba(45,52,54,0.85);
+            font-family: 'Courier New', monospace;
+        }
+
+        .encounter-hints {
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            color: rgba(45,52,54,0.85);
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.35);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .encounter-choice {
+            font-weight: 900;
+        }
+
+        .encounter-choice.yes { color: #0a7d3b; }
+        .encounter-choice.no { color: #b42318; }
+
+        .encounter-wait {
+            text-align: right;
+            opacity: 0.85;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 18px;
+            pointer-events: none;
+            animation: floatHeart 1.6s ease-in-out;
+        }
+        @keyframes floatHeart {
+            0% { transform: translateY(0) scale(0.2); opacity: 0; }
+            20% { opacity: 1; }
+            60% { transform: translateY(-30px) scale(1); opacity: 1; }
+            100% { transform: translateY(-55px) scale(0.7); opacity: 0; }
+        }
+
+        .ball-float {
+            position: absolute;
+            font-size: 18px;
+            pointer-events: none;
+            animation: floatBall 1.4s ease-in-out;
+        }
+        @keyframes floatBall {
+            0% { transform: translateY(0) scale(0.2); opacity: 0; }
+            20% { opacity: 1; }
+            70% { transform: translateY(-25px) scale(1); opacity: 1; }
+            100% { transform: translateY(-45px) scale(0.6); opacity: 0; }
+        }
+
+        .hug {
+            animation: hug 0.7s ease-in-out;
+        }
+        @keyframes hug {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-8px); }
+        }
+
+        .jump {
+            animation: jump 0.45s ease-in-out infinite;
+        }
+        @keyframes jump {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Pregnancy belly overlay */
+        .pregnant-belly {
+            position: absolute;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            width: 34px;
+            height: 26px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.35), rgba(255,255,255,0.10) 60%, transparent 70%);
+            opacity: 0.95;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
@@ -561,7 +666,6 @@
         <div class="menu-item" onclick="saveData()">💾 Sauvegarder</div>
         <label class="menu-item">📂 Charger <input type="file" onchange="loadData(this)"></label>
         <div class="menu-item" onclick="resetData()">🔄 Recommencer</div>
-        <div class="menu-item" onclick="toggleNetwork()">🌐 Réseau</div>
     </div>
 
     <!-- DEVICE -->
@@ -598,23 +702,35 @@
                     <!-- Stats View - Sans conteneur extérieur -->
                     <div class="stats-view" id="statsView"></div>
 
-                    <!-- FRIEND SUGGESTION OVERLAY -->
-                    <div class="friend-suggestion" id="friendSuggestion">
-                        <div class="friend-gotchi" id="friendGotchi"></div>
-                        <p style="font-size: 12px; margin: 10px 0;">Ami potentiel détecté !</p>
-                        <div class="friend-buttons">
-                            <button class="friend-btn yes" onclick="acceptFriend()">Oui 🥰</button>
-                            <button class="friend-btn no" onclick="declineFriend()">Non 😕</button>
-                        </div>
-                    </div>
-
                     <!-- Normal View -->
                     <div id="creatureContainer"></div>
                     <div class="poop-zone" id="poopZone"></div>
                     <div id="foodZone"></div>
                 </div>
 
-                <!-- Bottom Icons Row -->
+                
+
+                <!-- ENCOUNTER SCREEN (uses physical buttons) -->
+                <div class="encounter-screen" id="encounterScreen">
+                    <div class="encounter-card">
+                        <div class="encounter-title" id="encounterTitle">RENCONTRE</div>
+                        <div class="encounter-stage" id="encounterStage">
+                            <div class="encounter-creature" id="encMy"></div>
+                            <div class="encounter-vs" id="encVS">VS</div>
+                            <div class="encounter-creature" id="encOther"></div>
+                        </div>
+                        <div class="encounter-hints">
+                            <div>
+                                SELECT: <span class="encounter-choice" id="encChoice">OUI</span>
+                                · DECIDE: OK
+                                · CANCEL: NON
+                            </div>
+                            <div class="encounter-wait" id="encWait"></div>
+                        </div>
+                    </div>
+                </div>
+
+<!-- Bottom Icons Row -->
                 <div class="icons-row bottom">
                     <div class="icon" id="i4">🚿</div>
                     <div class="icon" id="i5">📊</div>
@@ -641,9 +757,10 @@
         </div>
     </div>
 
-<script>
+    <script>
+
   // ====================================
-  // GOTCHI AVEC NETWORK COMPLET
+  // GOTCHI - Network + Rencontre sync
   // ====================================
 
   // STATE
@@ -665,35 +782,42 @@
     lastPoopIncrease: Date.now(),
     dead: false,
     showingStats: false,
-    lastPoopCount: -1
+    lastPoopCount: -1,
+
+    // Repro
+    pregnant: false,
+    pregnancyStart: null,
+    mate: null,       // traits de l'autre parent
+    parents: null     // {mom:{speciesLine,gender}, dad:{speciesLine,gender}}
   };
 
   let msgTimeout = null;
 
-  // === NETWORKING CONFIG ===
+  // === NETWORK ===
   let NETWORK_ENABLED = (localStorage.getItem('gotchi_network_enabled') !== '0');
   const API_BASE = 'https://gotchi.sicho95.workers.dev';
-
   let playerId = null;
-  let presenceInterval = null;
   let currentPosition = null;
-  let pendingFriend = null;
+  let presenceInterval = null;
+
+  // suggestion anti-spam
   let lastSuggestedId = null;
   let lastSuggestedAt = 0;
 
+  // === ENCOUNTER ===
+  let inEncounter = false;
+  let encounterChoice = 'yes';
+  let currentEncounter = null; // {id, otherPlayerId, otherGotchi, myGotchi}
+  let encounterPoll = null;
+  let encounterLocked = false;
+
   function initNetworking() {
-    playerId = localStorage.getItem('gotchi_player_id');
-    if (!playerId) {
-      playerId = crypto.randomUUID();
-      localStorage.setItem('gotchi_player_id', playerId);
-    }
+    playerId = localStorage.getItem('gotchi_player_id') || crypto.randomUUID();
+    localStorage.setItem('gotchi_player_id', playerId);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        pos => {
-          currentPosition = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-          try { uiMsg('📍 Position OK'); } catch(e) {}
-        },
+        pos => { currentPosition = { lat: pos.coords.latitude, lon: pos.coords.longitude }; },
         () => {},
         { timeout: 5000, enableHighAccuracy: true }
       );
@@ -705,7 +829,7 @@
   }
 
   async function pushPresence(status = 'playing') {
-    if (!NETWORK_ENABLED || !playerId) return;
+    if (!NETWORK_ENABLED || !playerId || inEncounter) return;
 
     const gotchi = {
       id: 'main',
@@ -723,48 +847,198 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerId, gotchi, status, position: currentPosition })
       });
-
       if (!res.ok) return;
       const data = await res.json();
 
-      if (data && data.suggestedFriend) {
-        const id = data.suggestedFriend.playerId;
+      if (data && data.suggestedFriend && data.suggestedFriend.encounterId) {
+        const otherId = data.suggestedFriend.playerId;
         const now = Date.now();
-        const sameAsLast = (id === lastSuggestedId);
-        const tooSoon = (now - lastSuggestedAt < 2 * 60 * 1000);
+        const sameAsLast = (otherId === lastSuggestedId);
+        const tooSoon = (now - lastSuggestedAt < 90 * 1000);
+        if (sameAsLast && tooSoon) return;
 
-        if (!(sameAsLast && tooSoon)) {
-          lastSuggestedId = id;
-          lastSuggestedAt = now;
-          pendingFriend = data.suggestedFriend;
-          showFriendSuggestion(data.suggestedFriend);
-        }
+        lastSuggestedId = otherId;
+        lastSuggestedAt = now;
+
+        currentEncounter = {
+          id: data.suggestedFriend.encounterId,
+          otherPlayerId: otherId,
+          otherGotchi: data.suggestedFriend.gotchi,
+          myGotchi: gotchi
+        };
+
+        startEncounterUI();
       }
     } catch (e) {}
   }
 
-  function showFriendSuggestion(friend) {
-    const el = document.getElementById('friendSuggestion');
-    const gotchiEl = document.getElementById('friendGotchi');
-    if (!el || !gotchiEl) return;
+  function startEncounterUI() {
+    inEncounter = true;
+    encounterLocked = false;
+    encounterChoice = 'yes';
 
-    const emoji = friend?.gotchi?.gender === 'male' ? '♂️' : (friend?.gotchi?.gender === 'female' ? '♀️' : '❔');
-    const line = friend?.gotchi?.speciesLine || 'Gotchi';
-    const stage = friend?.gotchi?.stage || '';
+    const scr = document.getElementById('encounterScreen');
+    scr.classList.add('show');
 
-    gotchiEl.textContent = `👋 ${emoji} ${line} ${stage}`.trim();
-    el.classList.add('show');
+    document.getElementById('encounterTitle').textContent = 'RENCONTRE';
+    document.getElementById('encWait').textContent = '';
+
+    renderEncounterCreatures();
+    updateEncounterChoiceUI();
   }
 
-  function acceptFriend() {
-    document.getElementById('friendSuggestion')?.classList.remove('show');
-    uiMsg('🥰 Rencontre acceptée !');
-    console.log('Accept friend:', pendingFriend);
+  function renderEncounterCreatures() {
+    const my = document.getElementById('encMy');
+    const other = document.getElementById('encOther');
+
+    my.innerHTML = getCreatureSVGFromTraits(currentEncounter.myGotchi.stage, currentEncounter.myGotchi.gender, currentEncounter.myGotchi.speciesLine, false, 4);
+    other.innerHTML = getCreatureSVGFromTraits(currentEncounter.otherGotchi.stage, currentEncounter.otherGotchi.gender, currentEncounter.otherGotchi.speciesLine, false, 4);
   }
 
-  function declineFriend() {
-    document.getElementById('friendSuggestion')?.classList.remove('show');
-    uiMsg('😕 Pas maintenant');
+  function updateEncounterChoiceUI() {
+    const el = document.getElementById('encChoice');
+    if (encounterChoice === 'yes') {
+      el.textContent = 'OUI';
+      el.classList.remove('no');
+      el.classList.add('yes');
+    } else {
+      el.textContent = 'NON';
+      el.classList.remove('yes');
+      el.classList.add('no');
+    }
+  }
+
+  async function sendEncounterAnswer() {
+    if (!currentEncounter || encounterLocked) return;
+    encounterLocked = true;
+
+    document.getElementById('encWait').textContent = "Attente...";
+
+    try {
+      await fetch(`${API_BASE}/encounter/answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId, encounterId: currentEncounter.id, answer: encounterChoice })
+      });
+    } catch (e) {}
+
+    startEncounterPolling();
+  }
+
+  function startEncounterPolling() {
+    if (encounterPoll) clearInterval(encounterPoll);
+    encounterPoll = setInterval(async () => {
+      try {
+        const res = await fetch(`${API_BASE}/encounter/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ encounterId: currentEncounter.id })
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !data.encounter) return;
+
+        if (data.encounter.status !== 'pending') {
+          clearInterval(encounterPoll);
+          encounterPoll = null;
+          await runEncounterCinematic(data.encounter);
+          endEncounter();
+        }
+      } catch (e) {}
+    }, 900);
+  }
+
+  async function runEncounterCinematic(enc) {
+    if (enc.status === 'declined') {
+      document.getElementById('encounterTitle').textContent = '...';
+      document.getElementById('encWait').textContent = 'Refus';
+      await sleep(900);
+      return;
+    }
+
+    // RULE:
+    // - Same sex -> friendship only
+    // - Different sex -> worker decides love/friendship
+    const g1 = currentEncounter.myGotchi.gender;
+    const g2 = currentEncounter.otherGotchi.gender;
+    const sameSex = (g1 && g2 && g1 === g2);
+
+    const type = sameSex ? 'friendship' : (enc.matchType || 'friendship');
+
+    if (type === 'love') {
+      document.getElementById('encounterTitle').textContent = 'AMOUR';
+      await cinematicLove();
+
+      // pregnancy only for female (on her device)
+      if (STATE.gender === 'female') {
+        STATE.pregnant = true;
+        STATE.pregnancyStart = Date.now();
+        STATE.mate = { speciesLine: currentEncounter.otherGotchi.speciesLine, gender: currentEncounter.otherGotchi.gender };
+        uiMsg('💕 Enceinte');
+      }
+
+      STATE.happy = Math.min(5, STATE.happy + 1);
+    } else {
+      document.getElementById('encounterTitle').textContent = 'AMITIE';
+      await cinematicFriendship();
+      STATE.happy = Math.min(5, STATE.happy + 1);
+    }
+  }
+
+  async function cinematicLove() {
+    const st = document.getElementById('encounterStage');
+    const my = document.getElementById('encMy');
+    const other = document.getElementById('encOther');
+
+    my.classList.add('hug');
+    other.classList.add('hug');
+
+    for (let i = 0; i < 7; i++) {
+      spawnFx(st, '💕', 'heart-float');
+      await sleep(230);
+    }
+
+    await sleep(900);
+    my.classList.remove('hug');
+    other.classList.remove('hug');
+  }
+
+  async function cinematicFriendship() {
+    const st = document.getElementById('encounterStage');
+    const my = document.getElementById('encMy');
+    const other = document.getElementById('encOther');
+
+    my.classList.add('jump');
+    other.classList.add('jump');
+
+    for (let i = 0; i < 4; i++) {
+      spawnFx(st, '⚽', 'ball-float');
+      await sleep(260);
+    }
+
+    await sleep(900);
+    my.classList.remove('jump');
+    other.classList.remove('jump');
+  }
+
+  function spawnFx(container, glyph, cls) {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = glyph;
+    el.style.left = (42 + Math.random() * 16) + '%';
+    el.style.top = (50 + Math.random() * 8) + '%';
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 1700);
+  }
+
+  function endEncounter() {
+    const scr = document.getElementById('encounterScreen');
+    scr.classList.remove('show');
+    inEncounter = false;
+    encounterLocked = false;
+    currentEncounter = null;
+    document.getElementById('encWait').textContent = '';
+    render();
   }
 
   function toggleNetwork() {
@@ -774,6 +1048,101 @@
     if (NETWORK_ENABLED) pushPresence('playing');
     toggleSysMenu();
   }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // --- Pregnancy: lay egg automatically when adult and 2 minutes passed ---
+  setInterval(() => {
+    if (!STATE.pregnant || !STATE.pregnancyStart) return;
+    if (STATE.dead) return;
+
+    const mature = (STATE.stage === 'adult');
+    const elapsed = Date.now() - STATE.pregnancyStart;
+
+    if (mature && elapsed >= 120000) {
+      layEggNow();
+    }
+  }, 1000);
+
+  function layEggNow() {
+    // Build parents for hatch logic
+    const mom = { speciesLine: STATE.speciesLine, gender: STATE.gender };
+    const dad = STATE.mate ? { speciesLine: STATE.mate.speciesLine, gender: STATE.mate.gender } : { speciesLine: null, gender: 'male' };
+    STATE.parents = { mom, dad };
+
+    // reset to egg (new generation)
+    STATE.pregnant = false;
+    STATE.pregnancyStart = null;
+    STATE.mate = null;
+
+    STATE.stage = 'egg';
+    STATE.speciesLine = null;
+    STATE.gender = null;
+    STATE.birth = Date.now();
+    STATE.hunger = 4;
+    STATE.happy = 4;
+    STATE.weight = 5;
+    STATE.poops = 0;
+    STATE.poopTime = null;
+    STATE.sick = false;
+    STATE.sickTime = null;
+    STATE.menuIdx = -1;
+    STATE.dead = false;
+
+    uiMsg('🥚 Ponte!');
+    render();
+  }
+
+
+
+  function getCreatureSVGFromTraits(stage, gender, speciesLine, sick, happy) {
+    const genderColor = gender === 'male' ? '#74b9ff' : '#ff6b9d';
+    const secondaryColor = speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
+    const sickTint = sick ? 'filter: hue-rotate(80deg) saturate(0.7);' : '';
+
+    const mouthSad = 'M 38 56 Q 42 59 45 56 Q 48 59 52 56';
+    const mouthHappy = 'M 38 56 Q 45 52 52 56';
+    const mouthNeutral = 'M 38 56 Q 45 60 52 56';
+
+    const mouthPath = sick ? mouthSad : (happy <= 1 ? mouthSad : (happy >= 4 ? mouthHappy : mouthNeutral));
+
+    if (stage === 'egg') {
+      return `<div class="egg-container" style="transform: scale(0.9)"><div class="egg"></div></div>`;
+    }
+
+    if (stage === 'baby') {
+      return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;${sickTint}">
+        <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
+        <circle cx="38" cy="45" r="5" fill="#2d3436"/>
+        <circle cx="52" cy="45" r="5" fill="#2d3436"/>
+        <circle cx="39.5" cy="44" r="2" fill="#fff"/>
+        <circle cx="53.5" cy="44" r="2" fill="#fff"/>
+        <path d="${mouthPath}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+        <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+      </svg>`;
+    }
+
+    // child/teen/adult: close enough to your original look
+    const rx = stage === 'adult' ? 32 : (stage === 'teen' ? 30 : 26);
+    const ry = stage === 'adult' ? 30 : (stage === 'teen' ? 28 : 24);
+    const cy = stage === 'adult' ? 55 : (stage === 'teen' ? 54 : 52);
+
+    const eyeR = stage === 'adult' ? 6 : 5;
+
+    return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;${sickTint}">
+      <ellipse cx="45" cy="${cy}" rx="${rx}" ry="${ry}" fill="${genderColor}"/>
+      <ellipse cx="45" cy="${cy}" rx="${Math.max(rx-4, 20)}" ry="${Math.max(ry-4, 20)}" fill="${secondaryColor}" opacity="0.45"/>
+      <circle cx="38" cy="50" r="${eyeR}" fill="#2d3436"/>
+      <circle cx="54" cy="50" r="${eyeR}" fill="#2d3436"/>
+      <circle cx="39.5" cy="49" r="${Math.max(eyeR-3,2)}" fill="#fff"/>
+      <circle cx="55.5" cy="49" r="${Math.max(eyeR-3,2)}" fill="#fff"/>
+      <path d="${mouthPath.replaceAll('56','62').replaceAll('52','55').replaceAll('38','35')}" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="28" cy="${cy+1}" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+      <ellipse cx="62" cy="${cy+1}" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+    </svg>`;
+  }
+
 
 // INIT
         const saved = localStorage.getItem('gotchi_modern');
@@ -1369,16 +1738,95 @@
         // START
         render();
 
-  // === HOOK NETWORK ===
-  const _originalDoAction = doAction;
-  doAction = function(idx) {
-    _originalDoAction(idx);
-    setTimeout(() => pushPresence('playing'), 300);
-  };
+    
+
+
+  function installHooks() {
+    // Physical buttons handling while in encounter
+    const _btnA = btnA;
+    const _btnB = btnB;
+    const _btnC = btnC;
+
+    btnA = function() {
+      if (inEncounter && !encounterLocked) {
+        encounterChoice = (encounterChoice === 'yes') ? 'no' : 'yes';
+        updateEncounterChoiceUI();
+        return;
+      }
+      _btnA();
+    };
+
+    btnB = function() {
+      if (inEncounter) {
+        sendEncounterAnswer();
+        return;
+      }
+      _btnB();
+    };
+
+    btnC = function() {
+      if (inEncounter) {
+        encounterChoice = 'no';
+        updateEncounterChoiceUI();
+        sendEncounterAnswer();
+        return;
+      }
+      _btnC();
+    };
+
+    // Push presence after actions
+    const _doAction = doAction;
+    doAction = function(idx) {
+      _doAction(idx);
+      setTimeout(() => pushPresence('playing'), 300);
+    };
+
+    // render wrapper: add belly when pregnant (adult)
+    const _render = render;
+    render = function() {
+      _render();
+      if (STATE.pregnant && STATE.stage !== 'egg' && !STATE.dead) {
+        const container = document.getElementById('creatureContainer');
+        if (!container) return;
+        // avoid duplicates
+        if (!container.querySelector('.pregnant-belly')) {
+          const belly = document.createElement('div');
+          belly.className = 'pregnant-belly';
+          container.appendChild(belly);
+        }
+      }
+    };
+
+    // override hatchEgg to use parents traits when available
+    const _hatchEgg = hatchEgg;
+    hatchEgg = function() {
+      const egg = document.querySelector('.egg');
+      if (egg) egg.classList.add('hatching');
+
+      setTimeout(() => {
+        STATE.stage = 'baby';
+
+        if (STATE.parents && STATE.parents.mom && STATE.parents.dad) {
+          const lines = [STATE.parents.mom.speciesLine, STATE.parents.dad.speciesLine].filter(Boolean);
+          STATE.speciesLine = lines.length ? lines[Math.floor(Math.random() * lines.length)] : (Math.random() < 0.5 ? 'Bubbly' : 'Fluffy');
+        } else {
+          STATE.speciesLine = Math.random() < 0.5 ? 'Bubbly' : 'Fluffy';
+        }
+
+        STATE.gender = Math.random() < 0.5 ? 'male' : 'female';
+        STATE.parents = null;
+
+        uiMsg('🐣 Éclosion!');
+        render();
+      }, 800);
+    };
+  }
+
 
   // START
   render();
   initNetworking();
+  installHooks();
 </script>
 </body>
 </html>
