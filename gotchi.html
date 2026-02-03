@@ -506,31 +506,129 @@
 
     
 
-        /* ENCOUNTER OVERLAY (fullscreen) */
-        .encounter-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9999;align-items:center;justify-content:center;}
-        .encounter-overlay.show{display:flex;}
-        .encounter-box{width:320px;max-width:92vw;background:linear-gradient(135deg,#a8d5ba 0%,#8bc4aa 100%);border:4px solid #7ab89d;border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
-        .encounter-header{text-align:center;font-family:'Courier New',monospace;font-weight:800;font-size:14px;color:#2d3436;margin-bottom:14px;padding:8px;background:rgba(255,255,255,.40);border-radius:12px;}
-        .encounter-creatures-row{display:flex;justify-content:space-around;align-items:center;gap:16px;margin:14px 0;min-height:108px;position:relative;}
-        .encounter-creature-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;}
-        .encounter-creature-display{width:92px;height:92px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.22);border-radius:16px;padding:8px;overflow:hidden;}
-        .encounter-label{font-size:10px;font-weight:800;color:#2d3436;font-family:'Courier New',monospace;}
-        .encounter-vs{font-size:18px;font-weight:900;color:#2d3436;}
-        .encounter-controls{display:flex;justify-content:center;gap:14px;margin:14px 0;}
-        .encounter-choice-btn{flex:1;padding:12px;border-radius:12px;font-weight:900;font-size:13px;text-align:center;transition:all .18s;border:3px solid transparent;user-select:none;}
-        .encounter-choice-btn.yes{background:#4ade80;color:#fff;}
-        .encounter-choice-btn.no{background:#f87171;color:#fff;}
-        .encounter-choice-btn.selected{border-color:#2d3436;transform:scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,.28);}
-        .encounter-hints{font-size:10px;text-align:center;color:#2d3436;font-family:'Courier New',monospace;margin-top:8px;}
-        .encounter-wait{text-align:center;font-size:11px;font-weight:800;color:#636e72;margin-top:6px;min-height:14px;}
-        .heart-anim,.ball-anim{position:absolute;pointer-events:none;animation:floatUp 1.8s ease-out;}
-        .heart-anim{font-size:24px;}
-        .ball-anim{font-size:22px;}
-        @keyframes floatUp{0%{transform:translateY(0) scale(.3);opacity:0}30%{opacity:1}70%{transform:translateY(-40px) scale(1);opacity:1}100%{transform:translateY(-70px) scale(.6);opacity:0}}
+        /* ENCOUNTER SCREEN (inside LCD) */
+        .encounter-screen{
+            display:none;
+            position:absolute;
+            inset:0;
+            z-index:30;
+            padding:8px;
+            background:rgba(0,0,0,.15);
+        }
+        .encounter-screen.show{display:block;}
+
+        .enc-card{
+            position:absolute;
+            inset:44px 8px 44px 8px; /* keep top/bottom icon rows */
+            background:rgba(255,255,255,.58);
+            border:2px solid rgba(255,255,255,.55);
+            border-radius:14px;
+            box-shadow:0 10px 22px rgba(0,0,0,.28);
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+        }
+        .enc-title{
+            text-align:center;
+            font-family:'Courier New',monospace;
+            font-weight:900;
+            font-size:12px;
+            color:#2d3436;
+            padding:8px 10px;
+            background:rgba(255,255,255,.35);
+            border-bottom:1px solid rgba(0,0,0,.06);
+        }
+        .enc-row{
+            flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            padding:10px;
+            position:relative;
+        }
+        .enc-side{
+            width:86px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:6px;
+        }
+        .enc-label{
+            font-family:'Courier New',monospace;
+            font-weight:900;
+            font-size:9px;
+            color:#2d3436;
+            opacity:.9;
+        }
+        .enc-creature{
+            width:78px;
+            height:78px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(255,255,255,.20);
+            border-radius:14px;
+            overflow:hidden;
+        }
+        .enc-mid{
+            width:28px;
+            text-align:center;
+            font-weight:900;
+            color:rgba(45,52,54,.85);
+            font-family:'Courier New',monospace;
+        }
+        .enc-choices{
+            display:flex;
+            gap:10px;
+            padding:10px;
+            background:rgba(255,255,255,.30);
+            border-top:1px solid rgba(0,0,0,.06);
+        }
+        .enc-btn{
+            flex:1;
+            padding:8px 0;
+            border-radius:12px;
+            font-weight:900;
+            font-size:12px;
+            text-align:center;
+            background:rgba(209,213,219,.85);
+            color:#2d3436;
+            border:2px solid rgba(0,0,0,.10);
+            transition:all .15s;
+            user-select:none;
+        }
+        .enc-btn.selected{
+            border-color:#2d3436;
+            transform:scale(1.02);
+            box-shadow:0 6px 14px rgba(0,0,0,.22);
+            color:#fff;
+        }
+        .enc-btn.yes.selected{ background:#22c55e; }
+        .enc-btn.no.selected{ background:#ef4444; }
+
+        .enc-hint{
+            font-family:'Courier New',monospace;
+            font-size:9px;
+            color:rgba(45,52,54,.85);
+            padding:6px 10px;
+            background:rgba(255,255,255,.28);
+            border-top:1px solid rgba(0,0,0,.06);
+            display:flex;
+            justify-content:space-between;
+            gap:8px;
+        }
+        .enc-wait{ text-align:right; font-weight:800; }
+
+        .heart-anim,.ball-anim{position:absolute;pointer-events:none;animation:floatUp 1.7s ease-out;}
+        .heart-anim{font-size:18px;}
+        .ball-anim{font-size:18px;}
+        @keyframes floatUp{0%{transform:translateY(0) scale(.3);opacity:0}30%{opacity:1}70%{transform:translateY(-30px) scale(1);opacity:1}100%{transform:translateY(-50px) scale(.6);opacity:0}}
         .hug-move{animation:hugAnim .8s ease-in-out;}
-        @keyframes hugAnim{0%,100%{transform:translateX(0)}50%{transform:translateX(-12px)}}
+        @keyframes hugAnim{0%,100%{transform:translateX(0)}50%{transform:translateX(-10px)}}
         .jump-play{animation:jumpAnim .5s ease-in-out infinite;}
-        @keyframes jumpAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+        @keyframes jumpAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
         /* FAMILY MODE (two creatures on LCD) */
         .family-mode{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;justify-content:center;align-items:center;background:rgba(255,255,255,.03);gap:10px;pointer-events:none;}
@@ -606,6 +704,34 @@
                 </div>
 
                 
+
+                    <!-- ENCOUNTER SCREEN (LCD) -->
+                    <div class="encounter-screen" id="encounterScreen">
+                        <div class="enc-card">
+                            <div class="enc-title" id="encTitle">RENCONTRE !</div>
+                            <div class="enc-row" id="encRow">
+                                <div class="enc-side">
+                                    <div class="enc-label">Moi</div>
+                                    <div class="enc-creature" id="encMy"></div>
+                                </div>
+                                <div class="enc-mid">💫</div>
+                                <div class="enc-side">
+                                    <div class="enc-label">Ami</div>
+                                    <div class="enc-creature" id="encOther"></div>
+                                </div>
+                            </div>
+                            <div class="enc-choices">
+                                <div class="enc-btn yes" id="encYes">💚 OUI</div>
+                                <div class="enc-btn no" id="encNo">💔 NON</div>
+                            </div>
+                            <div class="enc-hint">
+                                <div>SELECT: choisir · DECIDE: valider · CANCEL: refuser</div>
+                                <div class="enc-wait" id="encWait"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                     <!-- FAMILY MODE -->
                     <div class="family-mode" id="familyMode">
@@ -688,10 +814,10 @@
   let lastSuggestedId = null;
   let lastSuggestedAt = 0;
 
-  // ===== Encounter =====
+  // ===== Encounter (LCD) =====
   let inEncounter = false;
   let encounterChoice = 'yes';
-  let currentEncounter = null; // {id, otherPlayerId, otherGotchi, myGotchi}
+  let currentEncounter = null;
   let encounterPollInterval = null;
   let encounterLocked = false;
 
@@ -759,40 +885,35 @@
     encounterLocked = false;
     encounterChoice = 'yes';
 
+    // close menus
     STATE.menuIdx = -1;
 
-    const overlay = document.getElementById('encounterOverlay');
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden', 'false');
-
-    document.getElementById('encounterHeader').textContent = 'RENCONTRE !';
-    document.getElementById('encounterWait').textContent = '';
+    document.getElementById('encounterScreen')?.classList.add('show');
+    document.getElementById('encTitle').textContent = 'RENCONTRE !';
+    document.getElementById('encWait').textContent = '';
 
     renderEncounterCreatures();
     updateEncounterChoiceDisplay();
   }
 
   function endEncounterUI() {
-    const overlay = document.getElementById('encounterOverlay');
-    overlay.classList.remove('show');
-    overlay.setAttribute('aria-hidden', 'true');
-
+    document.getElementById('encounterScreen')?.classList.remove('show');
     inEncounter = false;
     encounterLocked = false;
     currentEncounter = null;
-
     render();
   }
 
   function updateEncounterChoiceDisplay() {
-    const yesBtn = document.getElementById('encounterYes');
-    const noBtn = document.getElementById('encounterNo');
+    const yesBtn = document.getElementById('encYes');
+    const noBtn = document.getElementById('encNo');
+
     if (encounterChoice === 'yes') {
-      yesBtn.classList.add('selected');
-      noBtn.classList.remove('selected');
+      yesBtn?.classList.add('selected');
+      noBtn?.classList.remove('selected');
     } else {
-      yesBtn.classList.remove('selected');
-      noBtn.classList.add('selected');
+      yesBtn?.classList.remove('selected');
+      noBtn?.classList.add('selected');
     }
   }
 
@@ -827,12 +948,14 @@
     STATE.sick = backup.sick;
     STATE.dead = backup.dead;
 
-    return svg;
+    return svg || '';
   }
 
   function renderEncounterCreatures() {
-    const myDiv = document.getElementById('encounterMyCreature');
-    const otherDiv = document.getElementById('encounterOtherCreature');
+    const myDiv = document.getElementById('encMy');
+    const otherDiv = document.getElementById('encOther');
+
+    if (!myDiv || !otherDiv || !currentEncounter) return;
 
     myDiv.innerHTML = getCreatureSVGFromTraits({
       stage: currentEncounter.myGotchi.stage,
@@ -858,7 +981,7 @@
   async function validateEncounterChoice() {
     if (!currentEncounter || encounterLocked) return;
     encounterLocked = true;
-    document.getElementById('encounterWait').textContent = "En attente...";
+    document.getElementById('encWait').textContent = 'Attente...';
 
     try {
       await fetch(`${API_BASE}/encounter/answer`, {
@@ -891,65 +1014,65 @@
         await playEncounterResult(data.encounter);
         endEncounterUI();
       } catch (e) {}
-    }, 1000);
+    }, 900);
   }
 
   function spawnFx(container, emoji, cls) {
     const el = document.createElement('div');
     el.className = cls;
     el.textContent = emoji;
-    el.style.left = (40 + Math.random() * 20) + '%';
-    el.style.top = '50%';
+    el.style.left = (42 + Math.random() * 16) + '%';
+    el.style.top = (54 + Math.random() * 8) + '%';
     container.appendChild(el);
-    setTimeout(() => el.remove(), 1900);
+    setTimeout(() => el.remove(), 1750);
   }
 
   async function playLoveAnimation() {
-    const row = document.getElementById('encounterCreaturesRow');
-    const myC = document.getElementById('encounterMyCreature');
-    const othC = document.getElementById('encounterOtherCreature');
-    myC.classList.add('hug-move');
-    othC.classList.add('hug-move');
+    const row = document.getElementById('encRow');
+    const myC = document.getElementById('encMy');
+    const othC = document.getElementById('encOther');
+    myC?.classList.add('hug-move');
+    othC?.classList.add('hug-move');
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 7; i++) {
       spawnFx(row, '💕', 'heart-anim');
-      await sleep(220);
+      await sleep(200);
     }
 
-    await sleep(650);
-    myC.classList.remove('hug-move');
-    othC.classList.remove('hug-move');
+    await sleep(550);
+    myC?.classList.remove('hug-move');
+    othC?.classList.remove('hug-move');
   }
 
   async function playFriendshipAnimation() {
-    const row = document.getElementById('encounterCreaturesRow');
-    const myC = document.getElementById('encounterMyCreature');
-    const othC = document.getElementById('encounterOtherCreature');
-    myC.classList.add('jump-play');
-    othC.classList.add('jump-play');
+    const row = document.getElementById('encRow');
+    const myC = document.getElementById('encMy');
+    const othC = document.getElementById('encOther');
+    myC?.classList.add('jump-play');
+    othC?.classList.add('jump-play');
 
     for (let i = 0; i < 5; i++) {
       spawnFx(row, '⚽', 'ball-anim');
-      await sleep(260);
+      await sleep(240);
     }
 
     await sleep(650);
-    myC.classList.remove('jump-play');
-    othC.classList.remove('jump-play');
+    myC?.classList.remove('jump-play');
+    othC?.classList.remove('jump-play');
   }
 
   async function playEncounterResult(enc) {
     if (enc.status === 'declined') {
-      document.getElementById('encounterHeader').textContent = 'Refusé...';
-      document.getElementById('encounterWait').textContent = '';
-      await sleep(1000);
+      document.getElementById('encTitle').textContent = 'Refus...';
+      document.getElementById('encWait').textContent = '';
+      await sleep(800);
       return;
     }
 
     const matchType = enc.matchType || 'friendship';
 
     if (matchType === 'love') {
-      document.getElementById('encounterHeader').textContent = '💕 AMOUR';
+      document.getElementById('encTitle').textContent = 'AMOUR';
       await playLoveAnimation();
 
       if (STATE.gender === 'female') {
@@ -961,7 +1084,7 @@
 
       STATE.happy = Math.min(5, STATE.happy + 1);
     } else {
-      document.getElementById('encounterHeader').textContent = '🎮 AMITIÉ';
+      document.getElementById('encTitle').textContent = 'AMITIE';
       await playFriendshipAnimation();
       STATE.happy = Math.min(5, STATE.happy + 1);
     }
@@ -982,10 +1105,8 @@
         hunger: 4,
         happy: 4,
         weight: 3,
-        poops: 0,
         sick: false,
-        dead: false,
-        lastNeed: Date.now()
+        dead: false
       };
     }
   }
@@ -1029,6 +1150,7 @@
     const b = STATE.family.baby;
     if (!b || b.dead) return;
 
+    // auto hatch after 30s
     if (b.stage === 'egg' && (Date.now() - b.birth >= 30000)) hatchFamilyEgg();
 
     if (b.stage !== 'egg') {
@@ -1082,13 +1204,14 @@
       }
 
       const needs = (b.hunger <= 1) || (b.happy <= 1);
-      babyDiv.classList.toggle('priority-glow', needs && !b.dead);
+      babyDiv?.classList.toggle('priority-glow', needs && !b.dead);
     } else {
       fm.classList.remove('active');
     }
   }
 
   function installEncounterAndFamilyHooks() {
+    // Buttons: do not let background menus move during encounter
     const _btnA = btnA;
     const _btnB = btnB;
     const _btnC = btnC;
@@ -1120,6 +1243,7 @@
       _btnC();
     };
 
+    // Feed/play: baby first
     const _doAction = doAction;
     doAction = function(idx) {
       const FEED_IDX = 0;
@@ -1148,6 +1272,7 @@
       setTimeout(() => pushPresence(), 250);
     };
 
+    // render wrapper: belly + family UI
     const _render = render;
     render = function() {
       _render();
@@ -1162,11 +1287,12 @@
       renderFamilyUI();
     };
 
-    document.getElementById('encounterYes')?.addEventListener('click', () => { encounterChoice='yes'; updateEncounterChoiceDisplay(); });
-    document.getElementById('encounterNo')?.addEventListener('click', () => { encounterChoice='no'; updateEncounterChoiceDisplay(); });
+    // Click support (optional)
+    document.getElementById('encYes')?.addEventListener('click', () => { if(inEncounter && !encounterLocked){ encounterChoice='yes'; updateEncounterChoiceDisplay(); } });
+    document.getElementById('encNo')?.addEventListener('click', () => { if(inEncounter && !encounterLocked){ encounterChoice='no'; updateEncounterChoiceDisplay(); } });
   }
 
-  // Pregnancy timer: lay egg after 2 min once adult, mom stays on screen
+  // Pregnancy timer: lay egg after 2 min once adult, mom stays
   setInterval(() => {
     if (!STATE.pregnant || !STATE.pregnancyStart) return;
     if (STATE.dead) return;
@@ -1176,7 +1302,7 @@
     }
   }, 1000);
 
-  // Family update tick
+  // Family tick
   setInterval(() => {
     updateFamilyNeeds();
     if (STATE.family?.hasBaby) renderFamilyUI();
@@ -1781,31 +1907,5 @@
         initNetworking();
         installEncounterAndFamilyHooks();
 </script>
-
-
-    <!-- ENCOUNTER OVERLAY (blocks background) -->
-    <div class="encounter-overlay" id="encounterOverlay" aria-hidden="true">
-        <div class="encounter-box">
-            <div class="encounter-header" id="encounterHeader">RENCONTRE !</div>
-            <div class="encounter-creatures-row" id="encounterCreaturesRow">
-                <div class="encounter-creature-wrap">
-                    <div class="encounter-label">Moi</div>
-                    <div class="encounter-creature-display" id="encounterMyCreature"></div>
-                </div>
-                <div class="encounter-vs">💫</div>
-                <div class="encounter-creature-wrap">
-                    <div class="encounter-label">Ami</div>
-                    <div class="encounter-creature-display" id="encounterOtherCreature"></div>
-                </div>
-            </div>
-            <div class="encounter-controls">
-                <div class="encounter-choice-btn yes" id="encounterYes">💚 OUI</div>
-                <div class="encounter-choice-btn no" id="encounterNo">💔 NON</div>
-            </div>
-            <div class="encounter-hints">SELECT: changer · DECIDE: valider · CANCEL: refuser</div>
-            <div class="encounter-wait" id="encounterWait"></div>
-        </div>
-    </div>
-
 </body>
 </html>
