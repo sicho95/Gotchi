@@ -507,120 +507,22 @@
     
 
         /* ENCOUNTER SCREEN (inside LCD) */
-        .encounter-screen{
-            display:none;
-            position:absolute;
-            inset:0;
-            z-index:30;
-            padding:8px;
-            background:rgba(0,0,0,.15);
-        }
+        .encounter-screen{display:none;position:absolute;inset:0;z-index:30;padding:8px;background:rgba(0,0,0,.15);}
         .encounter-screen.show{display:block;}
-
-        .enc-card{
-            position:absolute;
-            inset:44px 8px 44px 8px; /* keep top/bottom icon rows */
-            background:rgba(255,255,255,.58);
-            border:2px solid rgba(255,255,255,.55);
-            border-radius:14px;
-            box-shadow:0 10px 22px rgba(0,0,0,.28);
-            overflow:hidden;
-            display:flex;
-            flex-direction:column;
-            justify-content:space-between;
-        }
-        .enc-title{
-            text-align:center;
-            font-family:'Courier New',monospace;
-            font-weight:900;
-            font-size:12px;
-            color:#2d3436;
-            padding:8px 10px;
-            background:rgba(255,255,255,.35);
-            border-bottom:1px solid rgba(0,0,0,.06);
-        }
-        .enc-row{
-            flex:1;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:10px;
-            padding:10px;
-            position:relative;
-        }
-        .enc-side{
-            width:86px;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            gap:6px;
-        }
-        .enc-label{
-            font-family:'Courier New',monospace;
-            font-weight:900;
-            font-size:9px;
-            color:#2d3436;
-            opacity:.9;
-        }
-        .enc-creature{
-            width:78px;
-            height:78px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            background:rgba(255,255,255,.20);
-            border-radius:14px;
-            overflow:hidden;
-        }
-        .enc-mid{
-            width:28px;
-            text-align:center;
-            font-weight:900;
-            color:rgba(45,52,54,.85);
-            font-family:'Courier New',monospace;
-        }
-        .enc-choices{
-            display:flex;
-            gap:10px;
-            padding:10px;
-            background:rgba(255,255,255,.30);
-            border-top:1px solid rgba(0,0,0,.06);
-        }
-        .enc-btn{
-            flex:1;
-            padding:8px 0;
-            border-radius:12px;
-            font-weight:900;
-            font-size:12px;
-            text-align:center;
-            background:rgba(209,213,219,.85);
-            color:#2d3436;
-            border:2px solid rgba(0,0,0,.10);
-            transition:all .15s;
-            user-select:none;
-        }
-        .enc-btn.selected{
-            border-color:#2d3436;
-            transform:scale(1.02);
-            box-shadow:0 6px 14px rgba(0,0,0,.22);
-            color:#fff;
-        }
-        .enc-btn.yes.selected{ background:#22c55e; }
-        .enc-btn.no.selected{ background:#ef4444; }
-
-        .enc-hint{
-            font-family:'Courier New',monospace;
-            font-size:9px;
-            color:rgba(45,52,54,.85);
-            padding:6px 10px;
-            background:rgba(255,255,255,.28);
-            border-top:1px solid rgba(0,0,0,.06);
-            display:flex;
-            justify-content:space-between;
-            gap:8px;
-        }
-        .enc-wait{ text-align:right; font-weight:800; }
-
+        .enc-card{position:absolute;inset:44px 8px 44px 8px;background:rgba(255,255,255,.58);border:2px solid rgba(255,255,255,.55);border-radius:14px;box-shadow:0 10px 22px rgba(0,0,0,.28);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;}
+        .enc-title{text-align:center;font-family:'Courier New',monospace;font-weight:900;font-size:12px;color:#2d3436;padding:8px 10px;background:rgba(255,255,255,.35);border-bottom:1px solid rgba(0,0,0,.06);}
+        .enc-row{flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;position:relative;}
+        .enc-side{width:86px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+        .enc-label{font-family:'Courier New',monospace;font-weight:900;font-size:9px;color:#2d3436;opacity:.9;}
+        .enc-creature{width:78px;height:78px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.20);border-radius:14px;overflow:hidden;}
+        .enc-mid{width:28px;text-align:center;font-weight:900;color:rgba(45,52,54,.85);font-family:'Courier New',monospace;}
+        .enc-choices{display:flex;gap:10px;padding:10px;background:rgba(255,255,255,.30);border-top:1px solid rgba(0,0,0,.06);}
+        .enc-btn{flex:1;padding:8px 0;border-radius:12px;font-weight:900;font-size:12px;text-align:center;background:rgba(209,213,219,.85);color:#2d3436;border:2px solid rgba(0,0,0,.10);transition:all .15s;user-select:none;}
+        .enc-btn.selected{border-color:#2d3436;transform:scale(1.02);box-shadow:0 6px 14px rgba(0,0,0,.22);color:#fff;}
+        .enc-btn.yes.selected{background:#22c55e;}
+        .enc-btn.no.selected{background:#ef4444;}
+        .enc-hint{font-family:'Courier New',monospace;font-size:9px;color:rgba(45,52,54,.85);padding:6px 10px;background:rgba(255,255,255,.28);border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;gap:8px;}
+        .enc-wait{text-align:right;font-weight:800;}
         .heart-anim,.ball-anim{position:absolute;pointer-events:none;animation:floatUp 1.7s ease-out;}
         .heart-anim{font-size:18px;}
         .ball-anim{font-size:18px;}
@@ -629,20 +531,6 @@
         @keyframes hugAnim{0%,100%{transform:translateX(0)}50%{transform:translateX(-10px)}}
         .jump-play{animation:jumpAnim .5s ease-in-out infinite;}
         @keyframes jumpAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-
-        /* FAMILY MODE (two creatures on LCD) */
-        .family-mode{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;justify-content:center;align-items:center;background:rgba(255,255,255,.03);gap:10px;pointer-events:none;}
-        .family-mode.active{display:flex;}
-        .family-title{font-family:'Courier New',monospace;font-size:11px;font-weight:900;color:#2d3436;background:rgba(255,255,255,.45);padding:4px 10px;border-radius:8px;}
-        .family-row{display:flex;gap:16px;align-items:center;}
-        .family-member{display:flex;flex-direction:column;align-items:center;gap:6px;}
-        .family-creature{width:74px;height:74px;display:flex;align-items:center;justify-content:center;position:relative;}
-        .family-label{font-size:9px;font-weight:900;color:#2d3436;font-family:'Courier New',monospace;}
-        .priority-glow{animation:priorityGlow 1.5s ease-in-out infinite;}
-        @keyframes priorityGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25) drop-shadow(0 0 8px #ffd93d)}}
-
-        /* Pregnancy belly */
-        .pregnant-belly{position:absolute;bottom:18%;left:50%;transform:translateX(-50%);width:32px;height:24px;background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,.42),rgba(255,255,255,.12) 60%,transparent 70%);border-radius:50%;pointer-events:none;z-index:-1;}
 
     </style>
 </head>
@@ -731,23 +619,6 @@
                         </div>
                     </div>
 
-
-
-                    <!-- FAMILY MODE -->
-                    <div class="family-mode" id="familyMode">
-                        <div class="family-title">FAMILLE</div>
-                        <div class="family-row">
-                            <div class="family-member">
-                                <div class="family-label">Maman</div>
-                                <div class="family-creature" id="familyMom"></div>
-                            </div>
-                            <div class="family-member">
-                                <div class="family-label">Bébé</div>
-                                <div class="family-creature" id="familyBaby"></div>
-                            </div>
-                        </div>
-                    </div>
-
 <!-- Bottom Icons Row -->
                 <div class="icons-row bottom">
                     <div class="icon" id="i4">🚿</div>
@@ -798,14 +669,7 @@
             lastPoopCount: -1  // -1 pour forcer le premier rendu
         };
 
-  // ===== Extensions (Repro + Famille) =====
-  STATE.pregnant = false;
-  STATE.pregnancyStart = null;
-  STATE.mate = null; // {speciesLine, gender}
-
-  STATE.family = STATE.family || { hasBaby: false, baby: null, momDead: false };
-
-  // ===== Network =====
+  // ===== Network + Encounter (LCD) =====
   let NETWORK_ENABLED = (localStorage.getItem('gotchi_network_enabled') !== '0');
   const API_BASE = 'https://gotchi.sicho95.workers.dev';
   let playerId = null;
@@ -814,7 +678,6 @@
   let lastSuggestedId = null;
   let lastSuggestedAt = 0;
 
-  // ===== Encounter (LCD) =====
   let inEncounter = false;
   let encounterChoice = 'yes';
   let currentEncounter = null;
@@ -880,34 +743,9 @@
     } catch (e) {}
   }
 
-  function startEncounterUI() {
-    inEncounter = true;
-    encounterLocked = false;
-    encounterChoice = 'yes';
-
-    // close menus
-    STATE.menuIdx = -1;
-
-    document.getElementById('encounterScreen')?.classList.add('show');
-    document.getElementById('encTitle').textContent = 'RENCONTRE !';
-    document.getElementById('encWait').textContent = '';
-
-    renderEncounterCreatures();
-    updateEncounterChoiceDisplay();
-  }
-
-  function endEncounterUI() {
-    document.getElementById('encounterScreen')?.classList.remove('show');
-    inEncounter = false;
-    encounterLocked = false;
-    currentEncounter = null;
-    render();
-  }
-
   function updateEncounterChoiceDisplay() {
     const yesBtn = document.getElementById('encYes');
     const noBtn = document.getElementById('encNo');
-
     if (encounterChoice === 'yes') {
       yesBtn?.classList.add('selected');
       noBtn?.classList.remove('selected');
@@ -918,7 +756,6 @@
   }
 
   function getCreatureSVGFromTraits(traits) {
-    // Render with the exact same renderer as current game
     const backup = {
       stage: STATE.stage,
       speciesLine: STATE.speciesLine,
@@ -954,7 +791,6 @@
   function renderEncounterCreatures() {
     const myDiv = document.getElementById('encMy');
     const otherDiv = document.getElementById('encOther');
-
     if (!myDiv || !otherDiv || !currentEncounter) return;
 
     myDiv.innerHTML = getCreatureSVGFromTraits({
@@ -978,6 +814,28 @@
     });
   }
 
+  function startEncounterUI() {
+    inEncounter = true;
+    encounterLocked = false;
+    encounterChoice = 'yes';
+    STATE.menuIdx = -1;
+
+    document.getElementById('encounterScreen')?.classList.add('show');
+    document.getElementById('encTitle').textContent = 'RENCONTRE !';
+    document.getElementById('encWait').textContent = '';
+
+    renderEncounterCreatures();
+    updateEncounterChoiceDisplay();
+  }
+
+  function endEncounterUI() {
+    document.getElementById('encounterScreen')?.classList.remove('show');
+    inEncounter = false;
+    encounterLocked = false;
+    currentEncounter = null;
+    render();
+  }
+
   async function validateEncounterChoice() {
     if (!currentEncounter || encounterLocked) return;
     encounterLocked = true;
@@ -996,7 +854,6 @@
 
   function startEncounterPolling() {
     if (encounterPollInterval) clearInterval(encounterPollInterval);
-
     encounterPollInterval = setInterval(async () => {
       try {
         const res = await fetch(`${API_BASE}/encounter/status`, {
@@ -1011,207 +868,17 @@
         clearInterval(encounterPollInterval);
         encounterPollInterval = null;
 
-        await playEncounterResult(data.encounter);
+        document.getElementById('encWait').textContent = '';
+        // simple feedback
+        document.getElementById('encTitle').textContent = (data.encounter.status === 'matched') ? 'OK !' : 'Refus...';
+        await new Promise(r => setTimeout(r, 700));
         endEncounterUI();
       } catch (e) {}
     }, 900);
   }
 
-  function spawnFx(container, emoji, cls) {
-    const el = document.createElement('div');
-    el.className = cls;
-    el.textContent = emoji;
-    el.style.left = (42 + Math.random() * 16) + '%';
-    el.style.top = (54 + Math.random() * 8) + '%';
-    container.appendChild(el);
-    setTimeout(() => el.remove(), 1750);
-  }
-
-  async function playLoveAnimation() {
-    const row = document.getElementById('encRow');
-    const myC = document.getElementById('encMy');
-    const othC = document.getElementById('encOther');
-    myC?.classList.add('hug-move');
-    othC?.classList.add('hug-move');
-
-    for (let i = 0; i < 7; i++) {
-      spawnFx(row, '💕', 'heart-anim');
-      await sleep(200);
-    }
-
-    await sleep(550);
-    myC?.classList.remove('hug-move');
-    othC?.classList.remove('hug-move');
-  }
-
-  async function playFriendshipAnimation() {
-    const row = document.getElementById('encRow');
-    const myC = document.getElementById('encMy');
-    const othC = document.getElementById('encOther');
-    myC?.classList.add('jump-play');
-    othC?.classList.add('jump-play');
-
-    for (let i = 0; i < 5; i++) {
-      spawnFx(row, '⚽', 'ball-anim');
-      await sleep(240);
-    }
-
-    await sleep(650);
-    myC?.classList.remove('jump-play');
-    othC?.classList.remove('jump-play');
-  }
-
-  async function playEncounterResult(enc) {
-    if (enc.status === 'declined') {
-      document.getElementById('encTitle').textContent = 'Refus...';
-      document.getElementById('encWait').textContent = '';
-      await sleep(800);
-      return;
-    }
-
-    const matchType = enc.matchType || 'friendship';
-
-    if (matchType === 'love') {
-      document.getElementById('encTitle').textContent = 'AMOUR';
-      await playLoveAnimation();
-
-      if (STATE.gender === 'female') {
-        STATE.pregnant = true;
-        STATE.pregnancyStart = Date.now();
-        STATE.mate = { speciesLine: currentEncounter.otherGotchi.speciesLine, gender: currentEncounter.otherGotchi.gender };
-        uiMsg('💕 Enceinte !');
-      }
-
-      STATE.happy = Math.min(5, STATE.happy + 1);
-    } else {
-      document.getElementById('encTitle').textContent = 'AMITIE';
-      await playFriendshipAnimation();
-      STATE.happy = Math.min(5, STATE.happy + 1);
-    }
-  }
-
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  // ===== Family helpers =====
-  function ensureBaby() {
-    if (!STATE.family) STATE.family = { hasBaby: false, baby: null, momDead: false };
-    if (!STATE.family.hasBaby) return;
-    if (!STATE.family.baby) {
-      STATE.family.baby = {
-        stage: 'egg',
-        speciesLine: STATE.speciesLine || (Math.random() < 0.5 ? 'Bubbly' : 'Fluffy'),
-        gender: Math.random() < 0.5 ? 'male' : 'female',
-        birth: Date.now(),
-        hunger: 4,
-        happy: 4,
-        weight: 3,
-        sick: false,
-        dead: false
-      };
-    }
-  }
-
-  function layFamilyEgg() {
-    STATE.family = { hasBaby: true, baby: null, momDead: false };
-    ensureBaby();
-
-    const momLine = STATE.speciesLine;
-    const dadLine = STATE.mate?.speciesLine || null;
-    const pick = [momLine, dadLine].filter(Boolean);
-    STATE.family.baby.speciesLine = pick.length ? pick[Math.floor(Math.random() * pick.length)] : (Math.random() < 0.5 ? 'Bubbly' : 'Fluffy');
-
-    STATE.pregnant = false;
-    STATE.pregnancyStart = null;
-    STATE.mate = null;
-
-    uiMsg('🥚 Œuf pondu !');
-    render();
-  }
-
-  function hatchFamilyEgg() {
-    ensureBaby();
-    if (!STATE.family.baby || STATE.family.baby.stage !== 'egg') return;
-    STATE.family.baby.stage = 'baby';
-    STATE.family.baby.birth = Date.now();
-    uiMsg('🐣 Bébé né !');
-    render();
-  }
-
-  function familyStageFromAge(ageSec) {
-    if (ageSec < 60) return 'baby';
-    if (ageSec < 180) return 'child';
-    if (ageSec < 360) return 'teen';
-    return 'adult';
-  }
-
-  function updateFamilyNeeds() {
-    if (!STATE.family?.hasBaby) return;
-    ensureBaby();
-    const b = STATE.family.baby;
-    if (!b || b.dead) return;
-
-    // auto hatch after 30s
-    if (b.stage === 'egg' && (Date.now() - b.birth >= 30000)) hatchFamilyEgg();
-
-    if (b.stage !== 'egg') {
-      const ageSec = Math.floor((Date.now() - b.birth) / 1000);
-      b.stage = familyStageFromAge(ageSec);
-    }
-
-    // NEEDS like mom (random decay)
-    if (b.stage !== 'egg') {
-      if (Math.random() < 0.015) b.hunger = Math.max(0, b.hunger - 1);
-      if (Math.random() < 0.015) b.happy  = Math.max(0, b.happy  - 1);
-    }
-
-    const babyWouldDie = (b.hunger <= 0) || (b.happy <= 0);
-    if (babyWouldDie && !STATE.family.momDead) {
-      STATE.family.momDead = true;
-      STATE.dead = true;
-      uiMsg('💔 Maman se sacrifie...');
-      b.hunger = Math.max(1, b.hunger);
-      b.happy = Math.max(1, b.happy);
-    } else if (babyWouldDie && STATE.family.momDead) {
-      b.dead = true;
-      uiMsg('💔 Bébé...');
-    }
-  }
-
-  function renderFamilyUI() {
-    const fm = document.getElementById('familyMode');
-    if (!fm) return;
-
-    if (STATE.family?.hasBaby && STATE.family.baby) {
-      fm.classList.add('active');
-      const momDiv = document.getElementById('familyMom');
-      const babyDiv = document.getElementById('familyBaby');
-
-      momDiv.innerHTML = (STATE.family.momDead || STATE.dead) ? '<div style="font-size:44px;">💀</div>' : getCreatureSVG();
-
-      const b = STATE.family.baby;
-      if (b.dead) {
-        babyDiv.innerHTML = '<div style="font-size:38px;">💀</div>';
-      } else {
-        babyDiv.innerHTML = getCreatureSVGFromTraits({
-          stage: b.stage,
-          speciesLine: b.speciesLine,
-          gender: b.gender,
-          hunger: b.hunger,
-          happy: b.happy,
-          sick: b.sick,
-          dead: false
-        });
-      }
-
-      const needs = (b.hunger <= 1) || (b.happy <= 1);
-      babyDiv?.classList.toggle('priority-glow', needs && !b.dead);
-    } else {
-      fm.classList.remove('active');
-    }
-  }
-
-  function installEncounterAndFamilyHooks() {
-    // Buttons: do not let background menus move during encounter
+  function installEncounterHooks() {
+    // Wrap existing btnA/B/C
     const _btnA = btnA;
     const _btnB = btnB;
     const _btnC = btnC;
@@ -1243,70 +910,25 @@
       _btnC();
     };
 
-    // Feed/play: baby first
-    const _doAction = doAction;
-    doAction = function(idx) {
-      const FEED_IDX = 0;
-      const PLAY_IDX = 2;
+    // Ensure physical button DOM events call the *current* btnA/B/C
+    const a = document.getElementById('btnA');
+    const b = document.getElementById('btnB');
+    const c = document.getElementById('btnC');
 
-      if (STATE.family?.hasBaby && STATE.family.baby && !STATE.family.baby.dead && !STATE.family.momDead) {
-        const b = STATE.family.baby;
-        if (idx === FEED_IDX && b.stage !== 'egg' && b.hunger < 5) {
-          b.hunger = Math.min(5, b.hunger + 1);
-          b.weight = Math.min(10, (b.weight || 3) + 0.3);
-          uiMsg('🍼 Bébé nourri');
-          render();
-          setTimeout(() => pushPresence(), 250);
-          return;
-        }
-        if (idx === PLAY_IDX && b.stage !== 'egg' && b.happy < 5) {
-          b.happy = Math.min(5, b.happy + 1);
-          uiMsg('🎮 Bébé joue');
-          render();
-          setTimeout(() => pushPresence(), 250);
-          return;
-        }
-      }
-
-      _doAction(idx);
-      setTimeout(() => pushPresence(), 250);
+    const bind = (el, fn) => {
+      if (!el) return;
+      el.addEventListener('click', (e) => { e.preventDefault(); fn(); }, { passive: false });
+      el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, { passive: false });
     };
 
-    // render wrapper: belly + family UI
-    const _render = render;
-    render = function() {
-      _render();
-      if (STATE.pregnant && STATE.stage !== 'egg' && !STATE.dead) {
-        const container = document.getElementById('creatureContainer');
-        if (container && !container.querySelector('.pregnant-belly')) {
-          const belly = document.createElement('div');
-          belly.className = 'pregnant-belly';
-          container.appendChild(belly);
-        }
-      }
-      renderFamilyUI();
-    };
+    bind(a, () => btnA());
+    bind(b, () => btnB());
+    bind(c, () => btnC());
 
-    // Click support (optional)
-    document.getElementById('encYes')?.addEventListener('click', () => { if(inEncounter && !encounterLocked){ encounterChoice='yes'; updateEncounterChoiceDisplay(); } });
-    document.getElementById('encNo')?.addEventListener('click', () => { if(inEncounter && !encounterLocked){ encounterChoice='no'; updateEncounterChoiceDisplay(); } });
+    // Also allow tapping the yes/no areas for debugging
+    bind(document.getElementById('encYes'), () => { if(inEncounter && !encounterLocked){ encounterChoice='yes'; updateEncounterChoiceDisplay(); }});
+    bind(document.getElementById('encNo'),  () => { if(inEncounter && !encounterLocked){ encounterChoice='no'; updateEncounterChoiceDisplay(); }});
   }
-
-  // Pregnancy timer: lay egg after 2 min once adult, mom stays
-  setInterval(() => {
-    if (!STATE.pregnant || !STATE.pregnancyStart) return;
-    if (STATE.dead) return;
-    if (STATE.stage !== 'adult') return;
-    if (Date.now() - STATE.pregnancyStart >= 120000) {
-      layFamilyEgg();
-    }
-  }, 1000);
-
-  // Family tick
-  setInterval(() => {
-    updateFamilyNeeds();
-    if (STATE.family?.hasBaby) renderFamilyUI();
-  }, 2000);
 
 
         let msgTimeout = null;
@@ -1905,7 +1527,7 @@
         // START
         render();
         initNetworking();
-        installEncounterAndFamilyHooks();
+        installEncounterHooks();
 </script>
 </body>
 </html>
