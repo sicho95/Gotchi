@@ -641,230 +641,245 @@
         </div>
     </div>
 
-    <script>
-        // ====================================
-        // TON CODE GOTCHI ORIGINAL - MODIFIÉ
-        // ====================================
+<script>
+  // ====================================
+  // GOTCHI + NETWORK (corrigé)
+  // ====================================
 
-        // STATE
-        const STATE = {
-            stage: 'egg',
-            speciesLine: null,
-            gender: null,
-            birth: Date.now(),
-            hunger: 4,
-            happy: 4,
-            weight: 5,
-            poops: 0,
-            poopTime: null,
-            sick: false,
-            sickTime: null,
-            lightOn: true,
-            menuIdx: -1,
-            lastAnim: Date.now(),
-            lastPoopIncrease: Date.now(),
-            dead: false,
-            showingStats: false,
-            lastPoopCount: -1
-        };
+  // STATE
+  const STATE = {
+    stage: 'egg',
+    speciesLine: null,
+    gender: null,
+    birth: Date.now(),
+    hunger: 4,
+    happy: 4,
+    weight: 5,
+    poops: 0,
+    poopTime: null,
+    sick: false,
+    sickTime: null,
+    lightOn: true,
+    menuIdx: -1,
+    lastAnim: Date.now(),
+    lastPoopIncrease: Date.now(),
+    dead: false,
+    showingStats: false,
+    lastPoopCount: -1
+  };
 
-        let msgTimeout = null;
+  let msgTimeout = null;
 
-        // === NETWORKING CONFIG ===
-        const NETWORK_ENABLED = true;
-        const API_BASE = 'https://your-gotchi-worker.youraccount.workers.dev'; // À changer
-        let playerId = null;
-        let presenceInterval = null;
-        let currentPosition = null;
-        let pendingFriend = null;
+  // === NETWORKING CONFIG ===
+  // ON/OFF persistant
+  let NETWORK_ENABLED = (localStorage.getItem('gotchi_network_enabled') !== '0');
 
-        let lastSuggestedId = null;
-        let lastSuggestedAt = 0;
+  // Ton Worker (OK + CORS)
+  const API_BASE = 'https://gotchi.sicho95.workers.dev';
 
+  let playerId = null;
+  let presenceInterval = null;
+  let currentPosition = null;
+  let pendingFriend = null;
 
-        // INIT NETWORKING
-        function initNetworking() {
-            playerId = localStorage.getItem('gotchi_player_id') || crypto.randomUUID();
-            localStorage.setItem('gotchi_player_id', playerId);
+  let lastSuggestedId = null;
+  let lastSuggestedAt = 0;
 
-            // Demander la géoloc une fois (optionnel)
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    currentPosition = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-                    uiMsg('📍 Position OK');
-                }, err => {
-                    console.log('GPS non autorisé');
-                }, { timeout: 5000, enableHighAccuracy: true });
-            }
+  function initNetworking() {
+    playerId = localStorage.getItem('gotchi_player_id');
+    if (!playerId) {
+      playerId = crypto.randomUUID();
+      localStorage.setItem('gotchi_player_id', playerId);
+    }
 
-            // Premier push au démarrage
-            setTimeout(() => pushPresence(), 1000);
+    // Géoloc optionnelle (ne bloque pas)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          currentPosition = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          try { uiMsg('📍 Position OK'); } catch(e) {}
+        },
+        () => {},
+        { timeout: 5000, enableHighAccuracy: true }
+      );
+    }
 
-            // Timer toutes les 3 minutes
-            presenceInterval = setInterval(pushPresence, 3 * 60 * 1000);
+    // Premier push au démarrage
+    setTimeout(() => pushPresence('playing'), 800);
+
+    // Timer toutes les 3 minutes
+    if (presenceInterval) clearInterval(presenceInterval);
+    presenceInterval = setInterval(() => pushPresence('playing'), 3 * 60 * 1000);
+  }
+
+  async function pushPresence(status = 'playing') {
+    if (!NETWORK_ENABLED) return;
+    if (!playerId) return; // init pas encore passée
+
+    const gotchi = {
+      id: 'main',
+      stage: STATE.stage,
+      speciesLine: STATE.speciesLine,
+      gender: STATE.gender,
+      ageSeconds: Math.floor((Date.now() - STATE.birth) / 1000),
+      hunger: STATE.hunger,
+      happy: STATE.happy
+    };
+
+    const body = {
+      playerId,
+      gotchi,
+      status,
+      position: currentPosition
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/presence/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+
+      if (data && data.suggestedFriend) {
+        const id = data.suggestedFriend.playerId;
+        const now = Date.now();
+
+        const sameAsLast = (id === lastSuggestedId);
+        const tooSoon = (now - lastSuggestedAt < 2 * 60 * 1000);
+
+        if (!(sameAsLast && tooSoon)) {
+          lastSuggestedId = id;
+          lastSuggestedAt = now;
+          pendingFriend = data.suggestedFriend;
+          showFriendSuggestion(data.suggestedFriend);
         }
+      }
+    } catch (e) {
+      // silence (réseau off / offline)
+    }
+  }
 
-        // === PUSH PRESENCE ===
-        async function pushPresence(status = 'playing') {
-            if (!NETWORK_ENABLED) return;
+  function showFriendSuggestion(friend) {
+    const el = document.getElementById('friendSuggestion');
+    const gotchiEl = document.getElementById('friendGotchi');
+    if (!el || !gotchiEl) return;
 
-            const gotchi = {
-                id: 'main',
-                stage: STATE.stage,
-                speciesLine: STATE.speciesLine,
-                gender: STATE.gender,
-                ageSeconds: Math.floor((Date.now() - STATE.birth) / 1000),
-                hunger: STATE.hunger,
-                happy: STATE.happy
-            };
+    const emoji = friend?.gotchi?.gender === 'male' ? '♂️' : (friend?.gotchi?.gender === 'female' ? '♀️' : '❔');
+    const line = friend?.gotchi?.speciesLine || 'Gotchi';
+    const stage = friend?.gotchi?.stage || '';
 
-            const body = {
-                playerId,
-                gotchi,
-                status,
-                position: currentPosition
-            };
+    gotchiEl.textContent = `👋 ${emoji} ${line} ${stage}`.trim();
+    el.classList.add('show');
+  }
 
-            try {
-                const res = await fetch(`${API_BASE}/presence/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
+  function acceptFriend() {
+    document.getElementById('friendSuggestion')?.classList.remove('show');
+    uiMsg('🥰 Rencontre acceptée !');
+    console.log('Accept friend:', pendingFriend);
+  }
 
-                if (!res.ok) {
-                    console.warn('Presence update failed:', res.status);
-                    return;
-                }
+  function declineFriend() {
+    document.getElementById('friendSuggestion')?.classList.remove('show');
+    uiMsg('😕 Pas maintenant');
+  }
 
-                const data = await res.json();
+  function toggleNetwork() {
+    NETWORK_ENABLED = !NETWORK_ENABLED;
+    localStorage.setItem('gotchi_network_enabled', NETWORK_ENABLED ? '1' : '0');
+    uiMsg(NETWORK_ENABLED ? '🌐 Réseau ON' : '🌐 Réseau OFF');
 
-                if (data.suggestedFriend) {
-                  const id = data.suggestedFriend.playerId;
-                  const now = Date.now();
-                
-                  const sameAsLast = (id === lastSuggestedId);
-                  const tooSoon = (now - lastSuggestedAt < 2 * 60 * 1000); // 2 min
-                
-                  if (!(sameAsLast && tooSoon)) {
-                    lastSuggestedId = id;
-                    lastSuggestedAt = now;
-                    pendingFriend = data.suggestedFriend;
-                    showFriendSuggestion(data.suggestedFriend);
-                  }
-                }
+    if (NETWORK_ENABLED) {
+      pushPresence('playing');
+    }
+    toggleSysMenu();
+  }
 
-            } catch (e) {
-                console.warn('Network error:', e);
-            }
-        }
+  // --- LOAD SAVE ORIGINAL ---
+  const saved = localStorage.getItem('gotchi_modern');
+  if (saved) {
+    try {
+      Object.assign(STATE, JSON.parse(saved));
+      STATE.lastPoopCount = -1;
+    } catch (e) {
+      console.error('Erreur chargement save:', e);
+    }
+  }
 
-        // === FRIEND SUGGESTION ===
-        function showFriendSuggestion(friend) {
-            const el = document.getElementById('friendSuggestion');
-            const gotchiEl = document.getElementById('friendGotchi');
+  // GAME LOOP
+  setInterval(() => {
+    if (STATE.dead) return;
 
-            const emoji = friend.gotchi.gender === 'male' ? '♂️' : '♀️';
-            gotchiEl.innerHTML = `👋 ${emoji} ${friend.gotchi.speciesLine || 'Gotchi'} ${friend.gotchi.stage}`;
+    const now = Date.now();
+    const age = (now - STATE.birth) / 1000;
 
-            el.classList.add('show');
-        }
+    if (STATE.stage === 'egg' && age > 15) {
+      hatchEgg();
+    } else if (STATE.stage === 'baby' && age > 45) {
+      evolve('child');
+    } else if (STATE.stage === 'child' && age > 90) {
+      evolve('teen');
+    } else if (STATE.stage === 'teen' && age > 150) {
+      evolve('adult');
+    }
 
-        function acceptFriend() {
-            document.getElementById('friendSuggestion').classList.remove('show');
-            uiMsg('🥰 Rencontre acceptée !');
-            // TODO: Logique de rencontre (match RNG, etc.)
-            console.log('Accept friend:', pendingFriend);
-        }
+    if (STATE.stage !== 'egg') {
+      if (Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
+      if (Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
 
-        function declineFriend() {
-            document.getElementById('friendSuggestion').classList.remove('show');
-            uiMsg('😕 Pas maintenant');
-        }
+      const timeSinceLastPoop = now - STATE.lastPoopIncrease;
+      if (Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) {
+        STATE.poops++;
+        STATE.lastPoopIncrease = now;
+        if (!STATE.poopTime) STATE.poopTime = now;
+      }
 
-        function toggleNetwork() {
-            localStorage.setItem('gotchi_network_enabled', NETWORK_ENABLED);
-            uiMsg(NETWORK_ENABLED ? '🌐 Réseau ON' : '🌐 Réseau OFF');
-            toggleSysMenu();
-        }
+      if ((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
+        STATE.sick = true;
+        STATE.sickTime = now;
+        uiMsg('🤒 Malade!');
+      }
 
-        // TON CODE ORIGINAL (légèrement modifié pour network)
-        // INIT
-        const saved = localStorage.getItem('gotchi_modern');
-        if(saved) {
-            try {
-                Object.assign(STATE, JSON.parse(saved));
-                STATE.lastPoopCount = -1;
-            } catch(e) {
-                console.error('Erreur chargement save:', e);
-            }
-        }
+      const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
+      if ((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
+        die();
+      }
+    }
 
-        // GAME LOOP
-        setInterval(() => {
-            if(STATE.dead) return;
+    if (STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
+      randomAnimation();
+      STATE.lastAnim = now;
+    }
 
-            const now = Date.now();
-            const age = (now - STATE.birth) / 1000;
+    render();
+    localStorage.setItem('gotchi_modern', JSON.stringify(STATE));
+  }, 1000);
 
-            // EVOLUTION
-            if(STATE.stage === 'egg' && age > 15) {
-                hatchEgg();
-            } else if(STATE.stage === 'baby' && age > 45) {
-                evolve('child');
-            } else if(STATE.stage === 'child' && age > 90) {
-                evolve('teen');
-            } else if(STATE.stage === 'teen' && age > 150) {
-                evolve('adult');
-            }
+  // ==========================================================
+  // ICI: tes fonctions originales doivent suivre dans le fichier
+  // hatchEgg, evolve, die, randomAnimation, render, doAction, etc.
+  // ==========================================================
 
-            // NEEDS
-            if(STATE.stage !== 'egg') {
-                if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
-                if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
+  // --- HOOK NETWORK SUR doAction (sans ReferenceError) ---
+  function hookDoActionForNetwork() {
+    if (typeof doAction !== 'function') return;
 
-                const timeSinceLastPoop = now - STATE.lastPoopIncrease;
-                if(Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) {
-                    STATE.poops++;
-                    STATE.lastPoopIncrease = now;
-                    if(!STATE.poopTime) STATE.poopTime = now;
-                }
+    const _doAction = doAction;
+    doAction = function(idx) {
+      _doAction(idx);
+      // Push après chaque action (léger délai pour laisser le rendu)
+      setTimeout(() => pushPresence('playing'), 300);
+    };
+  }
 
-                if((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
-                    STATE.sick = true;
-                    STATE.sickTime = now;
-                    uiMsg("🤒 Malade!");
-                }
+  // START
+  render();
+  initNetworking();
+  hookDoActionForNetwork();
+</script>
 
-                const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
-                if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
-                    die();
-                }
-            }
-
-            if(STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
-                randomAnimation();
-                STATE.lastAnim = now;
-            }
-
-            render();
-            localStorage.setItem('gotchi_modern', JSON.stringify(STATE));
-        }, 1000);
-
-        // ... (toutes tes fonctions originales : hatchEgg, evolve, die, randomAnimation, render, renderHearts, renderPoops, getCreatureSVG, btnA, btnB, btnC, doAction, showFood, showStats, uiMsg, toggleSysMenu, setShell, addValentineHearts, saveData, loadData, resetData)
-
-        // RACCORD AUTOMATIQUE : pushPresence sur chaque action
-        const originalDoAction = doAction;
-        doAction = function(idx) {
-            originalDoAction(idx);
-            // Push après chaque action
-            setTimeout(() => pushPresence('playing'), 500);
-        };
-
-        // START
-        render();
-        initNetworking();
-
-    </script>
 </body>
 </html>
