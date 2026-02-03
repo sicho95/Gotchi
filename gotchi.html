@@ -437,7 +437,7 @@
             background: rgba(255,255,255,0.35);
             padding: 2px 5px;
             border-radius: 3px;
-            whitespace: nowrap;
+            white-space: nowrap;
             font-size: 8.5px;
             color: #2d3436;
             font-weight: 600;
@@ -610,7 +610,7 @@
             lastPoopIncrease: Date.now(),
             dead: false,
             showingStats: false,
-            lastPoopCount: 0  // Pour éviter de recréer les mouches
+            lastPoopCount: -1  // -1 pour forcer le premier rendu
         };
 
         let msgTimeout = null;
@@ -620,6 +620,7 @@
         if(saved) {
             try {
                 Object.assign(STATE, JSON.parse(saved));
+                STATE.lastPoopCount = -1;  // Force le rendu initial
             } catch(e) {
                 console.error('Erreur chargement save:', e);
             }
@@ -806,6 +807,13 @@
             const now = Date.now();
             const poopAge = STATE.poopTime ? (now - STATE.poopTime) / 1000 : 0;
             const needFlies = poopAge > 60 && STATE.poops >= 3;
+
+            // FIX CRITIQUE : Si STATE.poops = 0, TOUJOURS vider la zone
+            if(STATE.poops === 0) {
+                pZone.innerHTML = '';
+                STATE.lastPoopCount = 0;
+                return;
+            }
 
             // OPTIMISATION : Ne recréer que si le nombre de poops a changé
             if(STATE.lastPoopCount !== STATE.poops) {
@@ -1025,14 +1033,15 @@
                 case 4: // Clean
                     STATE.poops = 0;
                     STATE.poopTime = null;
-                    STATE.lastPoopCount = 0;  // Reset pour recréer les poops
+                    STATE.lastPoopCount = -1;  // Force un re-rendu complet
                     uiMsg("Propre!");
+                    render();  // Forcer un rendu immédiat
                     break;
                 case 5: // Stats
                     showStats();
                     break;
                 case 6: // About
-                    uiMsg("Gotchi v3.3");
+                    uiMsg("Gotchi v3.4");
                     break;
                 case 7: // Attention
                     let issues = [];
@@ -1160,6 +1169,7 @@
             const r = new FileReader();
             r.onload = e => { 
                 Object.assign(STATE, JSON.parse(e.target.result)); 
+                STATE.lastPoopCount = -1;  // Force le rendu
                 render(); 
                 toggleSysMenu();
                 uiMsg("Chargé!");
@@ -1188,7 +1198,7 @@
                     lastPoopIncrease: Date.now(),
                     dead: false,
                     showingStats: false,
-                    lastPoopCount: 0
+                    lastPoopCount: -1
                 });
                 render();
                 uiMsg("Nouveau départ!");
