@@ -506,148 +506,45 @@
 
     
 
-        /* ENCOUNTER SCREEN (fits LCD) */
-        .encounter-screen {
-            display: none;
-            position: absolute;
-            inset: 0;
-            z-index: 25;
-            background: rgba(255,255,255,0.06);
-            backdrop-filter: blur(2px);
-            padding: 8px;
-        }
-        .encounter-screen.show { display: block; }
+        /* ENCOUNTER OVERLAY (fullscreen) */
+        .encounter-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9999;align-items:center;justify-content:center;}
+        .encounter-overlay.show{display:flex;}
+        .encounter-box{width:320px;max-width:92vw;background:linear-gradient(135deg,#a8d5ba 0%,#8bc4aa 100%);border:4px solid #7ab89d;border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+        .encounter-header{text-align:center;font-family:'Courier New',monospace;font-weight:800;font-size:14px;color:#2d3436;margin-bottom:14px;padding:8px;background:rgba(255,255,255,.40);border-radius:12px;}
+        .encounter-creatures-row{display:flex;justify-content:space-around;align-items:center;gap:16px;margin:14px 0;min-height:108px;position:relative;}
+        .encounter-creature-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;}
+        .encounter-creature-display{width:92px;height:92px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.22);border-radius:16px;padding:8px;overflow:hidden;}
+        .encounter-label{font-size:10px;font-weight:800;color:#2d3436;font-family:'Courier New',monospace;}
+        .encounter-vs{font-size:18px;font-weight:900;color:#2d3436;}
+        .encounter-controls{display:flex;justify-content:center;gap:14px;margin:14px 0;}
+        .encounter-choice-btn{flex:1;padding:12px;border-radius:12px;font-weight:900;font-size:13px;text-align:center;transition:all .18s;border:3px solid transparent;user-select:none;}
+        .encounter-choice-btn.yes{background:#4ade80;color:#fff;}
+        .encounter-choice-btn.no{background:#f87171;color:#fff;}
+        .encounter-choice-btn.selected{border-color:#2d3436;transform:scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,.28);}
+        .encounter-hints{font-size:10px;text-align:center;color:#2d3436;font-family:'Courier New',monospace;margin-top:8px;}
+        .encounter-wait{text-align:center;font-size:11px;font-weight:800;color:#636e72;margin-top:6px;min-height:14px;}
+        .heart-anim,.ball-anim{position:absolute;pointer-events:none;animation:floatUp 1.8s ease-out;}
+        .heart-anim{font-size:24px;}
+        .ball-anim{font-size:22px;}
+        @keyframes floatUp{0%{transform:translateY(0) scale(.3);opacity:0}30%{opacity:1}70%{transform:translateY(-40px) scale(1);opacity:1}100%{transform:translateY(-70px) scale(.6);opacity:0}}
+        .hug-move{animation:hugAnim .8s ease-in-out;}
+        @keyframes hugAnim{0%,100%{transform:translateX(0)}50%{transform:translateX(-12px)}}
+        .jump-play{animation:jumpAnim .5s ease-in-out infinite;}
+        @keyframes jumpAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 
-        .encounter-card {
-            position: absolute;
-            inset: 46px 8px 46px 8px; /* leave icon rows visible */
-            background: rgba(255,255,255,0.55);
-            border: 2px solid rgba(255,255,255,0.45);
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-        }
+        /* FAMILY MODE (two creatures on LCD) */
+        .family-mode{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;justify-content:center;align-items:center;background:rgba(255,255,255,.03);gap:10px;pointer-events:none;}
+        .family-mode.active{display:flex;}
+        .family-title{font-family:'Courier New',monospace;font-size:11px;font-weight:900;color:#2d3436;background:rgba(255,255,255,.45);padding:4px 10px;border-radius:8px;}
+        .family-row{display:flex;gap:16px;align-items:center;}
+        .family-member{display:flex;flex-direction:column;align-items:center;gap:6px;}
+        .family-creature{width:74px;height:74px;display:flex;align-items:center;justify-content:center;position:relative;}
+        .family-label{font-size:9px;font-weight:900;color:#2d3436;font-family:'Courier New',monospace;}
+        .priority-glow{animation:priorityGlow 1.5s ease-in-out infinite;}
+        @keyframes priorityGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25) drop-shadow(0 0 8px #ffd93d)}}
 
-        .encounter-title {
-            font-family: 'Courier New', monospace;
-            font-weight: 800;
-            font-size: 11px;
-            color: #2d3436;
-            padding: 8px 10px;
-            background: rgba(255,255,255,0.35);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            text-align: center;
-        }
-
-        .encounter-stage {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 8px 10px;
-        }
-
-        .encounter-creature {
-            width: 78px;
-            height: 78px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .encounter-vs {
-            width: 32px;
-            text-align: center;
-            font-weight: 900;
-            font-size: 12px;
-            color: rgba(45,52,54,0.85);
-            font-family: 'Courier New', monospace;
-        }
-
-        .encounter-hints {
-            font-family: 'Courier New', monospace;
-            font-size: 9px;
-            color: rgba(45,52,54,0.85);
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.35);
-            border-top: 1px solid rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .encounter-choice {
-            font-weight: 900;
-        }
-
-        .encounter-choice.yes { color: #0a7d3b; }
-        .encounter-choice.no { color: #b42318; }
-
-        .encounter-wait {
-            text-align: right;
-            opacity: 0.85;
-        }
-
-        .heart-float {
-            position: absolute;
-            font-size: 18px;
-            pointer-events: none;
-            animation: floatHeart 1.6s ease-in-out;
-        }
-        @keyframes floatHeart {
-            0% { transform: translateY(0) scale(0.2); opacity: 0; }
-            20% { opacity: 1; }
-            60% { transform: translateY(-30px) scale(1); opacity: 1; }
-            100% { transform: translateY(-55px) scale(0.7); opacity: 0; }
-        }
-
-        .ball-float {
-            position: absolute;
-            font-size: 18px;
-            pointer-events: none;
-            animation: floatBall 1.4s ease-in-out;
-        }
-        @keyframes floatBall {
-            0% { transform: translateY(0) scale(0.2); opacity: 0; }
-            20% { opacity: 1; }
-            70% { transform: translateY(-25px) scale(1); opacity: 1; }
-            100% { transform: translateY(-45px) scale(0.6); opacity: 0; }
-        }
-
-        .hug {
-            animation: hug 0.7s ease-in-out;
-        }
-        @keyframes hug {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-8px); }
-        }
-
-        .jump {
-            animation: jump 0.45s ease-in-out infinite;
-        }
-        @keyframes jump {
-            0%,100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Pregnancy belly overlay */
-        .pregnant-belly {
-            position: absolute;
-            left: 50%;
-            bottom: 22px;
-            transform: translateX(-50%);
-            width: 34px;
-            height: 26px;
-            border-radius: 50%;
-            background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.35), rgba(255,255,255,0.10) 60%, transparent 70%);
-            opacity: 0.95;
-            pointer-events: none;
-        }
+        /* Pregnancy belly */
+        .pregnant-belly{position:absolute;bottom:18%;left:50%;transform:translateX(-50%);width:32px;height:24px;background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,.42),rgba(255,255,255,.12) 60%,transparent 70%);border-radius:50%;pointer-events:none;z-index:-1;}
 
     </style>
 </head>
@@ -710,25 +607,20 @@
 
                 
 
-                <!-- ENCOUNTER SCREEN (uses physical buttons) -->
-                <div class="encounter-screen" id="encounterScreen">
-                    <div class="encounter-card">
-                        <div class="encounter-title" id="encounterTitle">RENCONTRE</div>
-                        <div class="encounter-stage" id="encounterStage">
-                            <div class="encounter-creature" id="encMy"></div>
-                            <div class="encounter-vs" id="encVS">VS</div>
-                            <div class="encounter-creature" id="encOther"></div>
-                        </div>
-                        <div class="encounter-hints">
-                            <div>
-                                SELECT: <span class="encounter-choice" id="encChoice">OUI</span>
-                                · DECIDE: OK
-                                · CANCEL: NON
+                    <!-- FAMILY MODE -->
+                    <div class="family-mode" id="familyMode">
+                        <div class="family-title">FAMILLE</div>
+                        <div class="family-row">
+                            <div class="family-member">
+                                <div class="family-label">Maman</div>
+                                <div class="family-creature" id="familyMom"></div>
                             </div>
-                            <div class="encounter-wait" id="encWait"></div>
+                            <div class="family-member">
+                                <div class="family-label">Bébé</div>
+                                <div class="family-creature" id="familyBaby"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
 <!-- Bottom Icons Row -->
                 <div class="icons-row bottom">
@@ -758,57 +650,49 @@
     </div>
 
     <script>
+// STATE
+        const STATE = {
+            stage: 'egg',
+            speciesLine: null,
+            gender: null,
+            birth: Date.now(),
+            hunger: 4,
+            happy: 4,
+            weight: 5,
+            poops: 0,
+            poopTime: null,
+            sick: false,
+            sickTime: null,
+            lightOn: true,
+            menuIdx: -1,
+            lastAnim: Date.now(),
+            lastPoopIncrease: Date.now(),
+            dead: false,
+            showingStats: false,
+            lastPoopCount: -1  // -1 pour forcer le premier rendu
+        };
 
-  // ====================================
-  // GOTCHI - Network + Rencontre sync
-  // ====================================
+  // ===== Extensions (Repro + Famille) =====
+  STATE.pregnant = false;
+  STATE.pregnancyStart = null;
+  STATE.mate = null; // {speciesLine, gender}
 
-  // STATE
-  const STATE = {
-    stage: 'egg',
-    speciesLine: null,
-    gender: null,
-    birth: Date.now(),
-    hunger: 4,
-    happy: 4,
-    weight: 5,
-    poops: 0,
-    poopTime: null,
-    sick: false,
-    sickTime: null,
-    lightOn: true,
-    menuIdx: -1,
-    lastAnim: Date.now(),
-    lastPoopIncrease: Date.now(),
-    dead: false,
-    showingStats: false,
-    lastPoopCount: -1,
+  STATE.family = STATE.family || { hasBaby: false, baby: null, momDead: false };
 
-    // Repro
-    pregnant: false,
-    pregnancyStart: null,
-    mate: null,       // traits de l'autre parent
-    parents: null     // {mom:{speciesLine,gender}, dad:{speciesLine,gender}}
-  };
-
-  let msgTimeout = null;
-
-  // === NETWORK ===
+  // ===== Network =====
   let NETWORK_ENABLED = (localStorage.getItem('gotchi_network_enabled') !== '0');
   const API_BASE = 'https://gotchi.sicho95.workers.dev';
   let playerId = null;
   let currentPosition = null;
   let presenceInterval = null;
-
-  // suggestion anti-spam
   let lastSuggestedId = null;
   let lastSuggestedAt = 0;
 
-  // === ENCOUNTER ===
+  // ===== Encounter =====
   let inEncounter = false;
   let encounterChoice = 'yes';
   let currentEncounter = null; // {id, otherPlayerId, otherGotchi, myGotchi}
-  let encounterPoll = null;
+  let encounterPollInterval = null;
   let encounterLocked = false;
 
   function initNetworking() {
@@ -823,12 +707,12 @@
       );
     }
 
-    setTimeout(() => pushPresence('playing'), 800);
+    setTimeout(() => pushPresence(), 900);
     if (presenceInterval) clearInterval(presenceInterval);
-    presenceInterval = setInterval(() => pushPresence('playing'), 3 * 60 * 1000);
+    presenceInterval = setInterval(() => pushPresence(), 3 * 60 * 1000);
   }
 
-  async function pushPresence(status = 'playing') {
+  async function pushPresence() {
     if (!NETWORK_ENABLED || !playerId || inEncounter) return;
 
     const gotchi = {
@@ -845,17 +729,15 @@
       const res = await fetch(`${API_BASE}/presence/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerId, gotchi, status, position: currentPosition })
+        body: JSON.stringify({ playerId, gotchi, status: 'playing', position: currentPosition })
       });
       if (!res.ok) return;
       const data = await res.json();
 
-      if (data && data.suggestedFriend && data.suggestedFriend.encounterId) {
+      if (data?.suggestedFriend?.encounterId && !inEncounter) {
         const otherId = data.suggestedFriend.playerId;
         const now = Date.now();
-        const sameAsLast = (otherId === lastSuggestedId);
-        const tooSoon = (now - lastSuggestedAt < 90 * 1000);
-        if (sameAsLast && tooSoon) return;
+        if (otherId === lastSuggestedId && (now - lastSuggestedAt < 90000)) return;
 
         lastSuggestedId = otherId;
         lastSuggestedAt = now;
@@ -877,42 +759,106 @@
     encounterLocked = false;
     encounterChoice = 'yes';
 
-    const scr = document.getElementById('encounterScreen');
-    scr.classList.add('show');
+    STATE.menuIdx = -1;
 
-    document.getElementById('encounterTitle').textContent = 'RENCONTRE';
-    document.getElementById('encWait').textContent = '';
+    const overlay = document.getElementById('encounterOverlay');
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    document.getElementById('encounterHeader').textContent = 'RENCONTRE !';
+    document.getElementById('encounterWait').textContent = '';
 
     renderEncounterCreatures();
-    updateEncounterChoiceUI();
+    updateEncounterChoiceDisplay();
   }
 
-  function renderEncounterCreatures() {
-    const my = document.getElementById('encMy');
-    const other = document.getElementById('encOther');
+  function endEncounterUI() {
+    const overlay = document.getElementById('encounterOverlay');
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
 
-    my.innerHTML = getCreatureSVGFromTraits(currentEncounter.myGotchi.stage, currentEncounter.myGotchi.gender, currentEncounter.myGotchi.speciesLine, false, 4);
-    other.innerHTML = getCreatureSVGFromTraits(currentEncounter.otherGotchi.stage, currentEncounter.otherGotchi.gender, currentEncounter.otherGotchi.speciesLine, false, 4);
+    inEncounter = false;
+    encounterLocked = false;
+    currentEncounter = null;
+
+    render();
   }
 
-  function updateEncounterChoiceUI() {
-    const el = document.getElementById('encChoice');
+  function updateEncounterChoiceDisplay() {
+    const yesBtn = document.getElementById('encounterYes');
+    const noBtn = document.getElementById('encounterNo');
     if (encounterChoice === 'yes') {
-      el.textContent = 'OUI';
-      el.classList.remove('no');
-      el.classList.add('yes');
+      yesBtn.classList.add('selected');
+      noBtn.classList.remove('selected');
     } else {
-      el.textContent = 'NON';
-      el.classList.remove('yes');
-      el.classList.add('no');
+      yesBtn.classList.remove('selected');
+      noBtn.classList.add('selected');
     }
   }
 
-  async function sendEncounterAnswer() {
+  function getCreatureSVGFromTraits(traits) {
+    // Render with the exact same renderer as current game
+    const backup = {
+      stage: STATE.stage,
+      speciesLine: STATE.speciesLine,
+      gender: STATE.gender,
+      hunger: STATE.hunger,
+      happy: STATE.happy,
+      sick: STATE.sick,
+      dead: STATE.dead
+    };
+
+    if (typeof traits.stage !== 'undefined') STATE.stage = traits.stage;
+    if (typeof traits.speciesLine !== 'undefined') STATE.speciesLine = traits.speciesLine;
+    if (typeof traits.gender !== 'undefined') STATE.gender = traits.gender;
+    if (typeof traits.hunger !== 'undefined') STATE.hunger = traits.hunger;
+    if (typeof traits.happy !== 'undefined') STATE.happy = traits.happy;
+    if (typeof traits.sick !== 'undefined') STATE.sick = traits.sick;
+    if (typeof traits.dead !== 'undefined') STATE.dead = traits.dead;
+
+    let svg = '';
+    try { svg = getCreatureSVG(); } catch (e) { svg = ''; }
+
+    STATE.stage = backup.stage;
+    STATE.speciesLine = backup.speciesLine;
+    STATE.gender = backup.gender;
+    STATE.hunger = backup.hunger;
+    STATE.happy = backup.happy;
+    STATE.sick = backup.sick;
+    STATE.dead = backup.dead;
+
+    return svg;
+  }
+
+  function renderEncounterCreatures() {
+    const myDiv = document.getElementById('encounterMyCreature');
+    const otherDiv = document.getElementById('encounterOtherCreature');
+
+    myDiv.innerHTML = getCreatureSVGFromTraits({
+      stage: currentEncounter.myGotchi.stage,
+      speciesLine: currentEncounter.myGotchi.speciesLine,
+      gender: currentEncounter.myGotchi.gender,
+      hunger: currentEncounter.myGotchi.hunger,
+      happy: currentEncounter.myGotchi.happy,
+      sick: STATE.sick,
+      dead: false
+    });
+
+    otherDiv.innerHTML = getCreatureSVGFromTraits({
+      stage: currentEncounter.otherGotchi.stage,
+      speciesLine: currentEncounter.otherGotchi.speciesLine,
+      gender: currentEncounter.otherGotchi.gender,
+      hunger: currentEncounter.otherGotchi.hunger,
+      happy: currentEncounter.otherGotchi.happy,
+      sick: false,
+      dead: false
+    });
+  }
+
+  async function validateEncounterChoice() {
     if (!currentEncounter || encounterLocked) return;
     encounterLocked = true;
-
-    document.getElementById('encWait').textContent = "Attente...";
+    document.getElementById('encounterWait').textContent = "En attente...";
 
     try {
       await fetch(`${API_BASE}/encounter/answer`, {
@@ -926,8 +872,9 @@
   }
 
   function startEncounterPolling() {
-    if (encounterPoll) clearInterval(encounterPoll);
-    encounterPoll = setInterval(async () => {
+    if (encounterPollInterval) clearInterval(encounterPollInterval);
+
+    encounterPollInterval = setInterval(async () => {
       try {
         const res = await fetch(`${API_BASE}/encounter/status`, {
           method: 'POST',
@@ -936,215 +883,309 @@
         });
         if (!res.ok) return;
         const data = await res.json();
-        if (!data || !data.encounter) return;
+        if (!data?.encounter || data.encounter.status === 'pending') return;
 
-        if (data.encounter.status !== 'pending') {
-          clearInterval(encounterPoll);
-          encounterPoll = null;
-          await runEncounterCinematic(data.encounter);
-          endEncounter();
-        }
+        clearInterval(encounterPollInterval);
+        encounterPollInterval = null;
+
+        await playEncounterResult(data.encounter);
+        endEncounterUI();
       } catch (e) {}
-    }, 900);
+    }, 1000);
   }
 
-  async function runEncounterCinematic(enc) {
+  function spawnFx(container, emoji, cls) {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = emoji;
+    el.style.left = (40 + Math.random() * 20) + '%';
+    el.style.top = '50%';
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 1900);
+  }
+
+  async function playLoveAnimation() {
+    const row = document.getElementById('encounterCreaturesRow');
+    const myC = document.getElementById('encounterMyCreature');
+    const othC = document.getElementById('encounterOtherCreature');
+    myC.classList.add('hug-move');
+    othC.classList.add('hug-move');
+
+    for (let i = 0; i < 8; i++) {
+      spawnFx(row, '💕', 'heart-anim');
+      await sleep(220);
+    }
+
+    await sleep(650);
+    myC.classList.remove('hug-move');
+    othC.classList.remove('hug-move');
+  }
+
+  async function playFriendshipAnimation() {
+    const row = document.getElementById('encounterCreaturesRow');
+    const myC = document.getElementById('encounterMyCreature');
+    const othC = document.getElementById('encounterOtherCreature');
+    myC.classList.add('jump-play');
+    othC.classList.add('jump-play');
+
+    for (let i = 0; i < 5; i++) {
+      spawnFx(row, '⚽', 'ball-anim');
+      await sleep(260);
+    }
+
+    await sleep(650);
+    myC.classList.remove('jump-play');
+    othC.classList.remove('jump-play');
+  }
+
+  async function playEncounterResult(enc) {
     if (enc.status === 'declined') {
-      document.getElementById('encounterTitle').textContent = '...';
-      document.getElementById('encWait').textContent = 'Refus';
-      await sleep(900);
+      document.getElementById('encounterHeader').textContent = 'Refusé...';
+      document.getElementById('encounterWait').textContent = '';
+      await sleep(1000);
       return;
     }
 
-    // RULE:
-    // - Same sex -> friendship only
-    // - Different sex -> worker decides love/friendship
-    const g1 = currentEncounter.myGotchi.gender;
-    const g2 = currentEncounter.otherGotchi.gender;
-    const sameSex = (g1 && g2 && g1 === g2);
+    const matchType = enc.matchType || 'friendship';
 
-    const type = sameSex ? 'friendship' : (enc.matchType || 'friendship');
+    if (matchType === 'love') {
+      document.getElementById('encounterHeader').textContent = '💕 AMOUR';
+      await playLoveAnimation();
 
-    if (type === 'love') {
-      document.getElementById('encounterTitle').textContent = 'AMOUR';
-      await cinematicLove();
-
-      // pregnancy only for female (on her device)
       if (STATE.gender === 'female') {
         STATE.pregnant = true;
         STATE.pregnancyStart = Date.now();
         STATE.mate = { speciesLine: currentEncounter.otherGotchi.speciesLine, gender: currentEncounter.otherGotchi.gender };
-        uiMsg('💕 Enceinte');
+        uiMsg('💕 Enceinte !');
       }
 
       STATE.happy = Math.min(5, STATE.happy + 1);
     } else {
-      document.getElementById('encounterTitle').textContent = 'AMITIE';
-      await cinematicFriendship();
+      document.getElementById('encounterHeader').textContent = '🎮 AMITIÉ';
+      await playFriendshipAnimation();
       STATE.happy = Math.min(5, STATE.happy + 1);
     }
   }
 
-  async function cinematicLove() {
-    const st = document.getElementById('encounterStage');
-    const my = document.getElementById('encMy');
-    const other = document.getElementById('encOther');
-
-    my.classList.add('hug');
-    other.classList.add('hug');
-
-    for (let i = 0; i < 7; i++) {
-      spawnFx(st, '💕', 'heart-float');
-      await sleep(230);
-    }
-
-    await sleep(900);
-    my.classList.remove('hug');
-    other.classList.remove('hug');
-  }
-
-  async function cinematicFriendship() {
-    const st = document.getElementById('encounterStage');
-    const my = document.getElementById('encMy');
-    const other = document.getElementById('encOther');
-
-    my.classList.add('jump');
-    other.classList.add('jump');
-
-    for (let i = 0; i < 4; i++) {
-      spawnFx(st, '⚽', 'ball-float');
-      await sleep(260);
-    }
-
-    await sleep(900);
-    my.classList.remove('jump');
-    other.classList.remove('jump');
-  }
-
-  function spawnFx(container, glyph, cls) {
-    const el = document.createElement('div');
-    el.className = cls;
-    el.textContent = glyph;
-    el.style.left = (42 + Math.random() * 16) + '%';
-    el.style.top = (50 + Math.random() * 8) + '%';
-    container.appendChild(el);
-    setTimeout(() => el.remove(), 1700);
-  }
-
-  function endEncounter() {
-    const scr = document.getElementById('encounterScreen');
-    scr.classList.remove('show');
-    inEncounter = false;
-    encounterLocked = false;
-    currentEncounter = null;
-    document.getElementById('encWait').textContent = '';
-    render();
-  }
-
-  function toggleNetwork() {
-    NETWORK_ENABLED = !NETWORK_ENABLED;
-    localStorage.setItem('gotchi_network_enabled', NETWORK_ENABLED ? '1' : '0');
-    uiMsg(NETWORK_ENABLED ? '🌐 Réseau ON' : '🌐 Réseau OFF');
-    if (NETWORK_ENABLED) pushPresence('playing');
-    toggleSysMenu();
-  }
-
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  // --- Pregnancy: lay egg automatically when adult and 2 minutes passed ---
-  setInterval(() => {
-    if (!STATE.pregnant || !STATE.pregnancyStart) return;
-    if (STATE.dead) return;
-
-    const mature = (STATE.stage === 'adult');
-    const elapsed = Date.now() - STATE.pregnancyStart;
-
-    if (mature && elapsed >= 120000) {
-      layEggNow();
+  // ===== Family helpers =====
+  function ensureBaby() {
+    if (!STATE.family) STATE.family = { hasBaby: false, baby: null, momDead: false };
+    if (!STATE.family.hasBaby) return;
+    if (!STATE.family.baby) {
+      STATE.family.baby = {
+        stage: 'egg',
+        speciesLine: STATE.speciesLine || (Math.random() < 0.5 ? 'Bubbly' : 'Fluffy'),
+        gender: Math.random() < 0.5 ? 'male' : 'female',
+        birth: Date.now(),
+        hunger: 4,
+        happy: 4,
+        weight: 3,
+        poops: 0,
+        sick: false,
+        dead: false,
+        lastNeed: Date.now()
+      };
     }
-  }, 1000);
+  }
 
-  function layEggNow() {
-    // Build parents for hatch logic
-    const mom = { speciesLine: STATE.speciesLine, gender: STATE.gender };
-    const dad = STATE.mate ? { speciesLine: STATE.mate.speciesLine, gender: STATE.mate.gender } : { speciesLine: null, gender: 'male' };
-    STATE.parents = { mom, dad };
+  function layFamilyEgg() {
+    STATE.family = { hasBaby: true, baby: null, momDead: false };
+    ensureBaby();
 
-    // reset to egg (new generation)
+    const momLine = STATE.speciesLine;
+    const dadLine = STATE.mate?.speciesLine || null;
+    const pick = [momLine, dadLine].filter(Boolean);
+    STATE.family.baby.speciesLine = pick.length ? pick[Math.floor(Math.random() * pick.length)] : (Math.random() < 0.5 ? 'Bubbly' : 'Fluffy');
+
     STATE.pregnant = false;
     STATE.pregnancyStart = null;
     STATE.mate = null;
 
-    STATE.stage = 'egg';
-    STATE.speciesLine = null;
-    STATE.gender = null;
-    STATE.birth = Date.now();
-    STATE.hunger = 4;
-    STATE.happy = 4;
-    STATE.weight = 5;
-    STATE.poops = 0;
-    STATE.poopTime = null;
-    STATE.sick = false;
-    STATE.sickTime = null;
-    STATE.menuIdx = -1;
-    STATE.dead = false;
-
-    uiMsg('🥚 Ponte!');
+    uiMsg('🥚 Œuf pondu !');
     render();
   }
 
-
-
-  function getCreatureSVGFromTraits(stage, gender, speciesLine, sick, happy) {
-    const genderColor = gender === 'male' ? '#74b9ff' : '#ff6b9d';
-    const secondaryColor = speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
-    const sickTint = sick ? 'filter: hue-rotate(80deg) saturate(0.7);' : '';
-
-    const mouthSad = 'M 38 56 Q 42 59 45 56 Q 48 59 52 56';
-    const mouthHappy = 'M 38 56 Q 45 52 52 56';
-    const mouthNeutral = 'M 38 56 Q 45 60 52 56';
-
-    const mouthPath = sick ? mouthSad : (happy <= 1 ? mouthSad : (happy >= 4 ? mouthHappy : mouthNeutral));
-
-    if (stage === 'egg') {
-      return `<div class="egg-container" style="transform: scale(0.9)"><div class="egg"></div></div>`;
-    }
-
-    if (stage === 'baby') {
-      return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;${sickTint}">
-        <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
-        <circle cx="38" cy="45" r="5" fill="#2d3436"/>
-        <circle cx="52" cy="45" r="5" fill="#2d3436"/>
-        <circle cx="39.5" cy="44" r="2" fill="#fff"/>
-        <circle cx="53.5" cy="44" r="2" fill="#fff"/>
-        <path d="${mouthPath}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
-        <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
-      </svg>`;
-    }
-
-    // child/teen/adult: close enough to your original look
-    const rx = stage === 'adult' ? 32 : (stage === 'teen' ? 30 : 26);
-    const ry = stage === 'adult' ? 30 : (stage === 'teen' ? 28 : 24);
-    const cy = stage === 'adult' ? 55 : (stage === 'teen' ? 54 : 52);
-
-    const eyeR = stage === 'adult' ? 6 : 5;
-
-    return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;${sickTint}">
-      <ellipse cx="45" cy="${cy}" rx="${rx}" ry="${ry}" fill="${genderColor}"/>
-      <ellipse cx="45" cy="${cy}" rx="${Math.max(rx-4, 20)}" ry="${Math.max(ry-4, 20)}" fill="${secondaryColor}" opacity="0.45"/>
-      <circle cx="38" cy="50" r="${eyeR}" fill="#2d3436"/>
-      <circle cx="54" cy="50" r="${eyeR}" fill="#2d3436"/>
-      <circle cx="39.5" cy="49" r="${Math.max(eyeR-3,2)}" fill="#fff"/>
-      <circle cx="55.5" cy="49" r="${Math.max(eyeR-3,2)}" fill="#fff"/>
-      <path d="${mouthPath.replaceAll('56','62').replaceAll('52','55').replaceAll('38','35')}" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="28" cy="${cy+1}" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
-      <ellipse cx="62" cy="${cy+1}" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
-    </svg>`;
+  function hatchFamilyEgg() {
+    ensureBaby();
+    if (!STATE.family.baby || STATE.family.baby.stage !== 'egg') return;
+    STATE.family.baby.stage = 'baby';
+    STATE.family.baby.birth = Date.now();
+    uiMsg('🐣 Bébé né !');
+    render();
   }
 
+  function familyStageFromAge(ageSec) {
+    if (ageSec < 60) return 'baby';
+    if (ageSec < 180) return 'child';
+    if (ageSec < 360) return 'teen';
+    return 'adult';
+  }
 
-// INIT
+  function updateFamilyNeeds() {
+    if (!STATE.family?.hasBaby) return;
+    ensureBaby();
+    const b = STATE.family.baby;
+    if (!b || b.dead) return;
+
+    if (b.stage === 'egg' && (Date.now() - b.birth >= 30000)) hatchFamilyEgg();
+
+    if (b.stage !== 'egg') {
+      const ageSec = Math.floor((Date.now() - b.birth) / 1000);
+      b.stage = familyStageFromAge(ageSec);
+    }
+
+    // NEEDS like mom (random decay)
+    if (b.stage !== 'egg') {
+      if (Math.random() < 0.015) b.hunger = Math.max(0, b.hunger - 1);
+      if (Math.random() < 0.015) b.happy  = Math.max(0, b.happy  - 1);
+    }
+
+    const babyWouldDie = (b.hunger <= 0) || (b.happy <= 0);
+    if (babyWouldDie && !STATE.family.momDead) {
+      STATE.family.momDead = true;
+      STATE.dead = true;
+      uiMsg('💔 Maman se sacrifie...');
+      b.hunger = Math.max(1, b.hunger);
+      b.happy = Math.max(1, b.happy);
+    } else if (babyWouldDie && STATE.family.momDead) {
+      b.dead = true;
+      uiMsg('💔 Bébé...');
+    }
+  }
+
+  function renderFamilyUI() {
+    const fm = document.getElementById('familyMode');
+    if (!fm) return;
+
+    if (STATE.family?.hasBaby && STATE.family.baby) {
+      fm.classList.add('active');
+      const momDiv = document.getElementById('familyMom');
+      const babyDiv = document.getElementById('familyBaby');
+
+      momDiv.innerHTML = (STATE.family.momDead || STATE.dead) ? '<div style="font-size:44px;">💀</div>' : getCreatureSVG();
+
+      const b = STATE.family.baby;
+      if (b.dead) {
+        babyDiv.innerHTML = '<div style="font-size:38px;">💀</div>';
+      } else {
+        babyDiv.innerHTML = getCreatureSVGFromTraits({
+          stage: b.stage,
+          speciesLine: b.speciesLine,
+          gender: b.gender,
+          hunger: b.hunger,
+          happy: b.happy,
+          sick: b.sick,
+          dead: false
+        });
+      }
+
+      const needs = (b.hunger <= 1) || (b.happy <= 1);
+      babyDiv.classList.toggle('priority-glow', needs && !b.dead);
+    } else {
+      fm.classList.remove('active');
+    }
+  }
+
+  function installEncounterAndFamilyHooks() {
+    const _btnA = btnA;
+    const _btnB = btnB;
+    const _btnC = btnC;
+
+    btnA = function() {
+      if (inEncounter && !encounterLocked) {
+        encounterChoice = (encounterChoice === 'yes') ? 'no' : 'yes';
+        updateEncounterChoiceDisplay();
+        return;
+      }
+      _btnA();
+    };
+
+    btnB = function() {
+      if (inEncounter) {
+        validateEncounterChoice();
+        return;
+      }
+      _btnB();
+    };
+
+    btnC = function() {
+      if (inEncounter) {
+        encounterChoice = 'no';
+        updateEncounterChoiceDisplay();
+        validateEncounterChoice();
+        return;
+      }
+      _btnC();
+    };
+
+    const _doAction = doAction;
+    doAction = function(idx) {
+      const FEED_IDX = 0;
+      const PLAY_IDX = 2;
+
+      if (STATE.family?.hasBaby && STATE.family.baby && !STATE.family.baby.dead && !STATE.family.momDead) {
+        const b = STATE.family.baby;
+        if (idx === FEED_IDX && b.stage !== 'egg' && b.hunger < 5) {
+          b.hunger = Math.min(5, b.hunger + 1);
+          b.weight = Math.min(10, (b.weight || 3) + 0.3);
+          uiMsg('🍼 Bébé nourri');
+          render();
+          setTimeout(() => pushPresence(), 250);
+          return;
+        }
+        if (idx === PLAY_IDX && b.stage !== 'egg' && b.happy < 5) {
+          b.happy = Math.min(5, b.happy + 1);
+          uiMsg('🎮 Bébé joue');
+          render();
+          setTimeout(() => pushPresence(), 250);
+          return;
+        }
+      }
+
+      _doAction(idx);
+      setTimeout(() => pushPresence(), 250);
+    };
+
+    const _render = render;
+    render = function() {
+      _render();
+      if (STATE.pregnant && STATE.stage !== 'egg' && !STATE.dead) {
+        const container = document.getElementById('creatureContainer');
+        if (container && !container.querySelector('.pregnant-belly')) {
+          const belly = document.createElement('div');
+          belly.className = 'pregnant-belly';
+          container.appendChild(belly);
+        }
+      }
+      renderFamilyUI();
+    };
+
+    document.getElementById('encounterYes')?.addEventListener('click', () => { encounterChoice='yes'; updateEncounterChoiceDisplay(); });
+    document.getElementById('encounterNo')?.addEventListener('click', () => { encounterChoice='no'; updateEncounterChoiceDisplay(); });
+  }
+
+  // Pregnancy timer: lay egg after 2 min once adult, mom stays on screen
+  setInterval(() => {
+    if (!STATE.pregnant || !STATE.pregnancyStart) return;
+    if (STATE.dead) return;
+    if (STATE.stage !== 'adult') return;
+    if (Date.now() - STATE.pregnancyStart >= 120000) {
+      layFamilyEgg();
+    }
+  }, 1000);
+
+  // Family update tick
+  setInterval(() => {
+    updateFamilyNeeds();
+    if (STATE.family?.hasBaby) renderFamilyUI();
+  }, 2000);
+
+
+        let msgTimeout = null;
+
+        // INIT
         const saved = localStorage.getItem('gotchi_modern');
         if(saved) {
             try {
@@ -1737,96 +1778,34 @@
 
         // START
         render();
-
-    
-
-
-  function installHooks() {
-    // Physical buttons handling while in encounter
-    const _btnA = btnA;
-    const _btnB = btnB;
-    const _btnC = btnC;
-
-    btnA = function() {
-      if (inEncounter && !encounterLocked) {
-        encounterChoice = (encounterChoice === 'yes') ? 'no' : 'yes';
-        updateEncounterChoiceUI();
-        return;
-      }
-      _btnA();
-    };
-
-    btnB = function() {
-      if (inEncounter) {
-        sendEncounterAnswer();
-        return;
-      }
-      _btnB();
-    };
-
-    btnC = function() {
-      if (inEncounter) {
-        encounterChoice = 'no';
-        updateEncounterChoiceUI();
-        sendEncounterAnswer();
-        return;
-      }
-      _btnC();
-    };
-
-    // Push presence after actions
-    const _doAction = doAction;
-    doAction = function(idx) {
-      _doAction(idx);
-      setTimeout(() => pushPresence('playing'), 300);
-    };
-
-    // render wrapper: add belly when pregnant (adult)
-    const _render = render;
-    render = function() {
-      _render();
-      if (STATE.pregnant && STATE.stage !== 'egg' && !STATE.dead) {
-        const container = document.getElementById('creatureContainer');
-        if (!container) return;
-        // avoid duplicates
-        if (!container.querySelector('.pregnant-belly')) {
-          const belly = document.createElement('div');
-          belly.className = 'pregnant-belly';
-          container.appendChild(belly);
-        }
-      }
-    };
-
-    // override hatchEgg to use parents traits when available
-    const _hatchEgg = hatchEgg;
-    hatchEgg = function() {
-      const egg = document.querySelector('.egg');
-      if (egg) egg.classList.add('hatching');
-
-      setTimeout(() => {
-        STATE.stage = 'baby';
-
-        if (STATE.parents && STATE.parents.mom && STATE.parents.dad) {
-          const lines = [STATE.parents.mom.speciesLine, STATE.parents.dad.speciesLine].filter(Boolean);
-          STATE.speciesLine = lines.length ? lines[Math.floor(Math.random() * lines.length)] : (Math.random() < 0.5 ? 'Bubbly' : 'Fluffy');
-        } else {
-          STATE.speciesLine = Math.random() < 0.5 ? 'Bubbly' : 'Fluffy';
-        }
-
-        STATE.gender = Math.random() < 0.5 ? 'male' : 'female';
-        STATE.parents = null;
-
-        uiMsg('🐣 Éclosion!');
-        render();
-      }, 800);
-    };
-  }
-
-
-  // START
-  render();
-  initNetworking();
-  installHooks();
+        initNetworking();
+        installEncounterAndFamilyHooks();
 </script>
+
+
+    <!-- ENCOUNTER OVERLAY (blocks background) -->
+    <div class="encounter-overlay" id="encounterOverlay" aria-hidden="true">
+        <div class="encounter-box">
+            <div class="encounter-header" id="encounterHeader">RENCONTRE !</div>
+            <div class="encounter-creatures-row" id="encounterCreaturesRow">
+                <div class="encounter-creature-wrap">
+                    <div class="encounter-label">Moi</div>
+                    <div class="encounter-creature-display" id="encounterMyCreature"></div>
+                </div>
+                <div class="encounter-vs">💫</div>
+                <div class="encounter-creature-wrap">
+                    <div class="encounter-label">Ami</div>
+                    <div class="encounter-creature-display" id="encounterOtherCreature"></div>
+                </div>
+            </div>
+            <div class="encounter-controls">
+                <div class="encounter-choice-btn yes" id="encounterYes">💚 OUI</div>
+                <div class="encounter-choice-btn no" id="encounterNo">💔 NON</div>
+            </div>
+            <div class="encounter-hints">SELECT: changer · DECIDE: valider · CANCEL: refuser</div>
+            <div class="encounter-wait" id="encounterWait"></div>
+        </div>
+    </div>
+
 </body>
 </html>
