@@ -643,7 +643,7 @@
 
 <script>
   // ====================================
-  // GOTCHI + NETWORK (corrigé)
+  // GOTCHI AVEC NETWORK COMPLET
   // ====================================
 
   // STATE
@@ -671,17 +671,13 @@
   let msgTimeout = null;
 
   // === NETWORKING CONFIG ===
-  // ON/OFF persistant
   let NETWORK_ENABLED = (localStorage.getItem('gotchi_network_enabled') !== '0');
-
-  // Ton Worker (OK + CORS)
   const API_BASE = 'https://gotchi.sicho95.workers.dev';
 
   let playerId = null;
   let presenceInterval = null;
   let currentPosition = null;
   let pendingFriend = null;
-
   let lastSuggestedId = null;
   let lastSuggestedAt = 0;
 
@@ -692,7 +688,6 @@
       localStorage.setItem('gotchi_player_id', playerId);
     }
 
-    // Géoloc optionnelle (ne bloque pas)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => {
@@ -704,17 +699,13 @@
       );
     }
 
-    // Premier push au démarrage
     setTimeout(() => pushPresence('playing'), 800);
-
-    // Timer toutes les 3 minutes
     if (presenceInterval) clearInterval(presenceInterval);
     presenceInterval = setInterval(() => pushPresence('playing'), 3 * 60 * 1000);
   }
 
   async function pushPresence(status = 'playing') {
-    if (!NETWORK_ENABLED) return;
-    if (!playerId) return; // init pas encore passée
+    if (!NETWORK_ENABLED || !playerId) return;
 
     const gotchi = {
       id: 'main',
@@ -726,28 +717,19 @@
       happy: STATE.happy
     };
 
-    const body = {
-      playerId,
-      gotchi,
-      status,
-      position: currentPosition
-    };
-
     try {
       const res = await fetch(`${API_BASE}/presence/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ playerId, gotchi, status, position: currentPosition })
       });
 
       if (!res.ok) return;
-
       const data = await res.json();
 
       if (data && data.suggestedFriend) {
         const id = data.suggestedFriend.playerId;
         const now = Date.now();
-
         const sameAsLast = (id === lastSuggestedId);
         const tooSoon = (now - lastSuggestedAt < 2 * 60 * 1000);
 
@@ -758,9 +740,7 @@
           showFriendSuggestion(data.suggestedFriend);
         }
       }
-    } catch (e) {
-      // silence (réseau off / offline)
-    }
+    } catch (e) {}
   }
 
   function showFriendSuggestion(friend) {
@@ -791,95 +771,614 @@
     NETWORK_ENABLED = !NETWORK_ENABLED;
     localStorage.setItem('gotchi_network_enabled', NETWORK_ENABLED ? '1' : '0');
     uiMsg(NETWORK_ENABLED ? '🌐 Réseau ON' : '🌐 Réseau OFF');
-
-    if (NETWORK_ENABLED) {
-      pushPresence('playing');
-    }
+    if (NETWORK_ENABLED) pushPresence('playing');
     toggleSysMenu();
   }
 
-  // --- LOAD SAVE ORIGINAL ---
-  const saved = localStorage.getItem('gotchi_modern');
-  if (saved) {
-    try {
-      Object.assign(STATE, JSON.parse(saved));
-      STATE.lastPoopCount = -1;
-    } catch (e) {
-      console.error('Erreur chargement save:', e);
-    }
-  }
+// INIT
+        const saved = localStorage.getItem('gotchi_modern');
+        if(saved) {
+            try {
+                Object.assign(STATE, JSON.parse(saved));
+                STATE.lastPoopCount = -1;  // Force le rendu initial
+            } catch(e) {
+                console.error('Erreur chargement save:', e);
+            }
+        }
 
-  // GAME LOOP
-  setInterval(() => {
-    if (STATE.dead) return;
+        // GAME LOOP
+        setInterval(() => {
+            if(STATE.dead) return;
 
-    const now = Date.now();
-    const age = (now - STATE.birth) / 1000;
+            const now = Date.now();
+            const age = (now - STATE.birth) / 1000;
 
-    if (STATE.stage === 'egg' && age > 15) {
-      hatchEgg();
-    } else if (STATE.stage === 'baby' && age > 45) {
-      evolve('child');
-    } else if (STATE.stage === 'child' && age > 90) {
-      evolve('teen');
-    } else if (STATE.stage === 'teen' && age > 150) {
-      evolve('adult');
-    }
+            // EVOLUTION
+            if(STATE.stage === 'egg' && age > 15) {
+                hatchEgg();
+            } else if(STATE.stage === 'baby' && age > 45) {
+                evolve('child');
+            } else if(STATE.stage === 'child' && age > 90) {
+                evolve('teen');
+            } else if(STATE.stage === 'teen' && age > 150) {
+                evolve('adult');
+            }
 
-    if (STATE.stage !== 'egg') {
-      if (Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
-      if (Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
+            // NEEDS
+            if(STATE.stage !== 'egg') {
+                if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
+                if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
 
-      const timeSinceLastPoop = now - STATE.lastPoopIncrease;
-      if (Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) {
-        STATE.poops++;
-        STATE.lastPoopIncrease = now;
-        if (!STATE.poopTime) STATE.poopTime = now;
-      }
+                const timeSinceLastPoop = now - STATE.lastPoopIncrease;
+                if(Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) {
+                    STATE.poops++;
+                    STATE.lastPoopIncrease = now;
+                    if(!STATE.poopTime) STATE.poopTime = now;
+                }
 
-      if ((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
-        STATE.sick = true;
-        STATE.sickTime = now;
-        uiMsg('🤒 Malade!');
-      }
+                if((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
+                    STATE.sick = true;
+                    STATE.sickTime = now;
+                    uiMsg("🤒 Malade!");
+                }
 
-      const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
-      if ((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
-        die();
-      }
-    }
+                const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
+                if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
+                    die();
+                }
+            }
 
-    if (STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
-      randomAnimation();
-      STATE.lastAnim = now;
-    }
+            if(STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
+                randomAnimation();
+                STATE.lastAnim = now;
+            }
 
-    render();
-    localStorage.setItem('gotchi_modern', JSON.stringify(STATE));
-  }, 1000);
+            render();
+            localStorage.setItem('gotchi_modern', JSON.stringify(STATE));
+        }, 1000);
 
-  // ==========================================================
-  // ICI: tes fonctions originales doivent suivre dans le fichier
-  // hatchEgg, evolve, die, randomAnimation, render, doAction, etc.
-  // ==========================================================
+        function hatchEgg() {
+            const egg = document.querySelector('.egg');
+            if(egg) {
+                egg.classList.add('hatching');
+                setTimeout(() => {
+                    STATE.stage = 'baby';
+                    STATE.speciesLine = Math.random() < 0.5 ? 'Bubbly' : 'Fluffy';
+                    STATE.gender = Math.random() < 0.5 ? 'male' : 'female';
+                    uiMsg("🐣 Éclosion!");
+                    render();
+                }, 800);
+            }
+        }
 
-  // --- HOOK NETWORK SUR doAction (sans ReferenceError) ---
-  function hookDoActionForNetwork() {
-    if (typeof doAction !== 'function') return;
+        function evolve(newStage) {
+            STATE.stage = newStage;
+            uiMsg("✨ Évolution!");
+        }
 
-    const _doAction = doAction;
-    doAction = function(idx) {
-      _doAction(idx);
-      // Push après chaque action (léger délai pour laisser le rendu)
-      setTimeout(() => pushPresence('playing'), 300);
-    };
-  }
+        function die() {
+            STATE.dead = true;
+            uiMsg("💀 Décédé...");
+        }
+
+        function randomAnimation() {
+            const container = document.getElementById('creatureContainer');
+            const anims = ['bounce', 'move-left', 'move-right', 'happy'];
+            const anim = anims[Math.floor(Math.random() * anims.length)];
+            container.classList.add(anim);
+            setTimeout(() => container.classList.remove(anim), 1000);
+        }
+
+        // RENDER
+        function render() {
+            const container = document.getElementById('creatureContainer');
+            const statsView = document.getElementById('statsView');
+
+            renderHearts();
+
+            if(STATE.showingStats) {
+                statsView.classList.add('show');
+                container.style.display = 'none';
+            } else {
+                statsView.classList.remove('show');
+                container.style.display = 'block';
+            }
+
+            if(STATE.dead) {
+                container.innerHTML = `<div class="dead-creature">
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Croix -->
+                        <rect x="52" y="5" width="16" height="50" rx="2" fill="#8b7355" opacity="0.9"/>
+                        <rect x="40" y="20" width="40" height="16" rx="2" fill="#8b7355" opacity="0.9"/>
+
+                        <!-- RIP texte -->
+                        <text x="60" y="72" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle" font-family="serif">RIP</text>
+
+                        <!-- Cercueil -->
+                        <path d="M 35 80 L 25 100 L 25 130 Q 25 135 30 135 L 90 135 Q 95 135 95 130 L 95 100 L 85 80 Z" 
+                              fill="#654321" stroke="#4a3017" stroke-width="2"/>
+
+                        <!-- Détails cercueil -->
+                        <rect x="50" y="95" width="20" height="30" rx="2" fill="#8b6914" opacity="0.4"/>
+                        <circle cx="45" cy="90" r="3" fill="#ffd700"/>
+                        <circle cx="75" cy="90" r="3" fill="#ffd700"/>
+                        <circle cx="45" cy="120" r="3" fill="#ffd700"/>
+                        <circle cx="75" cy="120" r="3" fill="#ffd700"/>
+
+                        <!-- Poignées -->
+                        <ellipse cx="32" cy="105" rx="4" ry="6" fill="#c0c0c0"/>
+                        <ellipse cx="88" cy="105" rx="4" ry="6" fill="#c0c0c0"/>
+                    </svg>
+                </div>`;
+            } else if(STATE.stage === 'egg') {
+                container.innerHTML = `
+                    <div class="egg-container">
+                        <div class="egg"></div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="creature">${getCreatureSVG()}</div>`;
+            }
+
+            for(let i=0; i<8; i++) {
+                const el = document.getElementById('i'+i);
+                el.classList.remove('selected', 'active');
+                if(STATE.menuIdx === i) el.classList.add('selected');
+            }
+
+            if(STATE.hunger < 2 || STATE.happy < 2 || STATE.poops > 2 || STATE.sick) {
+                document.getElementById('i7').classList.add('active');
+            }
+
+            renderPoops();
+
+            document.getElementById('lcd').style.background = STATE.lightOn 
+                ? 'linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%)' 
+                : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
+        }
+
+        function renderHearts() {
+            const hungerContainer = document.getElementById('hungerHearts');
+            const happyContainer = document.getElementById('happyHearts');
+
+            hungerContainer.innerHTML = '';
+            happyContainer.innerHTML = '';
+
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('span');
+                h.className = 'heart';
+                h.innerText = '❤️';
+                if(i < STATE.hunger) h.classList.add('filled');
+                hungerContainer.appendChild(h);
+            }
+
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('span');
+                h.className = 'heart';
+                h.innerText = '💛';
+                if(i < STATE.happy) h.classList.add('filled');
+                happyContainer.appendChild(h);
+            }
+        }
+
+        function renderPoops() {
+            const pZone = document.getElementById('poopZone');
+
+            const now = Date.now();
+            const poopAge = STATE.poopTime ? (now - STATE.poopTime) / 1000 : 0;
+            const needFlies = poopAge > 60 && STATE.poops >= 3;
+
+            // FIX CRITIQUE : Si STATE.poops = 0, TOUJOURS vider la zone
+            if(STATE.poops === 0) {
+                pZone.innerHTML = '';
+                STATE.lastPoopCount = 0;
+                return;
+            }
+
+            // OPTIMISATION : Ne recréer que si le nombre de poops a changé
+            if(STATE.lastPoopCount !== STATE.poops) {
+                pZone.innerHTML = '';
+
+                // Créer les poops
+                for(let i=0; i<STATE.poops; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'poop-sprite';
+                    if(poopAge > 30) p.classList.add('stinky');
+                    p.innerText = '💩';
+                    pZone.appendChild(p);
+                }
+
+                STATE.lastPoopCount = STATE.poops;
+            } else {
+                // Juste mettre à jour les classes stinky
+                const poops = pZone.querySelectorAll('.poop-sprite');
+                poops.forEach(p => {
+                    if(poopAge > 30) {
+                        p.classList.add('stinky');
+                    } else {
+                        p.classList.remove('stinky');
+                    }
+                });
+            }
+
+            // Gérer les mouches séparément
+            const existingFlies = pZone.querySelectorAll('.fly');
+
+            if(needFlies && existingFlies.length === 0) {
+                // Créer les mouches SEULEMENT si elles n'existent pas
+                const flyPositions = [
+                    { left: 5, top: -25, delay: 0 },
+                    { left: 18, top: -18, delay: 1.7 },
+                    { left: 30, top: -22, delay: 3.3 }
+                ];
+
+                flyPositions.forEach(pos => {
+                    const fly = document.createElement('div');
+                    fly.className = 'fly';
+                    fly.innerText = '🪰';
+                    fly.style.left = pos.left + 'px';
+                    fly.style.top = pos.top + 'px';
+                    fly.style.animationDelay = pos.delay + 's';
+                    pZone.appendChild(fly);
+                });
+            } else if(!needFlies && existingFlies.length > 0) {
+                // Supprimer les mouches si plus nécessaires
+                existingFlies.forEach(fly => fly.remove());
+            }
+        }
+
+        function getCreatureSVG() {
+            const genderColor = STATE.gender === 'male' ? '#74b9ff' : '#ff6b9d';
+            const secondaryColor = STATE.speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
+
+            const sickTint = STATE.sick ? 'filter: hue-rotate(80deg) saturate(0.7);' : '';
+            const mouthPath = STATE.sick 
+                ? 'M 38 56 Q 42 59 45 56 Q 48 59 52 56'
+                : STATE.happy <= 1
+                ? 'M 38 56 Q 45 52 52 56'
+                : 'M 38 56 Q 45 60 52 56';
+
+            if(STATE.stage === 'baby') {
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
+                    <circle cx="38" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="52" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="39.5" cy="44" r="2" fill="#fff"/>
+                    <circle cx="53.5" cy="44" r="2" fill="#fff"/>
+                    <path d="${mouthPath}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+                    <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+                    ${STATE.gender === 'female' ? '<ellipse cx="45" cy="28" rx="8" ry="5" fill="#ff6b9d" opacity="0.5"/>' : '<rect x="42" y="25" width="6" height="8" rx="3" fill="#74b9ff" opacity="0.5"/>'}
+                </svg>`;
+            }
+
+            if(STATE.stage === 'child') {
+                const hairLength = STATE.gender === 'female' ? 18 : 10;
+                const childMouth = STATE.sick 
+                    ? 'M 38 58 Q 42 61 45 58 Q 48 61 52 58'
+                    : STATE.happy <= 1
+                    ? 'M 38 58 Q 45 54 52 58'
+                    : 'M 38 58 Q 45 62 52 58';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="52" rx="26" ry="24" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="52" rx="22" ry="20" fill="${secondaryColor}" opacity="0.6"/>
+                    ${STATE.gender === 'female' 
+                        ? `<ellipse cx="38" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
+                           <ellipse cx="52" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
+                           <circle cx="38" cy="${28-hairLength+3}" r="4" fill="#ff6b9d"/>`
+                        : `<rect x="40" y="22" width="10" height="${hairLength}" rx="5" fill="#2d3436" opacity="0.8"/>`
+                    }
+                    <circle cx="38" cy="48" r="4.5" fill="#2d3436"/>
+                    <circle cx="52" cy="48" r="4.5" fill="#2d3436"/>
+                    <circle cx="39" cy="47" r="2" fill="#fff"/>
+                    <circle cx="53" cy="47" r="2" fill="#fff"/>
+                    <path d="${childMouth}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="32" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="58" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
+                    <circle cx="35" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
+                    <circle cx="55" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
+                </svg>`;
+            }
+
+            if(STATE.stage === 'teen') {
+                const teenMouth = STATE.sick 
+                    ? 'M 35 62 Q 40 66 45 62 Q 50 66 55 62'
+                    : STATE.happy <= 1
+                    ? 'M 35 62 Q 45 58 55 62'
+                    : 'M 35 62 Q 45 69 55 62';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="54" rx="30" ry="28" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="54" rx="25" ry="23" fill="${secondaryColor}" opacity="0.5"/>
+                    ${STATE.gender === 'female'
+                        ? `<path d="M 22 38 Q 28 25 35 38" fill="#2d3436"/>
+                           <path d="M 55 38 Q 62 25 68 38" fill="#2d3436"/>
+                           <ellipse cx="28" cy="30" rx="5" ry="10" fill="#2d3436" opacity="0.8"/>
+                           <ellipse cx="62" cy="30" rx="5" ry="10" fill="#2d3436" opacity="0.8"/>`
+                        : `<rect x="28" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>
+                           <rect x="54" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>`
+                    }
+                    <circle cx="36" cy="50" r="5" fill="#2d3436"/>
+                    <circle cx="54" cy="50" r="5" fill="#2d3436"/>
+                    <circle cx="37.5" cy="49" r="2.5" fill="#fff"/>
+                    <circle cx="55.5" cy="49" r="2.5" fill="#fff"/>
+                    <path d="${teenMouth}" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="28" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="62" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+                </svg>`;
+            }
+
+            if(STATE.stage === 'adult') {
+                const adultMouth = STATE.sick 
+                    ? 'M 33 65 Q 39 70 45 65 Q 51 70 57 65'
+                    : STATE.happy <= 1
+                    ? 'M 33 65 Q 45 61 57 65'
+                    : 'M 33 65 Q 45 73 57 65';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="55" rx="32" ry="30" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="55" rx="28" ry="26" fill="${secondaryColor}" opacity="0.4"/>
+                    ${STATE.gender === 'male'
+                        ? `<polygon points="38,18 45,8 52,18 50,22 40,22" fill="#ffd700"/>
+                           <circle cx="45" cy="15" r="3" fill="#ff6b6b"/>`
+                        : `<ellipse cx="30" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
+                           <ellipse cx="60" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
+                           <polygon points="35,20 45,10 55,20 52,25 38,25" fill="#ffd700"/>`
+                    }
+                    <circle cx="35" cy="50" r="6" fill="#2d3436"/>
+                    <circle cx="55" cy="50" r="6" fill="#2d3436"/>
+                    <circle cx="37" cy="49" r="3" fill="#fff"/>
+                    <circle cx="57" cy="49" r="3" fill="#fff"/>
+                    <path d="${adultMouth}" stroke="#2d3436" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="26" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="64" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
+                    <circle cx="38" cy="40" r="2.5" fill="${secondaryColor}"/>
+                    <circle cx="52" cy="40" r="2.5" fill="${secondaryColor}"/>
+                </svg>`;
+            }
+        }
+
+        // INPUTS
+        function btnA() {
+            if(STATE.stage === 'egg' || STATE.dead) return;
+            STATE.menuIdx = (STATE.menuIdx === -1) ? 0 : (STATE.menuIdx + 1) % 8;
+            render();
+        }
+
+        function btnB() {
+            if(STATE.stage === 'egg' || STATE.dead) return;
+            if(STATE.menuIdx === -1) {
+                // No action
+            } else {
+                doAction(STATE.menuIdx);
+            }
+        }
+
+        function btnC() {
+            STATE.menuIdx = -1;
+            STATE.showingStats = false;
+            render();
+        }
+
+        function doAction(idx) {
+            const container = document.getElementById('creatureContainer');
+
+            switch(idx) {
+                case 0: // Feed
+                    showFood('🍖');
+                    container.classList.add('eating');
+                    setTimeout(() => container.classList.remove('eating'), 1200);
+                    uiMsg("Miam!");
+                    STATE.hunger = Math.min(5, STATE.hunger + 1);
+                    STATE.weight++;
+                    break;
+                case 1: // Light
+                    STATE.lightOn = !STATE.lightOn;
+                    uiMsg(STATE.lightOn ? "Lumière ON" : "Lumière OFF");
+                    break;
+                case 2: // Game
+                    container.classList.add('happy');
+                    setTimeout(() => container.classList.remove('happy'), 500);
+                    uiMsg("Youpi!");
+                    STATE.happy = Math.min(5, STATE.happy + 1);
+                    STATE.weight = Math.max(1, STATE.weight - 1);
+                    break;
+                case 3: // Meds
+                    if(STATE.sick) { 
+                        STATE.sick = false;
+                        STATE.sickTime = null;
+                        uiMsg("Guéri!"); 
+                    } else {
+                        uiMsg("Ça va");
+                    }
+                    break;
+                case 4: // Clean
+                    STATE.poops = 0;
+                    STATE.poopTime = null;
+                    STATE.lastPoopCount = -1;  // Force un re-rendu complet
+                    uiMsg("Propre!");
+                    render();  // Forcer un rendu immédiat
+                    break;
+                case 5: // Stats
+                    showStats();
+                    break;
+                case 6: // About
+                    uiMsg("Gotchi v3.4");
+                    break;
+                case 7: // Attention
+                    let issues = [];
+                    if(STATE.hunger < 2) issues.push("Faim");
+                    if(STATE.happy < 2) issues.push("Triste");
+                    if(STATE.poops > 2) issues.push("Sale");
+                    if(STATE.sick) issues.push("Malade");
+                    uiMsg(issues.length ? "⚠️ " + issues.join(", ") : "✅ OK");
+                    break;
+            }
+            STATE.menuIdx = -1;
+            render();
+        }
+
+        function showFood(emoji) {
+            const zone = document.getElementById('foodZone');
+            zone.innerHTML = `<div class="food-item">${emoji}</div>`;
+            setTimeout(() => zone.innerHTML = '', 1500);
+        }
+
+        function showStats() {
+            const age = Math.floor((Date.now() - STATE.birth) / 60000);
+            const statsView = document.getElementById('statsView');
+
+            const speciesInfo = STATE.speciesLine || 'Œuf';
+            const genderIcon = STATE.gender === 'male' ? '♂️' : STATE.gender === 'female' ? '♀️' : '';
+
+            statsView.innerHTML = `
+                <div class="stat-line full-width"><strong>Esp:</strong><span>${speciesInfo}${genderIcon}</span></div>
+                <div class="stat-line"><strong>Âge:</strong><span>${age}m</span></div>
+                <div class="stat-line"><strong>Poid:</strong><span>${STATE.weight}g</span></div>
+                <div class="stat-line"><strong>Faim:</strong><span>${STATE.hunger}/5</span></div>
+                <div class="stat-line"><strong>Joie:</strong><span>${STATE.happy}/5</span></div>
+                <div class="stat-line full-width"><strong>État:</strong><span>${STATE.sick ? '🤒' : '✅'}</span></div>
+            `;
+            STATE.showingStats = true;
+            render();
+        }
+
+        function uiMsg(txt) {
+            const el = document.getElementById('msg');
+
+            if(msgTimeout) {
+                clearTimeout(msgTimeout);
+                msgTimeout = null;
+            }
+
+            el.innerText = txt;
+            el.classList.add('show');
+
+            msgTimeout = setTimeout(() => {
+                el.classList.remove('show');
+                msgTimeout = null;
+            }, 2000);
+        }
+
+        // SYSTEM
+        function toggleSysMenu() { 
+            document.getElementById('sysMenu').classList.toggle('active'); 
+        }
+
+        function setShell(color) {
+            const d = document.getElementById('device');
+            d.className = 'device-container';
+
+            const colors = {
+                purple: '#6a5acd',
+                blue: '#4169e1',
+                pink: '#ff69b4',
+                white: '#f0f0f0',
+                valentine: '#8b0000'
+            };
+
+            d.style.setProperty('--shell-color', colors[color]);
+
+            if(color === 'valentine') {
+                addValentineHearts(d);
+            }
+            toggleSysMenu();
+        }
+
+        function addValentineHearts(container) {
+            container.querySelectorAll('.heart-decoration').forEach(h => h.remove());
+
+            const positions = [
+                {x: 15, y: 20, size: 15},
+                {x: 80, y: 35, size: 12},
+                {x: 25, y: 70, size: 10},
+                {x: 75, y: 80, size: 14},
+                {x: 50, y: 50, size: 8},
+                {x: 40, y: 25, size: 11}
+            ];
+
+            positions.forEach(pos => {
+                const heart = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                heart.setAttribute('class', 'heart-decoration');
+                heart.setAttribute('width', pos.size);
+                heart.setAttribute('height', pos.size);
+                heart.style.left = pos.x + '%';
+                heart.style.top = pos.y + '%';
+                heart.innerHTML = `
+                    <path d="M${pos.size/2},${pos.size*0.85} 
+                             L${pos.size*0.2},${pos.size*0.4} 
+                             Q${pos.size*0.1},${pos.size*0.2} ${pos.size*0.2},${pos.size*0.15}
+                             Q${pos.size*0.3},${pos.size*0.1} ${pos.size/2},${pos.size*0.25}
+                             Q${pos.size*0.7},${pos.size*0.1} ${pos.size*0.8},${pos.size*0.15}
+                             Q${pos.size*0.9},${pos.size*0.2} ${pos.size*0.8},${pos.size*0.4} Z" 
+                          fill="${Math.random() < 0.5 ? '#ffc0cb' : '#ffffff'}"/>
+                `;
+                container.appendChild(heart);
+            });
+        }
+
+        function saveData() { 
+            const blob = new Blob([JSON.stringify(STATE)], {type:'application/json'});
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(blob); 
+            a.download='gotchi_save.json'; 
+            a.click();
+            uiMsg("Sauvegardé!");
+            toggleSysMenu();
+        }
+
+        function loadData(input) {
+            const r = new FileReader();
+            r.onload = e => { 
+                Object.assign(STATE, JSON.parse(e.target.result)); 
+                STATE.lastPoopCount = -1;  // Force le rendu
+                render(); 
+                toggleSysMenu();
+                uiMsg("Chargé!");
+            };
+            r.readAsText(input.files[0]);
+        }
+
+        function resetData() {
+            if(confirm("Recommencer depuis le début ?")) {
+                localStorage.removeItem('gotchi_modern');
+                Object.assign(STATE, {
+                    stage: 'egg',
+                    speciesLine: null,
+                    gender: null,
+                    birth: Date.now(),
+                    hunger: 4,
+                    happy: 4,
+                    weight: 5,
+                    poops: 0,
+                    poopTime: null,
+                    sick: false,
+                    sickTime: null,
+                    lightOn: true,
+                    menuIdx: -1,
+                    lastAnim: Date.now(),
+                    lastPoopIncrease: Date.now(),
+                    dead: false,
+                    showingStats: false,
+                    lastPoopCount: -1
+                });
+                render();
+                uiMsg("Nouveau départ!");
+                toggleSysMenu();
+            }
+        }
+
+        // START
+        render();
+
+  // === HOOK NETWORK ===
+  const _originalDoAction = doAction;
+  doAction = function(idx) {
+    _originalDoAction(idx);
+    setTimeout(() => pushPresence('playing'), 300);
+  };
 
   // START
   render();
   initNetworking();
-  hookDoActionForNetwork();
 </script>
-
 </body>
 </html>
