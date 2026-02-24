@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gotchi - Modern Edition</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* MENU HAMBURGER */
+        .hamburger { 
+            position: fixed; top: 20px; left: 20px; z-index: 1000; cursor: pointer; 
+            padding: 12px; background: rgba(255,255,255,0.2); border-radius: 12px; 
+            backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .hamburger:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+        .hamburger div { width: 28px; height: 3px; background: #fff; margin: 5px 0; border-radius: 3px; transition: 0.3s; }
+
+        .menu-dropdown { 
+            display: none; position: fixed; top: 80px; left: 20px; 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+            border-radius: 16px; z-index: 1001; min-width: 220px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .menu-dropdown.active { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .menu-item { 
+            padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); 
+            cursor: pointer; font-size: 15px; color: #333; 
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s;
+        }
+        .menu-item:hover { background: rgba(103,126,234,0.1); padding-left: 25px; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item input { display: none; }
+
+        /* DEVICE CONTAINER */
+        .device-container {
+            width: 360px;
+            height: 480px;
+            position: relative;
+            background: var(--shell-color, #6a5acd);
+            border-radius: 50% 50% 50% 50% / 60% 60% 45% 45%;
+            box-shadow: 
+                inset -10px -10px 30px rgba(0,0,0,0.3),
+                inset 10px 10px 30px rgba(255,255,255,0.2),
+                0 0 0 3px rgba(255,255,255,0.1),
+                0 40px 80px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 25px 55px 25px;
+            transition: background 0.5s ease;
+        }
+
+        .heart-decoration {
+            position: absolute;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .keychain-loop {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 55px; height: 55px; border-radius: 50%; 
+            border: 7px solid rgba(150,150,150,0.8);
+            z-index: 10; 
+            box-shadow: 
+                inset 0 3px 8px rgba(0,0,0,0.3),
+                0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .brand {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            font-weight: bold;
+            font-size: 28px;
+            letter-spacing: 3px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.3),
+                0 0 20px rgba(255,255,255,0.3);
+            transform: scaleY(0.85);
+            z-index: 5;
+        }
+
+        /* SCREEN BEZEL */
+        .screen-bezel {
+            background: linear-gradient(145deg, #e8e8e8, #f5f5f5);
+            width: 260px;
+            height: 260px;
+            border-radius: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                inset 3px 3px 8px rgba(0,0,0,0.12),
+                0 6px 15px rgba(0,0,0,0.2);
+            padding: 14px;
+            margin-bottom: 24px;
+            z-index: 5;
+        }
+
+        /* LCD SCREEN */
+        .lcd {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%);
+            border: 3px solid #7ab89d;
+            border-radius: 22px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: inset 4px 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .lcd::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* STATUS BARS */
+        .status-bars {
+            position: absolute;
+            top: 42px;
+            left: 5px;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 1px 3px;
+        }
+        .status-icon {
+            font-size: 10px;
+        }
+        .hearts-container {
+            display: flex;
+            gap: 1px;
+        }
+        .heart {
+            font-size: 9px;
+            filter: grayscale(100%);
+            opacity: 0.35;
+        }
+        .heart.filled {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
+        /* ICONS ROWS */
+        .icons-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 10px;
+            height: 38px;
+            z-index: 10;
+            position: relative;
+            background: rgba(255,255,255,0.15);
+        }
+        .icons-row.top { border-bottom: 2px solid rgba(255,255,255,0.3); }
+        .icons-row.bottom { border-top: 2px solid rgba(255,255,255,0.3); }
+
+        .icon {
+            font-size: 24px;
+            line-height: 28px;
+            opacity: 0.4;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            filter: grayscale(80%);
+        }
+        .icon:hover { transform: scale(1.2); filter: grayscale(0%); opacity: 0.8; }
+        .icon.active, .icon.selected { 
+            opacity: 1; 
+            filter: grayscale(0%); 
+            transform: scale(1.15);
+        }
+
+        /* MAIN GAME AREA */
+        .game-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            padding-top: 10px;
+        }
+
+        /* CREATURE SPRITE */
+        .creature {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* EGG */
+        .egg-container {
+            width: 65px;
+            height: 80px;
+            position: relative;
+            animation: eggWiggle 2s ease-in-out infinite;
+        }
+        @keyframes eggWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .egg {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 50%, #e0e0e0 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 
+                inset -5px -5px 15px rgba(0,0,0,0.1),
+                inset 5px 5px 15px rgba(255,255,255,0.8),
+                0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .egg::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 15px;
+            background: rgba(255,182,193,0.4);
+            border-radius: 50%;
+            top: 20%;
+            left: 30%;
+        }
+        .egg::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 18px;
+            background: rgba(173,216,230,0.4);
+            border-radius: 50%;
+            bottom: 25%;
+            right: 25%;
+        }
+
+        .egg.hatching {
+            animation: crack 0.8s ease-in-out forwards;
+        }
+        @keyframes crack {
+            0% { transform: scale(1); opacity: 1; }
+            20% { transform: scale(1.05) rotate(5deg); }
+            40% { transform: scale(0.95) rotate(-5deg); }
+            60% { transform: scale(1.05); opacity: 1; }
+            80% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* DEATH - Cercueil */
+        .dead-creature {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: death 1.5s ease-out;
+        }
+        @keyframes death {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(0.9) rotate(-5deg); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        /* CREATURE ANIMATIONS */
+        .bounce { animation: bounce 0.6s ease; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .move-left { animation: moveLeft 0.8s ease; }
+        @keyframes moveLeft {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-30px); }
+            100% { transform: translateX(0); }
+        }
+
+        .move-right { animation: moveRight 0.8s ease; }
+        @keyframes moveRight {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+            100% { transform: translateX(0); }
+        }
+
+        .happy { animation: happy 0.5s ease; }
+        @keyframes happy {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-10deg) scale(1.1); }
+            75% { transform: rotate(10deg) scale(1.1); }
+        }
+
+        .eating { animation: eating 1.2s ease; }
+        @keyframes eating {
+            0% { transform: translateX(0) scale(1); }
+            30% { transform: translateX(-15px) scale(1.05); }
+            50% { transform: translateX(-15px) scale(1.15); }
+            70% { transform: translateX(-15px) scale(1.05); }
+            100% { transform: translateX(0) scale(1); }
+        }
+
+        /* FOOD ITEM */
+        .food-item {
+            position: absolute;
+            left: 20px;
+            font-size: 32px;
+            animation: foodAppear 0.3s ease, foodEaten 1.2s ease 0.3s forwards;
+            z-index: 3;
+        }
+        @keyframes foodAppear {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes foodEaten {
+            0% { transform: scale(1); opacity: 1; }
+            60% { transform: scale(1); opacity: 1; }
+            80% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* POOP */
+        .poop-zone {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            display: flex;
+            gap: 4px;
+            z-index: 8;
+        }
+        .poop-sprite { 
+            position: relative;
+            font-size: 18px;
+        }
+
+        /* Fumée horizontale plus haute pour ne pas chevaucher le caca */
+        .poop-sprite.stinky::after {
+            content: '💨';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            font-size: 12px;
+            transform: rotate(-90deg);
+            animation: smoke 1s ease-in-out infinite;
+        }
+        @keyframes smoke {
+            0% { transform: translateX(-50%) rotate(-90deg); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(-15px) rotate(-90deg); opacity: 0; }
+        }
+
+        /* FLIES - Animation aller-retour vraiment fluide avec boucle parfaite */
+        .fly {
+            position: absolute;
+            font-size: 11px;
+            animation: flyAround 5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes flyAround {
+            0% { transform: translate(0px, 0px) rotate(0deg); }
+            12.5% { transform: translate(10px, -8px) rotate(45deg); }
+            25% { transform: translate(20px, -12px) rotate(90deg); }
+            37.5% { transform: translate(28px, -8px) rotate(135deg); }
+            50% { transform: translate(32px, 0px) rotate(180deg); }
+            62.5% { transform: translate(28px, -8px) rotate(225deg); }
+            75% { transform: translate(20px, -12px) rotate(270deg); }
+            87.5% { transform: translate(10px, -8px) rotate(315deg); }
+            100% { transform: translate(0px, 0px) rotate(360deg); }
+        }
+
+        /* TEXT OVERLAY - EN DESSOUS DE LA CRÉATURE */
+        .lcd-msg {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+            background: rgba(50,50,50,0.85);
+            backdrop-filter: blur(5px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: none;
+            z-index: 20;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+        .lcd-msg.show { display: block; }
+
+        /* STATS VIEW - Plus bas et légèrement à droite, sans cadre */
+        .stats-view {
+            display: none;
+            position: absolute;
+            top: 58%;
+            left: 52%;
+            transform: translate(-50%, -50%);
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 4px;
+            z-index: 12;
+        }
+        .stats-view.show { display: grid; }
+        .stats-view .stat-line { 
+            display: flex; 
+            justify-content: space-between; 
+            background: rgba(255,255,255,0.35);
+            padding: 2px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
+            font-size: 8.5px;
+            color: #2d3436;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        .stats-view .stat-line.full-width {
+            grid-column: 1 / -1;
+        }
+        .stats-view .stat-line strong { color: #0984e3; font-size: 8.5px; }
+        .stats-view .stat-line span { font-size: 8.5px; }
+
+        /* BUTTONS */
+        .buttons-area {
+            display: flex;
+            gap: 24px;
+            margin-top: auto;
+            z-index: 5;
+        }
+
+        .btn-group { position: relative; width: 48px; height: 48px; }
+
+        .phys-btn {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 5px 0 rgba(0,0,0,0.3), 
+                0 10px 15px rgba(0,0,0,0.25),
+                inset 0 -2px 8px rgba(0,0,0,0.2),
+                inset 0 2px 8px rgba(255,255,255,0.4);
+            transition: all 0.1s;
+            position: relative;
+            top: 0;
+        }
+        .phys-btn:hover { 
+            box-shadow: 
+                0 5px 0 rgba(0,0,0,0.3), 
+                0 10px 20px rgba(0,0,0,0.3),
+                inset 0 -2px 8px rgba(0,0,0,0.2),
+                inset 0 2px 8px rgba(255,255,255,0.5);
+        }
+        .phys-btn:active { 
+            top: 5px; 
+            box-shadow: 
+                0 0 0 rgba(0,0,0,0.3),
+                0 3px 8px rgba(0,0,0,0.3),
+                inset 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-yellow { background: radial-gradient(circle at 35% 35%, #ffe66d, #ffd93d); }
+        .btn-red { background: radial-gradient(circle at 35% 35%, #ff6b9d, #ff4757); }
+        .btn-blue { background: radial-gradient(circle at 35% 35%, #74b9ff, #0984e3); }
+
+        .btn-label {
+            position: absolute; 
+            bottom: -22px; 
+            width: 100%; 
+            text-align: center;
+            font-size: 10px; 
+            font-weight: bold; 
+            color: rgba(255,255,255,0.85); 
+            letter-spacing: 1.5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+    
+        /* ENCOUNTER SCREEN (inside LCD) */
+        .encounter-screen{display:none;position:absolute;inset:0;z-index:30;padding:8px;background:rgba(0,0,0,.15);}
+        .encounter-screen.show{display:block;}
+        .enc-card{position:absolute;inset:44px 8px 44px 8px;background:rgba(255,255,255,.58);border:2px solid rgba(255,255,255,.55);border-radius:14px;box-shadow:0 10px 22px rgba(0,0,0,.28);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;}
+        .enc-title{text-align:center;font-family:'Courier New',monospace;font-weight:900;font-size:12px;color:#2d3436;padding:8px 10px;background:rgba(255,255,255,.35);border-bottom:1px solid rgba(0,0,0,.06);}
+        .enc-row{flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;position:relative;}
+        .enc-side{width:86px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+        .enc-label{font-family:'Courier New',monospace;font-weight:900;font-size:9px;color:#2d3436;opacity:.9;}
+        .enc-creature{width:78px;height:78px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.20);border-radius:14px;overflow:hidden;}
+        .enc-mid{width:28px;text-align:center;font-weight:900;color:rgba(45,52,54,.85);font-family:'Courier New',monospace;}
+        .enc-choices{display:flex;gap:10px;padding:10px;background:rgba(255,255,255,.30);border-top:1px solid rgba(0,0,0,.06);}
+        .enc-btn{flex:1;padding:8px 0;border-radius:12px;font-weight:900;font-size:12px;text-align:center;background:rgba(209,213,219,.85);color:#2d3436;border:2px solid rgba(0,0,0,.10);transition:all .15s;user-select:none;}
+        .enc-btn.selected{border-color:#2d3436;transform:scale(1.02);box-shadow:0 6px 14px rgba(0,0,0,.22);color:#fff;}
+        .enc-btn.yes.selected{background:#22c55e;}
+        .enc-btn.no.selected{background:#ef4444;}
+        .enc-hint{font-family:'Courier New',monospace;font-size:9px;color:rgba(45,52,54,.85);padding:6px 10px;background:rgba(255,255,255,.28);border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;gap:8px;}
+        .enc-wait{text-align:right;font-weight:800;}
+        .heart-anim,.ball-anim{position:absolute;pointer-events:none;animation:floatUp 1.7s ease-out;}
+        .heart-anim{font-size:18px;}
+        .ball-anim{font-size:18px;}
+        @keyframes floatUp{0%{transform:translateY(0) scale(.3);opacity:0}30%{opacity:1}70%{transform:translateY(-30px) scale(1);opacity:1}100%{transform:translateY(-50px) scale(.6);opacity:0}}
+        .hug-move{animation:hugAnim .8s ease-in-out;}
+        @keyframes hugAnim{0%,100%{transform:translateX(0)}50%{transform:translateX(-10px)}}
+        .jump-play{animation:jumpAnim .5s ease-in-out infinite;}
+        @keyframes jumpAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+        /* FAMILY MODE */
+        .family-mode{position:absolute;inset:0;z-index:20;display:none;flex-direction:column;justify-content:center;align-items:center;background:rgba(255,255,255,.03);gap:10px;pointer-events:none;}
+        .family-mode.active{display:flex;}
+        .family-title{font-family:'Courier New',monospace;font-size:11px;font-weight:900;color:#2d3436;background:rgba(255,255,255,.45);padding:4px 10px;border-radius:8px;}
+        .family-row{display:flex;gap:16px;align-items:center;}
+        .family-member{display:flex;flex-direction:column;align-items:center;gap:6px;}
+        .family-creature{width:74px;height:74px;display:flex;align-items:center;justify-content:center;position:relative;}
+        .family-label{font-size:9px;font-weight:900;color:#2d3436;font-family:'Courier New',monospace;}
+        .priority-glow{animation:priorityGlow 1.5s ease-in-out infinite;}
+        @keyframes priorityGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25) drop-shadow(0 0 8px #ffd93d)}}
+
+        /* Pregnancy belly */
+        .pregnant-belly{position:absolute;bottom:18%;left:50%;transform:translateX(-50%);width:32px;height:24px;background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,.42),rgba(255,255,255,.12) 60%,transparent 70%);border-radius:50%;pointer-events:none;z-index:-1;}
+
+    </style>
+</head>
+<body>
+
+    <!-- HAMBURGER MENU -->
+    <div class="hamburger" onclick="toggleSysMenu()">
+        <div></div><div></div><div></div>
+    </div>
+    <div class="menu-dropdown" id="sysMenu">
+        <div class="menu-item" onclick="setShell('purple')">🟣 Violet</div>
+        <div class="menu-item" onclick="setShell('blue')">🔵 Bleu</div>
+        <div class="menu-item" onclick="setShell('pink')">💗 Rose</div>
+        <div class="menu-item" onclick="setShell('white')">⚪ Blanc</div>
+        <div class="menu-item" onclick="setShell('valentine')">💝 St-Valentin</div>
+        <div class="menu-item" onclick="saveData()">💾 Sauvegarder</div>
+        <label class="menu-item">📂 Charger <input type="file" onchange="loadData(this)"></label>
+        <div class="menu-item" onclick="resetData()">🔄 Recommencer</div>
+    </div>
+
+    <!-- DEVICE -->
+    <div class="device-container" id="device">
+        <div class="keychain-loop"></div>
+        <div class="brand">GOTCHI</div>
+
+        <div class="screen-bezel">
+            <div class="lcd" id="lcd">
+                <!-- Status Bars -->
+                <div class="status-bars" id="statusBars">
+                    <div class="status-bar">
+                        <span class="status-icon">🍖</span>
+                        <div class="hearts-container" id="hungerHearts"></div>
+                    </div>
+                    <div class="status-bar">
+                        <span class="status-icon">😊</span>
+                        <div class="hearts-container" id="happyHearts"></div>
+                    </div>
+                </div>
+
+                <!-- Top Icons Row -->
+                <div class="icons-row top">
+                    <div class="icon" id="i0">🍖</div>
+                    <div class="icon" id="i1">💡</div>
+                    <div class="icon" id="i2">🎮</div>
+                    <div class="icon" id="i3">💊</div>
+                </div>
+
+                <!-- Game Stage -->
+                <div class="game-stage" id="stage">
+                    <div class="lcd-msg" id="msg"></div>
+
+                    <!-- Stats View - Sans conteneur extérieur -->
+                    <div class="stats-view" id="statsView"></div>
+
+                    <!-- Normal View -->
+                    <div id="creatureContainer"></div>
+                    <div class="poop-zone" id="poopZone"></div>
+                    <div id="foodZone"></div>
+                </div>
+
+                
+                    <!-- ENCOUNTER SCREEN (LCD) -->
+                    <div class="encounter-screen" id="encounterScreen">
+                        <div class="enc-card">
+                            <div class="enc-title" id="encTitle">RENCONTRE !</div>
+                            <div class="enc-row" id="encRow">
+                                <div class="enc-side">
+                                    <div class="enc-label">Moi</div>
+                                    <div class="enc-creature" id="encMy"></div>
+                                </div>
+                                <div class="enc-mid">💫</div>
+                                <div class="enc-side">
+                                    <div class="enc-label">Ami</div>
+                                    <div class="enc-creature" id="encOther"></div>
+                                </div>
+                            </div>
+                            <div class="enc-choices">
+                                <div class="enc-btn yes" id="encYes">💚 OUI</div>
+                                <div class="enc-btn no" id="encNo">💔 NON</div>
+                            </div>
+                            <div class="enc-hint">
+                                <div>SELECT: choisir · DECIDE: valider · CANCEL: refuser</div>
+                                <div class="enc-wait" id="encWait"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAMILY MODE -->
+                    <div class="family-mode" id="familyMode">
+                        <div class="family-title">FAMILLE</div>
+                        <div class="family-row">
+                            <div class="family-member">
+                                <div class="family-label">Maman</div>
+                                <div class="family-creature" id="familyMom"></div>
+                            </div>
+                            <div class="family-member">
+                                <div class="family-label">Bébé</div>
+                                <div class="family-creature" id="familyBaby"></div>
+                            </div>
+                        </div>
+                    </div>
+<!-- Bottom Icons Row -->
+                <div class="icons-row bottom">
+                    <div class="icon" id="i4">🚿</div>
+                    <div class="icon" id="i5">📊</div>
+                    <div class="icon" id="i6">📖</div>
+                    <div class="icon" id="i7">⚠️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons-area">
+            <div class="btn-group">
+                <button class="phys-btn btn-yellow" onclick="btnA()"></button>
+                <div class="btn-label">SELECT</div>
+            </div>
+            <div class="btn-group">
+                <button class="phys-btn btn-red" onclick="btnB()"></button>
+                <div class="btn-label">DECIDE</div>
+            </div>
+            <div class="btn-group">
+                <button class="phys-btn btn-blue" onclick="btnC()"></button>
+                <div class="btn-label">CANCEL</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// STATE
+        const STATE = {
+            stage: 'egg',
+            speciesLine: null,
+            gender: null,
+            birth: Date.now(),
+            hunger: 4,
+            happy: 4,
+            weight: 5,
+            poops: 0,
+            poopTime: null,
+            sick: false,
+            sickTime: null,
+            lightOn: true,
+            menuIdx: -1,
+            lastAnim: Date.now(),
+            lastPoopIncrease: Date.now(),
+            dead: false,
+            showingStats: false,
+            lastPoopCount: -1  // -1 pour forcer le premier rendu
+        };
+  // Extensions
+  STATE.pregnant = false; STATE.pregnancyStart = null; STATE.mate = null;
+  STATE.family = STATE.family || { hasBaby: false, baby: null, momDead: false };
+
+  // Network
+  let NETWORK_ENABLED = (localStorage.getItem('gotchi_network_enabled') !== '0');
+  const API_BASE = 'https://gotchi.sicho95.workers.dev';
+  let playerId = null; let currentPosition = null; let presenceInterval = null;
+  let lastSuggestedId = null; let lastSuggestedAt = 0;
+
+  // Encounter
+  let inEncounter = false;
+  let encounterChoice = 'yes';
+  let currentEncounter = null;
+  let encounterPollInterval = null;
+  let encounterLocked = false;
+
+  function initNetworking() {
+    playerId = localStorage.getItem('gotchi_player_id') || crypto.randomUUID();
+    localStorage.setItem('gotchi_player_id', playerId);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => { currentPosition = { lat: pos.coords.latitude, lon: pos.coords.longitude }; },
+        () => {}, { timeout: 5000, enableHighAccuracy: true }
+      );
+    }
+    setTimeout(() => pushPresence(), 900);
+    if (presenceInterval) clearInterval(presenceInterval);
+    presenceInterval = setInterval(() => pushPresence(), 3 * 60 * 1000);
+  }
+
+  async function pushPresence() {
+    if (!NETWORK_ENABLED || !playerId || inEncounter) return;
+    const gotchi = {
+      id: 'main', stage: STATE.stage, speciesLine: STATE.speciesLine, gender: STATE.gender,
+      ageSeconds: Math.floor((Date.now() - STATE.birth) / 1000), hunger: STATE.hunger, happy: STATE.happy
+    };
+    try {
+      const res = await fetch(`${API_BASE}/presence/update`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId, gotchi, status: 'playing', position: currentPosition })
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.suggestedFriend?.encounterId && !inEncounter) {
+        const otherId = data.suggestedFriend.playerId;
+        const now = Date.now();
+        if (otherId === lastSuggestedId && (now - lastSuggestedAt < 90000)) return;
+        lastSuggestedId = otherId; lastSuggestedAt = now;
+        currentEncounter = {
+          id: data.suggestedFriend.encounterId, otherPlayerId: otherId,
+          otherGotchi: data.suggestedFriend.gotchi, myGotchi: gotchi
+        };
+        startEncounterUI();
+      }
+    } catch (e) {}
+  }
+
+  function updateEncounterChoiceDisplay() {
+    const yesBtn = document.getElementById('encYes');
+    const noBtn = document.getElementById('encNo');
+    if (encounterChoice === 'yes') {
+      yesBtn?.classList.add('selected'); noBtn?.classList.remove('selected');
+    } else {
+      yesBtn?.classList.remove('selected'); noBtn?.classList.add('selected');
+    }
+  }
+
+  function getCreatureSVGFromTraits(traits) {
+    const backup = { stage: STATE.stage, speciesLine: STATE.speciesLine, gender: STATE.gender, hunger: STATE.hunger, happy: STATE.happy, sick: STATE.sick, dead: STATE.dead };
+    if (typeof traits.stage !== 'undefined') STATE.stage = traits.stage;
+    if (typeof traits.speciesLine !== 'undefined') STATE.speciesLine = traits.speciesLine;
+    if (typeof traits.gender !== 'undefined') STATE.gender = traits.gender;
+    if (typeof traits.hunger !== 'undefined') STATE.hunger = traits.hunger;
+    if (typeof traits.happy !== 'undefined') STATE.happy = traits.happy;
+    if (typeof traits.sick !== 'undefined') STATE.sick = traits.sick;
+    if (typeof traits.dead !== 'undefined') STATE.dead = traits.dead;
+    let svg = ''; try { svg = getCreatureSVG(); } catch (e) { svg = ''; }
+    STATE.stage = backup.stage; STATE.speciesLine = backup.speciesLine; STATE.gender = backup.gender; STATE.hunger = backup.hunger; STATE.happy = backup.happy; STATE.sick = backup.sick; STATE.dead = backup.dead;
+    return svg || '';
+  }
+
+  function renderEncounterCreatures() {
+    const myDiv = document.getElementById('encMy');
+    const otherDiv = document.getElementById('encOther');
+    if (!myDiv || !otherDiv || !currentEncounter) return;
+    myDiv.innerHTML = getCreatureSVGFromTraits({
+      stage: currentEncounter.myGotchi.stage, speciesLine: currentEncounter.myGotchi.speciesLine, gender: currentEncounter.myGotchi.gender,
+      hunger: currentEncounter.myGotchi.hunger, happy: currentEncounter.myGotchi.happy, sick: STATE.sick, dead: false
+    });
+    otherDiv.innerHTML = getCreatureSVGFromTraits({
+      stage: currentEncounter.otherGotchi.stage, speciesLine: currentEncounter.otherGotchi.speciesLine, gender: currentEncounter.otherGotchi.gender,
+      hunger: currentEncounter.otherGotchi.hunger, happy: currentEncounter.otherGotchi.happy, sick: false, dead: false
+    });
+  }
+
+  function startEncounterUI() {
+    inEncounter = true; encounterLocked = false; encounterChoice = 'yes'; STATE.menuIdx = -1;
+    document.getElementById('encounterScreen')?.classList.add('show');
+    document.getElementById('encTitle').textContent = 'RENCONTRE !';
+    document.getElementById('encWait').textContent = '';
+    renderEncounterCreatures(); updateEncounterChoiceDisplay();
+  }
+
+  function endEncounterUI() {
+    document.getElementById('encounterScreen')?.classList.remove('show');
+    inEncounter = false; encounterLocked = false; currentEncounter = null; render();
+  }
+
+  async function validateEncounterChoice() {
+    if (!currentEncounter || encounterLocked) return;
+    encounterLocked = true; document.getElementById('encWait').textContent = 'Attente...';
+    try {
+      await fetch(`${API_BASE}/encounter/answer`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId, encounterId: currentEncounter.id, answer: encounterChoice })
+      });
+    } catch (e) {}
+    startEncounterPolling();
+  }
+
+  function startEncounterPolling() {
+    if (encounterPollInterval) clearInterval(encounterPollInterval);
+    encounterPollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`${API_BASE}/encounter/status`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ encounterId: currentEncounter.id })
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data?.encounter || data.encounter.status === 'pending') return;
+        clearInterval(encounterPollInterval); encounterPollInterval = null;
+        document.getElementById('encWait').textContent = '';
+        document.getElementById('encTitle').textContent = (data.encounter.status === 'matched') ? 'OK !' : 'Refus...';
+        await new Promise(r => setTimeout(r, 700));
+        await playEncounterResult(data.encounter);
+        endEncounterUI();
+      } catch (e) {}
+    }, 900);
+  }
+
+  function spawnFx(container, emoji, cls) {
+    const el = document.createElement('div'); el.className = cls; el.textContent = emoji;
+    el.style.left = (42 + Math.random() * 16) + '%'; el.style.top = (54 + Math.random() * 8) + '%';
+    container.appendChild(el); setTimeout(() => el.remove(), 1750);
+  }
+
+  async function playEncounterResult(enc) {
+     if (enc.status === 'declined') { return; }
+     const matchType = enc.matchType || 'friendship';
+     if (matchType === 'love') {
+        document.getElementById('encTitle').textContent = 'AMOUR';
+        await playLoveAnimation();
+        if (STATE.gender === 'female') {
+           STATE.pregnant = true; STATE.pregnancyStart = Date.now();
+           STATE.mate = { speciesLine: currentEncounter.otherGotchi.speciesLine, gender: currentEncounter.otherGotchi.gender };
+           uiMsg('💕 Enceinte !');
+        }
+        STATE.happy = Math.min(5, STATE.happy + 1);
+     } else {
+        document.getElementById('encTitle').textContent = 'AMITIE';
+        await playFriendshipAnimation();
+        STATE.happy = Math.min(5, STATE.happy + 1);
+     }
+  }
+  async function playLoveAnimation() {
+     const row = document.getElementById('encRow'); const myC = document.getElementById('encMy'); const othC = document.getElementById('encOther');
+     myC?.classList.add('hug-move'); othC?.classList.add('hug-move');
+     for(let i=0;i<7;i++){ spawnFx(row, '💕', 'heart-anim'); await sleep(200); }
+     await sleep(550); myC?.classList.remove('hug-move'); othC?.classList.remove('hug-move');
+  }
+  async function playFriendshipAnimation() {
+     const row = document.getElementById('encRow'); const myC = document.getElementById('encMy'); const othC = document.getElementById('encOther');
+     myC?.classList.add('jump-play'); othC?.classList.add('jump-play');
+     for(let i=0;i<5;i++){ spawnFx(row, '⚽', 'ball-anim'); await sleep(240); }
+     await sleep(650); myC?.classList.remove('jump-play'); othC?.classList.remove('jump-play');
+  }
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Family helpers
+  function ensureBaby() {
+    if (!STATE.family) STATE.family = { hasBaby: false, baby: null, momDead: false };
+    if (!STATE.family.hasBaby) return;
+    if (!STATE.family.baby) {
+      STATE.family.baby = { stage: 'egg', speciesLine: STATE.speciesLine || 'Bubbly', gender: Math.random()<.5?'male':'female', birth: Date.now(), hunger: 4, happy: 4, weight: 3, sick: false, dead: false };
+    }
+  }
+  function layFamilyEgg() {
+    STATE.family = { hasBaby: true, baby: null, momDead: false }; ensureBaby();
+    const momLine = STATE.speciesLine; const dadLine = STATE.mate?.speciesLine || null;
+    const pick = [momLine, dadLine].filter(Boolean);
+    STATE.family.baby.speciesLine = pick.length ? pick[Math.floor(Math.random() * pick.length)] : (Math.random()<.5?'Bubbly':'Fluffy');
+    STATE.pregnant = false; STATE.pregnancyStart = null; STATE.mate = null;
+    uiMsg('🥚 Œuf pondu !'); render();
+  }
+  function hatchFamilyEgg() {
+    ensureBaby(); if (!STATE.family.baby || STATE.family.baby.stage !== 'egg') return;
+    STATE.family.baby.stage = 'baby'; STATE.family.baby.birth = Date.now();
+    uiMsg('🐣 Bébé né !'); render();
+  }
+  function familyStageFromAge(ageSec) { if (ageSec<60)return 'baby'; if(ageSec<180)return 'child'; if(ageSec<360)return 'teen'; return 'adult'; }
+  function updateFamilyNeeds() {
+    if (!STATE.family?.hasBaby) return; ensureBaby(); const b = STATE.family.baby; if (!b || b.dead) return;
+    if (b.stage === 'egg' && (Date.now() - b.birth >= 30000)) hatchFamilyEgg();
+    if (b.stage !== 'egg') { b.stage = familyStageFromAge(Math.floor((Date.now() - b.birth) / 1000)); }
+    if (b.stage !== 'egg') { if(Math.random()<.015) b.hunger = Math.max(0,b.hunger-1); if(Math.random()<.015) b.happy = Math.max(0,b.happy-1); }
+    const die = (b.hunger <= 0) || (b.happy <= 0);
+    if (die && !STATE.family.momDead) { STATE.family.momDead = true; STATE.dead = true; uiMsg('💔 Maman se sacrifie...'); b.hunger=Math.max(1,b.hunger); b.happy=Math.max(1,b.happy); }
+    else if (die && STATE.family.momDead) { b.dead = true; uiMsg('💔 Bébé...'); }
+  }
+  function renderFamilyUI() {
+    const fm = document.getElementById('familyMode'); if (!fm) return;
+    if (STATE.family?.hasBaby && STATE.family.baby) {
+      fm.classList.add('active');
+      const momDiv = document.getElementById('familyMom'); const babyDiv = document.getElementById('familyBaby');
+      momDiv.innerHTML = (STATE.family.momDead || STATE.dead) ? '<div style=\"font-size:44px;\">💀</div>' : getCreatureSVG();
+      const b = STATE.family.baby;
+      if (b.dead) babyDiv.innerHTML = '<div style=\"font-size:38px;\">💀</div>';
+      else babyDiv.innerHTML = getCreatureSVGFromTraits({ stage: b.stage, speciesLine: b.speciesLine, gender: b.gender, hunger: b.hunger, happy: b.happy, sick: b.sick, dead: false });
+      const needs = (b.hunger <= 1) || (b.happy <= 1);
+      babyDiv?.classList.toggle('priority-glow', needs && !b.dead);
+    } else { fm.classList.remove('active'); }
+  }
+  function renderWrapped() {
+     if(typeof render !== 'undefined') {
+        const _r = render;
+        render = function() {
+           _r();
+           if (STATE.pregnant && STATE.stage !== 'egg' && !STATE.dead) {
+              const c = document.getElementById('creatureContainer');
+              if (c && !c.querySelector('.pregnant-belly')) { const d=document.createElement('div'); d.className='pregnant-belly'; c.appendChild(d); }
+           }
+           renderFamilyUI();
+        }
+     }
+  }
+
+  // NUCLEAR OPTION: FIX BUTTONS
+  function fixButtons() {
+    const ids = ['btnA', 'btnB', 'btnC'];
+    const handlers = {
+      'btnA': () => { if(inEncounter && !encounterLocked){ encounterChoice=(encounterChoice==='yes'?'no':'yes'); updateEncounterChoiceDisplay(); return; } if(typeof btnA==='function') btnA(); },
+      'btnB': () => { if(inEncounter){ validateEncounterChoice(); return; } if(typeof btnB==='function') btnB(); },
+      'btnC': () => { if(inEncounter){ encounterChoice='no'; updateEncounterChoiceDisplay(); validateEncounterChoice(); return; } if(typeof btnC==='function') btnC(); }
+    };
+    ids.forEach(id => {
+      const oldEl = document.getElementById(id);
+      if (!oldEl) return;
+      const newEl = oldEl.cloneNode(true);
+      oldEl.parentNode.replaceChild(newEl, oldEl);
+      const h = (e) => {
+         e.preventDefault(); e.stopPropagation();
+         if(navigator.vibrate) navigator.vibrate(5);
+         newEl.classList.add('pressed'); setTimeout(()=>newEl.classList.remove('pressed'),150);
+         handlers[id]();
+      };
+      newEl.addEventListener('touchstart', h, {passive:false});
+      newEl.addEventListener('click', h);
+    });
+  }
+
+  // Feed/play baby priority wrapper
+  function wrapDoAction() {
+     const _da = doAction;
+     doAction = function(idx) {
+        const FEED_IDX=0; const PLAY_IDX=2;
+        if (STATE.family?.hasBaby && STATE.family.baby && !STATE.family.baby.dead && !STATE.family.momDead) {
+           const b = STATE.family.baby;
+           if (idx===FEED_IDX && b.stage!=='egg' && b.hunger<5) { b.hunger=Math.min(5,b.hunger+1); b.weight=(b.weight||3)+0.3; uiMsg('🍼 Bébé nourri'); render(); setTimeout(()=>pushPresence(),250); return; }
+           if (idx===PLAY_IDX && b.stage!=='egg' && b.happy<5) { b.happy=Math.min(5,b.happy+1); uiMsg('🎮 Bébé joue'); render(); setTimeout(()=>pushPresence(),250); return; }
+        }
+        _da(idx); setTimeout(()=>pushPresence(),250);
+     }
+  }
+
+
+        let msgTimeout = null;
+
+        // INIT
+        const saved = localStorage.getItem('gotchi_modern');
+        if(saved) {
+            try {
+                Object.assign(STATE, JSON.parse(saved));
+                STATE.lastPoopCount = -1;  // Force le rendu initial
+            } catch(e) {
+                console.error('Erreur chargement save:', e);
+            }
+        }
+
+        // GAME LOOP
+        setInterval(() => {
+            if(STATE.dead) return;
+
+            const now = Date.now();
+            const age = (now - STATE.birth) / 1000;
+
+            // EVOLUTION
+            if(STATE.stage === 'egg' && age > 15) {
+                hatchEgg();
+            } else if(STATE.stage === 'baby' && age > 45) {
+                evolve('child');
+            } else if(STATE.stage === 'child' && age > 90) {
+                evolve('teen');
+            } else if(STATE.stage === 'teen' && age > 150) {
+                evolve('adult');
+            }
+
+            // NEEDS
+            if(STATE.stage !== 'egg') {
+                if(Math.random() < 0.015) STATE.hunger = Math.max(0, STATE.hunger - 1);
+                if(Math.random() < 0.015) STATE.happy = Math.max(0, STATE.happy - 1);
+
+                const timeSinceLastPoop = now - STATE.lastPoopIncrease;
+                if(Math.random() < 0.008 && timeSinceLastPoop > 15000 && STATE.poops < 5) {
+                    STATE.poops++;
+                    STATE.lastPoopIncrease = now;
+                    if(!STATE.poopTime) STATE.poopTime = now;
+                }
+
+                if((STATE.hunger <= 1 || STATE.poops >= 4) && !STATE.sick) {
+                    STATE.sick = true;
+                    STATE.sickTime = now;
+                    uiMsg("🤒 Malade!");
+                }
+
+                const sickDuration = STATE.sickTime ? (now - STATE.sickTime) / 1000 : 0;
+                if((STATE.sick && sickDuration > 120) || (STATE.hunger === 0 && age > 60) || STATE.poops >= 5) {
+                    die();
+                }
+            }
+
+            if(STATE.stage !== 'egg' && !STATE.dead && now - STATE.lastAnim > 8000 && Math.random() < 0.3) {
+                randomAnimation();
+                STATE.lastAnim = now;
+            }
+
+            render();
+            localStorage.setItem('gotchi_modern', JSON.stringify(STATE));
+        }, 1000);
+
+        function hatchEgg() {
+            const egg = document.querySelector('.egg');
+            if(egg) {
+                egg.classList.add('hatching');
+                setTimeout(() => {
+                    STATE.stage = 'baby';
+                    STATE.speciesLine = Math.random() < 0.5 ? 'Bubbly' : 'Fluffy';
+                    STATE.gender = Math.random() < 0.5 ? 'male' : 'female';
+                    uiMsg("🐣 Éclosion!");
+                    render();
+                }, 800);
+            }
+        }
+
+        function evolve(newStage) {
+            STATE.stage = newStage;
+            uiMsg("✨ Évolution!");
+        }
+
+        function die() {
+            STATE.dead = true;
+            uiMsg("💀 Décédé...");
+        }
+
+        function randomAnimation() {
+            const container = document.getElementById('creatureContainer');
+            const anims = ['bounce', 'move-left', 'move-right', 'happy'];
+            const anim = anims[Math.floor(Math.random() * anims.length)];
+            container.classList.add(anim);
+            setTimeout(() => container.classList.remove(anim), 1000);
+        }
+
+        // RENDER
+        function render() {
+            const container = document.getElementById('creatureContainer');
+            const statsView = document.getElementById('statsView');
+
+            renderHearts();
+
+            if(STATE.showingStats) {
+                statsView.classList.add('show');
+                container.style.display = 'none';
+            } else {
+                statsView.classList.remove('show');
+                container.style.display = 'block';
+            }
+
+            if(STATE.dead) {
+                container.innerHTML = `<div class="dead-creature">
+                    <svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Croix -->
+                        <rect x="52" y="5" width="16" height="50" rx="2" fill="#8b7355" opacity="0.9"/>
+                        <rect x="40" y="20" width="40" height="16" rx="2" fill="#8b7355" opacity="0.9"/>
+
+                        <!-- RIP texte -->
+                        <text x="60" y="72" font-size="18" font-weight="bold" fill="#fff" text-anchor="middle" font-family="serif">RIP</text>
+
+                        <!-- Cercueil -->
+                        <path d="M 35 80 L 25 100 L 25 130 Q 25 135 30 135 L 90 135 Q 95 135 95 130 L 95 100 L 85 80 Z" 
+                              fill="#654321" stroke="#4a3017" stroke-width="2"/>
+
+                        <!-- Détails cercueil -->
+                        <rect x="50" y="95" width="20" height="30" rx="2" fill="#8b6914" opacity="0.4"/>
+                        <circle cx="45" cy="90" r="3" fill="#ffd700"/>
+                        <circle cx="75" cy="90" r="3" fill="#ffd700"/>
+                        <circle cx="45" cy="120" r="3" fill="#ffd700"/>
+                        <circle cx="75" cy="120" r="3" fill="#ffd700"/>
+
+                        <!-- Poignées -->
+                        <ellipse cx="32" cy="105" rx="4" ry="6" fill="#c0c0c0"/>
+                        <ellipse cx="88" cy="105" rx="4" ry="6" fill="#c0c0c0"/>
+                    </svg>
+                </div>`;
+            } else if(STATE.stage === 'egg') {
+                container.innerHTML = `
+                    <div class="egg-container">
+                        <div class="egg"></div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="creature">${getCreatureSVG()}</div>`;
+            }
+
+            for(let i=0; i<8; i++) {
+                const el = document.getElementById('i'+i);
+                el.classList.remove('selected', 'active');
+                if(STATE.menuIdx === i) el.classList.add('selected');
+            }
+
+            if(STATE.hunger < 2 || STATE.happy < 2 || STATE.poops > 2 || STATE.sick) {
+                document.getElementById('i7').classList.add('active');
+            }
+
+            renderPoops();
+
+            document.getElementById('lcd').style.background = STATE.lightOn 
+                ? 'linear-gradient(135deg, #a8d5ba 0%, #8bc4aa 100%)' 
+                : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)';
+        }
+
+        function renderHearts() {
+            const hungerContainer = document.getElementById('hungerHearts');
+            const happyContainer = document.getElementById('happyHearts');
+
+            hungerContainer.innerHTML = '';
+            happyContainer.innerHTML = '';
+
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('span');
+                h.className = 'heart';
+                h.innerText = '❤️';
+                if(i < STATE.hunger) h.classList.add('filled');
+                hungerContainer.appendChild(h);
+            }
+
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('span');
+                h.className = 'heart';
+                h.innerText = '💛';
+                if(i < STATE.happy) h.classList.add('filled');
+                happyContainer.appendChild(h);
+            }
+        }
+
+        function renderPoops() {
+            const pZone = document.getElementById('poopZone');
+
+            const now = Date.now();
+            const poopAge = STATE.poopTime ? (now - STATE.poopTime) / 1000 : 0;
+            const needFlies = poopAge > 60 && STATE.poops >= 3;
+
+            // FIX CRITIQUE : Si STATE.poops = 0, TOUJOURS vider la zone
+            if(STATE.poops === 0) {
+                pZone.innerHTML = '';
+                STATE.lastPoopCount = 0;
+                return;
+            }
+
+            // OPTIMISATION : Ne recréer que si le nombre de poops a changé
+            if(STATE.lastPoopCount !== STATE.poops) {
+                pZone.innerHTML = '';
+
+                // Créer les poops
+                for(let i=0; i<STATE.poops; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'poop-sprite';
+                    if(poopAge > 30) p.classList.add('stinky');
+                    p.innerText = '💩';
+                    pZone.appendChild(p);
+                }
+
+                STATE.lastPoopCount = STATE.poops;
+            } else {
+                // Juste mettre à jour les classes stinky
+                const poops = pZone.querySelectorAll('.poop-sprite');
+                poops.forEach(p => {
+                    if(poopAge > 30) {
+                        p.classList.add('stinky');
+                    } else {
+                        p.classList.remove('stinky');
+                    }
+                });
+            }
+
+            // Gérer les mouches séparément
+            const existingFlies = pZone.querySelectorAll('.fly');
+
+            if(needFlies && existingFlies.length === 0) {
+                // Créer les mouches SEULEMENT si elles n'existent pas
+                const flyPositions = [
+                    { left: 5, top: -25, delay: 0 },
+                    { left: 18, top: -18, delay: 1.7 },
+                    { left: 30, top: -22, delay: 3.3 }
+                ];
+
+                flyPositions.forEach(pos => {
+                    const fly = document.createElement('div');
+                    fly.className = 'fly';
+                    fly.innerText = '🪰';
+                    fly.style.left = pos.left + 'px';
+                    fly.style.top = pos.top + 'px';
+                    fly.style.animationDelay = pos.delay + 's';
+                    pZone.appendChild(fly);
+                });
+            } else if(!needFlies && existingFlies.length > 0) {
+                // Supprimer les mouches si plus nécessaires
+                existingFlies.forEach(fly => fly.remove());
+            }
+        }
+
+        function getCreatureSVG() {
+            const genderColor = STATE.gender === 'male' ? '#74b9ff' : '#ff6b9d';
+            const secondaryColor = STATE.speciesLine === 'Bubbly' ? '#a29bfe' : '#ffeaa7';
+
+            const sickTint = STATE.sick ? 'filter: hue-rotate(80deg) saturate(0.7);' : '';
+            const mouthPath = STATE.sick 
+                ? 'M 38 56 Q 42 59 45 56 Q 48 59 52 56'
+                : STATE.happy <= 1
+                ? 'M 38 56 Q 45 52 52 56'
+                : 'M 38 56 Q 45 60 52 56';
+
+            if(STATE.stage === 'baby') {
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="50" rx="28" ry="26" fill="${secondaryColor}"/>
+                    <circle cx="38" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="52" cy="45" r="5" fill="#2d3436"/>
+                    <circle cx="39.5" cy="44" r="2" fill="#fff"/>
+                    <circle cx="53.5" cy="44" r="2" fill="#fff"/>
+                    <path d="${mouthPath}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="30" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+                    <ellipse cx="60" cy="52" rx="4" ry="3" fill="#ff9999" opacity="0.6"/>
+                    ${STATE.gender === 'female' ? '<ellipse cx="45" cy="28" rx="8" ry="5" fill="#ff6b9d" opacity="0.5"/>' : '<rect x="42" y="25" width="6" height="8" rx="3" fill="#74b9ff" opacity="0.5"/>'}
+                </svg>`;
+            }
+
+            if(STATE.stage === 'child') {
+                const hairLength = STATE.gender === 'female' ? 18 : 10;
+                const childMouth = STATE.sick 
+                    ? 'M 38 58 Q 42 61 45 58 Q 48 61 52 58'
+                    : STATE.happy <= 1
+                    ? 'M 38 58 Q 45 54 52 58'
+                    : 'M 38 58 Q 45 62 52 58';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="52" rx="26" ry="24" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="52" rx="22" ry="20" fill="${secondaryColor}" opacity="0.6"/>
+                    ${STATE.gender === 'female' 
+                        ? `<ellipse cx="38" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
+                           <ellipse cx="52" cy="28" rx="6" ry="${hairLength}" fill="#2d3436" opacity="0.8"/>
+                           <circle cx="38" cy="${28-hairLength+3}" r="4" fill="#ff6b9d"/>`
+                        : `<rect x="40" y="22" width="10" height="${hairLength}" rx="5" fill="#2d3436" opacity="0.8"/>`
+                    }
+                    <circle cx="38" cy="48" r="4.5" fill="#2d3436"/>
+                    <circle cx="52" cy="48" r="4.5" fill="#2d3436"/>
+                    <circle cx="39" cy="47" r="2" fill="#fff"/>
+                    <circle cx="53" cy="47" r="2" fill="#fff"/>
+                    <path d="${childMouth}" stroke="#2d3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="32" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="58" cy="52" rx="5" ry="4" fill="#ff9999" opacity="0.7"/>
+                    <circle cx="35" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
+                    <circle cx="55" cy="40" r="2" fill="${secondaryColor}" opacity="0.8"/>
+                </svg>`;
+            }
+
+            if(STATE.stage === 'teen') {
+                const teenMouth = STATE.sick 
+                    ? 'M 35 62 Q 40 66 45 62 Q 50 66 55 62'
+                    : STATE.happy <= 1
+                    ? 'M 35 62 Q 45 58 55 62'
+                    : 'M 35 62 Q 45 69 55 62';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="54" rx="30" ry="28" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="54" rx="25" ry="23" fill="${secondaryColor}" opacity="0.5"/>
+                    ${STATE.gender === 'female'
+                        ? `<path d="M 22 38 Q 28 25 35 38" fill="#2d3436"/>
+                           <path d="M 55 38 Q 62 25 68 38" fill="#2d3436"/>
+                           <ellipse cx="28" cy="30" rx="5" ry="10" fill="#2d3436" opacity="0.8"/>
+                           <ellipse cx="62" cy="30" rx="5" ry="10" fill="#2d3436" opacity="0.8"/>`
+                        : `<rect x="28" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>
+                           <rect x="54" y="28" width="8" height="12" fill="#2d3436" rx="4" opacity="0.8"/>`
+                    }
+                    <circle cx="36" cy="50" r="5" fill="#2d3436"/>
+                    <circle cx="54" cy="50" r="5" fill="#2d3436"/>
+                    <circle cx="37.5" cy="49" r="2.5" fill="#fff"/>
+                    <circle cx="55.5" cy="49" r="2.5" fill="#fff"/>
+                    <path d="${teenMouth}" stroke="#2d3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="28" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="62" cy="55" rx="6" ry="5" fill="#ff9999" opacity="0.7"/>
+                </svg>`;
+            }
+
+            if(STATE.stage === 'adult') {
+                const adultMouth = STATE.sick 
+                    ? 'M 33 65 Q 39 70 45 65 Q 51 70 57 65'
+                    : STATE.happy <= 1
+                    ? 'M 33 65 Q 45 61 57 65'
+                    : 'M 33 65 Q 45 73 57 65';
+                return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" style="${sickTint}">
+                    <ellipse cx="45" cy="55" rx="32" ry="30" fill="${genderColor}"/>
+                    <ellipse cx="45" cy="55" rx="28" ry="26" fill="${secondaryColor}" opacity="0.4"/>
+                    ${STATE.gender === 'male'
+                        ? `<polygon points="38,18 45,8 52,18 50,22 40,22" fill="#ffd700"/>
+                           <circle cx="45" cy="15" r="3" fill="#ff6b6b"/>`
+                        : `<ellipse cx="30" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
+                           <ellipse cx="60" cy="22" rx="10" ry="12" fill="#ff6b9d" opacity="0.7"/>
+                           <polygon points="35,20 45,10 55,20 52,25 38,25" fill="#ffd700"/>`
+                    }
+                    <circle cx="35" cy="50" r="6" fill="#2d3436"/>
+                    <circle cx="55" cy="50" r="6" fill="#2d3436"/>
+                    <circle cx="37" cy="49" r="3" fill="#fff"/>
+                    <circle cx="57" cy="49" r="3" fill="#fff"/>
+                    <path d="${adultMouth}" stroke="#2d3436" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="26" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
+                    <ellipse cx="64" cy="56" rx="7" ry="6" fill="#ff9999" opacity="0.7"/>
+                    <circle cx="38" cy="40" r="2.5" fill="${secondaryColor}"/>
+                    <circle cx="52" cy="40" r="2.5" fill="${secondaryColor}"/>
+                </svg>`;
+            }
+        }
+
+        // INPUTS
+        function btnA() {
+            if(STATE.stage === 'egg' || STATE.dead) return;
+            STATE.menuIdx = (STATE.menuIdx === -1) ? 0 : (STATE.menuIdx + 1) % 8;
+            render();
+        }
+
+        function btnB() {
+            if(STATE.stage === 'egg' || STATE.dead) return;
+            if(STATE.menuIdx === -1) {
+                // No action
+            } else {
+                doAction(STATE.menuIdx);
+            }
+        }
+
+        function btnC() {
+            STATE.menuIdx = -1;
+            STATE.showingStats = false;
+            render();
+        }
+
+        function doAction(idx) {
+            const container = document.getElementById('creatureContainer');
+
+            switch(idx) {
+                case 0: // Feed
+                    showFood('🍖');
+                    container.classList.add('eating');
+                    setTimeout(() => container.classList.remove('eating'), 1200);
+                    uiMsg("Miam!");
+                    STATE.hunger = Math.min(5, STATE.hunger + 1);
+                    STATE.weight++;
+                    break;
+                case 1: // Light
+                    STATE.lightOn = !STATE.lightOn;
+                    uiMsg(STATE.lightOn ? "Lumière ON" : "Lumière OFF");
+                    break;
+                case 2: // Game
+                    container.classList.add('happy');
+                    setTimeout(() => container.classList.remove('happy'), 500);
+                    uiMsg("Youpi!");
+                    STATE.happy = Math.min(5, STATE.happy + 1);
+                    STATE.weight = Math.max(1, STATE.weight - 1);
+                    break;
+                case 3: // Meds
+                    if(STATE.sick) { 
+                        STATE.sick = false;
+                        STATE.sickTime = null;
+                        uiMsg("Guéri!"); 
+                    } else {
+                        uiMsg("Ça va");
+                    }
+                    break;
+                case 4: // Clean
+                    STATE.poops = 0;
+                    STATE.poopTime = null;
+                    STATE.lastPoopCount = -1;  // Force un re-rendu complet
+                    uiMsg("Propre!");
+                    render();  // Forcer un rendu immédiat
+                    break;
+                case 5: // Stats
+                    showStats();
+                    break;
+                case 6: // About
+                    uiMsg("Gotchi v3.4");
+                    break;
+                case 7: // Attention
+                    let issues = [];
+                    if(STATE.hunger < 2) issues.push("Faim");
+                    if(STATE.happy < 2) issues.push("Triste");
+                    if(STATE.poops > 2) issues.push("Sale");
+                    if(STATE.sick) issues.push("Malade");
+                    uiMsg(issues.length ? "⚠️ " + issues.join(", ") : "✅ OK");
+                    break;
+            }
+            STATE.menuIdx = -1;
+            render();
+        }
+
+        function showFood(emoji) {
+            const zone = document.getElementById('foodZone');
+            zone.innerHTML = `<div class="food-item">${emoji}</div>`;
+            setTimeout(() => zone.innerHTML = '', 1500);
+        }
+
+        function showStats() {
+            const age = Math.floor((Date.now() - STATE.birth) / 60000);
+            const statsView = document.getElementById('statsView');
+
+            const speciesInfo = STATE.speciesLine || 'Œuf';
+            const genderIcon = STATE.gender === 'male' ? '♂️' : STATE.gender === 'female' ? '♀️' : '';
+
+            statsView.innerHTML = `
+                <div class="stat-line full-width"><strong>Esp:</strong><span>${speciesInfo}${genderIcon}</span></div>
+                <div class="stat-line"><strong>Âge:</strong><span>${age}m</span></div>
+                <div class="stat-line"><strong>Poid:</strong><span>${STATE.weight}g</span></div>
+                <div class="stat-line"><strong>Faim:</strong><span>${STATE.hunger}/5</span></div>
+                <div class="stat-line"><strong>Joie:</strong><span>${STATE.happy}/5</span></div>
+                <div class="stat-line full-width"><strong>État:</strong><span>${STATE.sick ? '🤒' : '✅'}</span></div>
+            `;
+            STATE.showingStats = true;
+            render();
+        }
+
+        function uiMsg(txt) {
+            const el = document.getElementById('msg');
+
+            if(msgTimeout) {
+                clearTimeout(msgTimeout);
+                msgTimeout = null;
+            }
+
+            el.innerText = txt;
+            el.classList.add('show');
+
+            msgTimeout = setTimeout(() => {
+                el.classList.remove('show');
+                msgTimeout = null;
+            }, 2000);
+        }
+
+        // SYSTEM
+        function toggleSysMenu() { 
+            document.getElementById('sysMenu').classList.toggle('active'); 
+        }
+
+        function setShell(color) {
+            const d = document.getElementById('device');
+            d.className = 'device-container';
+
+            const colors = {
+                purple: '#6a5acd',
+                blue: '#4169e1',
+                pink: '#ff69b4',
+                white: '#f0f0f0',
+                valentine: '#8b0000'
+            };
+
+            d.style.setProperty('--shell-color', colors[color]);
+
+            if(color === 'valentine') {
+                addValentineHearts(d);
+            }
+            toggleSysMenu();
+        }
+
+        function addValentineHearts(container) {
+            container.querySelectorAll('.heart-decoration').forEach(h => h.remove());
+
+            const positions = [
+                {x: 15, y: 20, size: 15},
+                {x: 80, y: 35, size: 12},
+                {x: 25, y: 70, size: 10},
+                {x: 75, y: 80, size: 14},
+                {x: 50, y: 50, size: 8},
+                {x: 40, y: 25, size: 11}
+            ];
+
+            positions.forEach(pos => {
+                const heart = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                heart.setAttribute('class', 'heart-decoration');
+                heart.setAttribute('width', pos.size);
+                heart.setAttribute('height', pos.size);
+                heart.style.left = pos.x + '%';
+                heart.style.top = pos.y + '%';
+                heart.innerHTML = `
+                    <path d="M${pos.size/2},${pos.size*0.85} 
+                             L${pos.size*0.2},${pos.size*0.4} 
+                             Q${pos.size*0.1},${pos.size*0.2} ${pos.size*0.2},${pos.size*0.15}
+                             Q${pos.size*0.3},${pos.size*0.1} ${pos.size/2},${pos.size*0.25}
+                             Q${pos.size*0.7},${pos.size*0.1} ${pos.size*0.8},${pos.size*0.15}
+                             Q${pos.size*0.9},${pos.size*0.2} ${pos.size*0.8},${pos.size*0.4} Z" 
+                          fill="${Math.random() < 0.5 ? '#ffc0cb' : '#ffffff'}"/>
+                `;
+                container.appendChild(heart);
+            });
+        }
+
+        function saveData() { 
+            const blob = new Blob([JSON.stringify(STATE)], {type:'application/json'});
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(blob); 
+            a.download='gotchi_save.json'; 
+            a.click();
+            uiMsg("Sauvegardé!");
+            toggleSysMenu();
+        }
+
+        function loadData(input) {
+            const r = new FileReader();
+            r.onload = e => { 
+                Object.assign(STATE, JSON.parse(e.target.result)); 
+                STATE.lastPoopCount = -1;  // Force le rendu
+                render(); 
+                toggleSysMenu();
+                uiMsg("Chargé!");
+            };
+            r.readAsText(input.files[0]);
+        }
+
+        function resetData() {
+            if(confirm("Recommencer depuis le début ?")) {
+                localStorage.removeItem('gotchi_modern');
+                Object.assign(STATE, {
+                    stage: 'egg',
+                    speciesLine: null,
+                    gender: null,
+                    birth: Date.now(),
+                    hunger: 4,
+                    happy: 4,
+                    weight: 5,
+                    poops: 0,
+                    poopTime: null,
+                    sick: false,
+                    sickTime: null,
+                    lightOn: true,
+                    menuIdx: -1,
+                    lastAnim: Date.now(),
+                    lastPoopIncrease: Date.now(),
+                    dead: false,
+                    showingStats: false,
+                    lastPoopCount: -1
+                });
+                render();
+                uiMsg("Nouveau départ!");
+                toggleSysMenu();
+            }
+        }
+
+        // START
+        renderWrapped();
+        wrapDoAction();
+        render();
+        initNetworking();
+        fixButtons();
+</script>
+</body>
+</html>
